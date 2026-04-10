@@ -1,0 +1,82 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #080809;
+  --fg: #e8eef2;
+  --accent-orange: #ff6b2c;
+  --accent-blue: #4dadff;
+  --silicone: rgba(255, 255, 255, 0.06);
+  --silicone-border: rgba(255, 255, 255, 0.12);
+  /* 12 breaths/min → one full inhale+exhale */
+  --hero-breath-cycle: 5s;
+}
+
+@theme inline {
+  --color-background: var(--bg);
+  --color-foreground: var(--fg);
+  --font-sans: var(--font-body);
+}
+
+body {
+  font-family: var(--font-body), system-ui, sans-serif;
+}
+
+.font-display {
+  font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Custom “air” cursor: hide system cursor only when our cursor is active */
+body.air-cursor-active {
+  cursor: none;
+}
+
+body.air-cursor-active a,
+body.air-cursor-active button,
+body.air-cursor-active [role="button"] {
+  cursor: none;
+}
+
+/* Hero: soft “tissue” pulse behind video — always visible if MP4 fails */
+@keyframes hero-membrane-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.38;
+  }
+  50% {
+    transform: scale(1.14);
+    opacity: 0.62;
+  }
+}
+
+.hero-membrane {
+  background:
+    radial-gradient(
+      ellipse 80% 70% at 50% 45%,
+      rgba(77, 173, 255, 0.14) 0%,
+      rgba(255, 107, 44, 0.06) 42%,
+      transparent 68%
+    ),
+    radial-gradient(
+      ellipse 120% 90% at 70% 60%,
+      rgba(255, 255, 255, 0.05) 0%,
+      transparent 55%
+    );
+  animation: hero-membrane-breathe var(--hero-breath-cycle) ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.hero-membrane--delayed {
+  animation-delay: -2.5s;
+  mix-blend-mode: plus-lighter;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-membrane,
+  .hero-membrane--delayed {
+    animation: none;
+    opacity: 0.48;
+    transform: none;
+  }
+}
+
