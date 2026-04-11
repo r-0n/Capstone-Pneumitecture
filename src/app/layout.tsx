@@ -1,23 +1,23 @@
 import type { Metadata } from "next";
-import { Bebas_Neue, Syne } from "next/font/google";
+import { Instrument_Sans, Inter } from "next/font/google";
 import { AppShell } from "@/components/AppShell";
 import "./globals.css";
 
-const display = Bebas_Neue({
-  weight: "400",
+const sans = Inter({
   subsets: ["latin"],
-  variable: "--font-display",
+  variable: "--font-sans",
 });
 
-const body = Syne({
+const display = Instrument_Sans({
   subsets: ["latin"],
-  variable: "--font-body",
+  variable: "--font-display",
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
-  title: "Breathing Walls | Prototyping Empathic Spaces",
+  title: "Pneumitecture | Inflatable Systems for Adaptive Spaces",
   description:
-    "Living architecture and pneumatic soft robotics — TPU cells that breathe with human presence.",
+    "Soft responsive architecture — pneumatic cellular modules, system design, and adaptive spatial design.",
 };
 
 export default function RootLayout({
@@ -28,9 +28,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${display.variable} ${body.variable} h-full scroll-smooth antialiased`}
+      className={`${sans.variable} ${display.variable} theme-light h-full scroll-smooth antialiased`}
     >
-      <body className="min-h-dvh bg-[var(--bg)] text-[var(--fg)]">
+      <body className="min-h-dvh bg-[var(--canvas)] text-[var(--ink)]">
         <AppShell>{children}</AppShell>
       </body>
     </html>

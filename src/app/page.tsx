@@ -1,9 +1,9 @@
-import { Hero } from "@/components/sections/Hero";
+import { HomePage } from "@/components/pages/HomePage";
 
 export default function Home() {
   return (
     <main className="flex flex-1 flex-col">
-      <Hero />
+      <HomePage />
     </main>
   );
 }

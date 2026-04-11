@@ -1,31 +1,113 @@
 @import "tailwindcss";
 
-:root {
-  --bg: #080809;
-  --fg: #e8eef2;
-  --accent-orange: #ff6b2c;
-  --accent-blue: #4dadff;
-  --silicone: rgba(255, 255, 255, 0.06);
-  --silicone-border: rgba(255, 255, 255, 0.12);
-  /* 12 breaths/min → one full inhale+exhale */
-  --hero-breath-cycle: 5s;
+:root,
+.theme-light {
+  --canvas: #eef1f6;
+  --canvas-deep: #e4e8f0;
+  --paper: #ffffff;
+  --ink: #14161a;
+  --ink-muted: #5c6370;
+  --hairline: rgba(20, 22, 26, 0.08);
+  --hairline-strong: rgba(20, 22, 26, 0.14);
+  --accent-soft: #6b8cff;
+  --accent-cyan: #5eb8d4;
+  --glass: rgba(255, 255, 255, 0.52);
+  --glass-border: rgba(255, 255, 255, 0.72);
+  --shadow-soft: 0 24px 80px rgba(15, 23, 42, 0.06);
+  --hero-breath-cycle: 8s;
 }
 
 @theme inline {
-  --color-background: var(--bg);
-  --color-foreground: var(--fg);
-  --font-sans: var(--font-body);
+  --color-background: var(--canvas);
+  --color-foreground: var(--ink);
 }
 
 body {
-  font-family: var(--font-body), system-ui, sans-serif;
+  font-family: var(--font-sans), system-ui, sans-serif;
 }
 
 .font-display {
-  font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-display), var(--font-sans), system-ui, sans-serif;
 }
 
-/* Custom “air” cursor: hide system cursor only when our cursor is active */
+/* Sticky frosted nav */
+.site-nav-glass {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.82) 0%,
+    rgba(248, 250, 252, 0.76) 100%
+  );
+  backdrop-filter: blur(18px) saturate(1.35);
+  -webkit-backdrop-filter: blur(18px) saturate(1.35);
+}
+
+/* Engineering grid (System / Behavior mockups) */
+.bg-blueprint {
+  background-color: var(--canvas-deep);
+  background-image:
+    linear-gradient(rgba(20, 24, 32, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(20, 24, 32, 0.045) 1px, transparent 1px);
+  background-size: 22px 22px;
+  background-position: -1px -1px;
+}
+
+/* Frosted panels */
+.glass-card {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(20px) saturate(1.2);
+  -webkit-backdrop-filter: blur(20px) saturate(1.2);
+}
+
+/* Ethereal drifting blobs (hero & soft sections) */
+@keyframes ethereal-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.55;
+  }
+  50% {
+    transform: translate3d(2%, -1.5%, 0) scale(1.06);
+    opacity: 0.72;
+  }
+}
+
+.ethereal-layer {
+  background:
+    radial-gradient(
+      ellipse 90% 70% at 20% 30%,
+      rgba(255, 255, 255, 0.95) 0%,
+      transparent 55%
+    ),
+    radial-gradient(
+      ellipse 70% 60% at 85% 20%,
+      rgba(200, 230, 255, 0.5) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse 80% 80% at 50% 100%,
+      rgba(255, 255, 255, 0.65) 0%,
+      rgba(238, 241, 246, 0.3) 45%,
+      transparent 70%
+    );
+  animation: ethereal-drift var(--hero-breath-cycle) ease-in-out infinite;
+}
+
+.ethereal-layer--lag {
+  animation-delay: -4s;
+  opacity: 0.85;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ethereal-layer,
+  .ethereal-layer--lag {
+    animation: none;
+    opacity: 0.68;
+  }
+}
+
+/* Custom cursor — light UI */
 body.air-cursor-active {
   cursor: none;
 }
@@ -35,48 +117,3 @@ body.air-cursor-active button,
 body.air-cursor-active [role="button"] {
   cursor: none;
 }
-
-/* Hero: soft “tissue” pulse behind video — always visible if MP4 fails */
-@keyframes hero-membrane-breathe {
-  0%,
-  100% {
-    transform: scale(1);
-    opacity: 0.38;
-  }
-  50% {
-    transform: scale(1.14);
-    opacity: 0.62;
-  }
-}
-
-.hero-membrane {
-  background:
-    radial-gradient(
-      ellipse 80% 70% at 50% 45%,
-      rgba(77, 173, 255, 0.14) 0%,
-      rgba(255, 107, 44, 0.06) 42%,
-      transparent 68%
-    ),
-    radial-gradient(
-      ellipse 120% 90% at 70% 60%,
-      rgba(255, 255, 255, 0.05) 0%,
-      transparent 55%
-    );
-  animation: hero-membrane-breathe var(--hero-breath-cycle) ease-in-out infinite;
-  will-change: transform, opacity;
-}
-
-.hero-membrane--delayed {
-  animation-delay: -2.5s;
-  mix-blend-mode: plus-lighter;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .hero-membrane,
-  .hero-membrane--delayed {
-    animation: none;
-    opacity: 0.48;
-    transform: none;
-  }
-}
-

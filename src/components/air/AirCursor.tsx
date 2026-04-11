@@ -3,9 +3,7 @@
 import { motion, useSpring } from "framer-motion";
 import { useCursor } from "@/contexts/CursorContext";
 
-/**
- * “Air source” cursor: soft core + translucent pressure ring, follows pointer with spring lag.
- */
+/** Soft “instrument” cursor tuned for the light, clinical UI */
 export function AirCursor() {
   const { mouseX, mouseY, finePointer, reducedMotion } = useCursor();
 
@@ -23,25 +21,25 @@ export function AirCursor() {
   return (
     <motion.div
       aria-hidden
-      className="pointer-events-none fixed left-0 top-0 z-[10000] mix-blend-screen"
+      className="pointer-events-none fixed left-0 top-0 z-[10000]"
       style={{ x, y }}
     >
       <div className="relative flex h-0 w-0 -translate-x-1/2 -translate-y-1/2 items-center justify-center">
         <div
-          className="absolute h-14 w-14 rounded-full opacity-40 blur-md"
+          className="absolute h-12 w-12 rounded-full opacity-35 blur-md"
           style={{
             background:
-              "radial-gradient(circle, rgba(77,173,255,0.55) 0%, rgba(255,107,44,0.15) 55%, transparent 70%)",
+              "radial-gradient(circle, rgba(107,140,255,0.45) 0%, rgba(94,184,212,0.2) 50%, transparent 70%)",
           }}
         />
         <div
-          className="relative h-3 w-3 rounded-full border border-white/50 bg-white/90"
+          className="relative h-2.5 w-2.5 rounded-full border border-slate-400/70 bg-white shadow-[0_2px_12px_rgba(15,23,42,0.12)]"
           style={{
             boxShadow:
-              "0 0 20px rgba(77,173,255,0.85), 0 0 24px rgba(77,173,255,0.45), inset 0 0 8px rgba(255,255,255,0.5)",
+              "0 0 0 1px rgba(255,255,255,0.9), 0 4px 20px rgba(107,140,255,0.25)",
           }}
         />
-        <div className="absolute h-10 w-10 rounded-full border border-[rgba(77,173,255,0.35)]" />
+        <div className="absolute h-9 w-9 rounded-full border border-slate-300/40" />
       </div>
     </motion.div>
   );
