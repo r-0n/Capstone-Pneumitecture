@@ -1,56 +1,27 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { motion, useReducedMotion } from "framer-motion";
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  type SyntheticEvent,
-} from "react";
 import { AirSensitive } from "@/components/air/AirSensitive";
 
-const VIDEO_SOURCES = [
-  "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-  "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
-  "https://assets.mixkit.co/videos/preview/mixkit-white-smoke-on-black-background-44712-large.mp4",
-];
-
-function tryPlay(video: HTMLVideoElement | null) {
-  if (!video) return;
-  const p = video.play();
-  if (p !== undefined) void p.catch(() => {});
-}
+const HeroPavilionCanvas = dynamic(
+  () =>
+    import("@/components/three/HeroPavilionCanvas").then((m) => m.HeroPavilionCanvas),
+  {
+    ssr: false,
+    loading: () => (
+      <div
+        className="absolute inset-0 flex items-center justify-center bg-[#0c1016]"
+        aria-hidden
+      >
+        <div className="h-px w-16 animate-pulse bg-[var(--accent-cyan)]/50" />
+      </div>
+    ),
+  },
+);
 
 export function Hero() {
   const reduceMotion = useReducedMotion();
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [srcIndex, setSrcIndex] = useState(0);
-  const src = VIDEO_SOURCES[srcIndex] ?? VIDEO_SOURCES[0];
-
-  const onVideoError = useCallback(
-    (e: SyntheticEvent<HTMLVideoElement, Event>) => {
-      const el = e.currentTarget;
-      if (el.error?.code === MediaError.MEDIA_ERR_ABORTED) return;
-      setSrcIndex((i) => {
-        const next = i + 1;
-        return next < VIDEO_SOURCES.length ? next : i;
-      });
-    },
-    [],
-  );
-
-  useEffect(() => {
-    const v = videoRef.current;
-    if (!v) return;
-    v.defaultMuted = true;
-    v.muted = true;
-    v.load();
-    const onCanPlay = () => tryPlay(v);
-    v.addEventListener("canplay", onCanPlay);
-    tryPlay(v);
-    return () => v.removeEventListener("canplay", onCanPlay);
-  }, [src]);
 
   return (
     <section
@@ -70,21 +41,11 @@ export function Hero() {
           transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
           className="glass-card mt-4 overflow-hidden rounded-[1.35rem] shadow-[var(--shadow-soft)]"
         >
-          <div className="relative aspect-[21/9] min-h-[200px] w-full bg-slate-200/60 md:min-h-[280px]">
-            <video
-              ref={videoRef}
-              key={src}
-              className="absolute inset-0 h-full w-full object-cover"
-              src={src}
-              autoPlay
-              muted
-              loop
-              playsInline
-              preload="auto"
-              onError={onVideoError}
-            />
+          <div className="relative aspect-[21/9] min-h-[200px] w-full md:min-h-[280px]">
+            <HeroPavilionCanvas className="h-full w-full" />
+            {/* Light scrim so typography below stays legible; pointer-events none so OrbitControls work */}
             <div
-              className="absolute inset-0 bg-linear-to-t from-[var(--canvas)] via-white/25 to-transparent"
+              className="pointer-events-none absolute inset-0 bg-linear-to-t from-[var(--canvas)] via-[var(--canvas)]/20 to-transparent"
               aria-hidden
             />
           </div>
@@ -107,11 +68,7 @@ export function Hero() {
           <motion.a
             href="#concept"
             className="mt-auto flex flex-col items-center gap-2 pb-4 pt-16 text-[11px] font-semibold uppercase tracking-[0.28em] text-[var(--ink-muted)]"
-            animate={
-              reduceMotion
-                ? {}
-                : { y: [0, 6, 0] }
-            }
+            animate={reduceMotion ? {} : { y: [0, 6, 0] }}
             transition={{
               duration: 2.8,
               repeat: Infinity,
