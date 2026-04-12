@@ -8,7 +8,7 @@ import { PrototypingSection } from "@/components/sections/PrototypingSection";
 import { SystemSection } from "@/components/sections/SystemSection";
 import { BehaviorSection } from "@/components/sections/BehaviorSection";
 import { PavilionSection } from "@/components/sections/PavilionSection";
-import { ContinuationBands } from "@/components/sections/ContinuationBands";
+import MediaArchive from "../pneumitecture/MediaArchive";
 
 export function HomePage() {
   return (
@@ -21,7 +21,7 @@ export function HomePage() {
       <PrototypingSection />
       <BehaviorSection />
       <PavilionSection />
-      <ContinuationBands />
+      <MediaArchive />
       <footer className="border-t border-[var(--hairline)] bg-[var(--canvas-deep)] py-12 text-center text-[11px] text-[var(--ink-muted)]">
         Pneumitecture — portfolio shell aligned to design boards. Replace placeholders with your
         photography &amp; video.

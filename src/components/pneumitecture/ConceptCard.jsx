@@ -13,7 +13,8 @@ export default function ConceptCard({ title, description, index, image }) {
       transition={{ duration: 0.6, delay: index * 0.15 }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className="group relative border border-border/50 p-8 md:p-10 cursor-default transition-colors duration-500 hover:bg-aero/30"
+      className="group relative p-8 md:p-10 cursor-default transition-colors duration-500 hover:bg-aero/30"
+      style={{ border: '1px solid rgba(0,0,0,0.08)' }}
     >
       {/* Card image */}
       {image && (

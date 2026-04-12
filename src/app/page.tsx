@@ -5,6 +5,7 @@ import NavOverlay from "@/components/pneumitecture/NavOverlay";
 import SectionFade from "@/components/pneumitecture/SectionFade";
 import HeroSection from "@/components/pneumitecture/HeroSection";
 import PavilionReveal from "@/components/pneumitecture/PavilionReveal";
+import DesignConcept from "../components/pneumitecture/DesignConcept";
 import { HomePage } from "@/components/pages/HomePage";
 
 export default function Home() {
@@ -16,6 +17,7 @@ export default function Home() {
         <HeroSection />
         <SectionFade fromColor="#121212" toColor="#FBFBF9" height={160} />
         <PavilionReveal />
+        <DesignConcept />
         <main className="flex flex-1 flex-col">
           <HomePage />
         </main>

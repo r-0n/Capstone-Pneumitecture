@@ -63,8 +63,11 @@ export default function DesignProcess() {
                 onMouseLeave={() => setHovered(null)}
               >
                 <div
-                  className="relative mb-4 aspect-[4/3] w-full overflow-hidden rounded-xl ring-1 ring-black/[0.06]"
+                  className="relative mb-4 aspect-[4/3] w-full overflow-hidden rounded-xl p-0"
                   style={{
+                    border: 'none',
+                    overflow: 'hidden',
+                    padding: 0,
                     transform: hovered === i ? 'scale(1.03)' : 'scale(1)',
                     boxShadow: hovered === i ? '0 12px 40px rgba(0,0,0,0.09)' : '0 0 0 rgba(0,0,0,0)',
                     transition: 'transform 0.4s ease, box-shadow 0.4s ease',
@@ -73,7 +76,7 @@ export default function DesignProcess() {
                   <img
                     src={phase.img}
                     alt={phase.title}
-                    className="absolute inset-0 h-full w-full object-cover"
+                    className="absolute inset-0 h-full w-full border-0 object-contain block"
                   />
                 </div>
                 <div
@@ -99,8 +102,11 @@ export default function DesignProcess() {
                 onMouseLeave={() => setHovered(null)}
               >
                 <div
-                  className="relative mb-4 aspect-[4/3] w-full overflow-hidden rounded-xl ring-1 ring-black/[0.06]"
+                  className="relative mb-4 aspect-[4/3] w-full overflow-hidden rounded-xl p-0"
                   style={{
+                    border: 'none',
+                    overflow: 'hidden',
+                    padding: 0,
                     transform: hovered === i + 3 ? 'scale(1.03)' : 'scale(1)',
                     boxShadow: hovered === i + 3 ? '0 12px 40px rgba(0,0,0,0.09)' : '0 0 0 rgba(0,0,0,0)',
                     transition: 'transform 0.4s ease, box-shadow 0.4s ease',
@@ -109,7 +115,7 @@ export default function DesignProcess() {
                   <img
                     src={phase.img}
                     alt={phase.title}
-                    className="absolute inset-0 h-full w-full object-cover"
+                    className="absolute inset-0 h-full w-full border-0 object-contain block"
                   />
                 </div>
                 <div

@@ -51,7 +51,7 @@ export default function MaterialExploration() {
             directly informed the final system's construction methodology.
           </p>
           <p className="tech-label text-structural mt-6">
-            Materials: LDPE Film · TPU Membrane · Nylon Ripstop · Heat-Seal Tape
+            <span className="font-bold">Materials:</span> TPU Coated Fabric (Silk, Cotton) · TPU 3D Print Filament ·
           </p>
         </div>
       </ScrollReveal>
