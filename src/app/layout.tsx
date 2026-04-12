@@ -29,8 +29,12 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${sans.variable} ${display.variable} theme-light h-full scroll-smooth antialiased`}
+      suppressHydrationWarning
     >
-      <body className="min-h-dvh bg-[var(--canvas)] text-[var(--ink)]">
+      <body
+        className="min-h-dvh bg-[var(--canvas)] text-[var(--ink)]"
+        suppressHydrationWarning
+      >
         <AppShell>{children}</AppShell>
       </body>
     </html>

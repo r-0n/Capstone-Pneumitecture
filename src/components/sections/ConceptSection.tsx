@@ -1,43 +1,52 @@
 "use client";
 
-import { motion } from "framer-motion";
+import Image from "next/image";
 
 const pillars = [
   {
     title: "Softness",
     copy:
-      "Contrast with rigid architecture — emotional and spatial qualities that invite empathy and gradual adaptation.",
+      "Softness is explored as a spatial condition rather than a material quality. It enables architecture to move away from rigidity and towards adaptability, where form can deform, respond, and continuously shift in relation to external forces.",
+    image:
+      "/images/" +
+      encodeURIComponent("Gemini_Generated_Image_5wyv915wyv915wyv (2).png"),
   },
   {
     title: "Inflatables",
     copy:
-      "Lightweight, deployable, transformable geometries that fold for transit and expand for occupation.",
+      "Inflatables introduce a lightweight system of spatial transformation driven by air. Their ability to expand and collapse allows architecture to exist in a state of constant change, challenging permanence and static form.",
+    image:
+      "/images/" +
+      encodeURIComponent("Gemini_Generated_Image_5wyv915wyv915wyv (1).png"),
   },
   {
     title: "Pneumatics",
     copy:
-      "Control through air — real-time responsiveness and clear actuation logic across cellular arrays.",
+      "Pneumatics act as the driving mechanism behind the system, translating air pressure into controlled movement. This enables responsive behavior, where structural form becomes directly linked to environmental and human interaction.",
+    image: "/images/pneumatics.PNG",
   },
 ];
 
-function CellOrb({ delay }: { delay: number }) {
+function CardImage({
+  src,
+  alt,
+  priority,
+}: {
+  src: string;
+  alt: string;
+  priority?: boolean;
+}) {
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.92 }}
-      whileInView={{ opacity: 1, scale: 1 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] }}
-      className="relative mx-auto aspect-square w-full max-w-[220px]"
-    >
-      <div
-        className="absolute inset-0 rounded-full opacity-90 shadow-[inset_0_-20px_40px_rgba(255,255,255,0.5)]"
-        style={{
-          background:
-            "radial-gradient(circle at 35% 30%, rgba(255,255,255,0.95) 0%, rgba(220,235,255,0.75) 28%, rgba(180,210,240,0.55) 52%, rgba(160,180,210,0.35) 100%)",
-        }}
+    <div className="relative mx-auto aspect-[4/3] w-full max-w-[320px] overflow-hidden rounded-2xl border border-[var(--glass-border)] bg-[var(--paper)] shadow-[0_12px_40px_rgba(15,23,42,0.08)] transition-[border-color] duration-400 ease-[ease] group-hover:border-transparent">
+      <Image
+        src={src}
+        alt={alt}
+        fill
+        className="object-cover"
+        sizes="(max-width: 768px) 100vw, 33vw"
+        priority={priority}
       />
-      <div className="absolute inset-[12%] rounded-full bg-white/25 blur-xl" />
-    </motion.div>
+    </div>
   );
 }
 
@@ -50,15 +59,11 @@ export function ConceptSection() {
       <div className="ethereal-layer pointer-events-none absolute inset-0 opacity-40" aria-hidden />
       <div className="relative z-10 mx-auto max-w-[1200px] px-5 md:px-10">
         <header className="mx-auto max-w-2xl text-center">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--ink-muted)]">
-            Design Concept
-          </p>
           <h2 className="font-display mt-3 text-3xl font-semibold tracking-tight text-[var(--ink)] md:text-4xl">
-            Soft Responsive Architecture
+            Conceptual Foundations
           </h2>
           <p className="mt-4 text-sm leading-relaxed text-[var(--ink-muted)] md:text-base">
-            Inflatable systems for adaptive spatial design — cellular modules using pneumatic
-            logic to adapt and react to human presence.
+            A responsive pneumatic pavilion defined by softness, movement, and interaction
           </p>
         </header>
 
@@ -66,16 +71,16 @@ export function ConceptSection() {
           {pillars.map((p, i) => (
             <article
               key={p.title}
-              className="glass-card flex flex-col rounded-2xl p-8 md:p-10"
+              className="group glass-card flex flex-col rounded-2xl border !border-transparent p-8 md:p-10 transition-[border-color] duration-400 ease-[ease] group-hover:!border-[var(--glass-border)]"
             >
-              <CellOrb delay={i * 0.12} />
+              <CardImage src={p.image} alt={p.title} priority={i === 0} />
               <h3 className="font-display mt-10 text-center text-xl font-semibold text-[var(--ink)]">
                 {p.title}
               </h3>
-              <p className="mt-4 text-center text-sm leading-relaxed text-[var(--ink-muted)]">
+              <p className="mt-4 translate-y-2 text-center text-sm leading-relaxed text-[var(--ink-muted)] opacity-0 transition-[opacity,transform] duration-400 ease-[ease] group-hover:translate-y-0 group-hover:opacity-100">
                 {p.copy}
               </p>
-              <p className="mt-8 border-t border-[var(--hairline)] pt-6 text-center text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+              <p className="mt-8 translate-y-2 border-t border-[var(--hairline)] pt-6 text-center text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)] opacity-0 transition-[opacity,transform] duration-400 ease-[ease] group-hover:translate-y-0 group-hover:opacity-100">
                 Adaptive &amp; Air Controlled
               </p>
             </article>

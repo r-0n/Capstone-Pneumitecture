@@ -18,8 +18,34 @@
 }
 
 @theme inline {
-  --color-background: var(--canvas);
+  --color-background: #121212;
   --color-foreground: var(--ink);
+  --color-obsidian: #121212;
+  --color-bone: #fbfbf9;
+  --color-structural: #707070;
+  --color-aero: #eef1f4;
+  --color-border: #d4d8de;
+  --font-family-display: var(--font-display), var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Pneumitecture hero kit — display + label utilities */
+.display-heading {
+  font-family: var(--font-display), var(--font-sans), system-ui, sans-serif;
+  font-weight: 200;
+  letter-spacing: -0.02em;
+}
+
+.tech-label {
+  font-family: var(--font-sans), system-ui, sans-serif;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+}
+
+/* Horizontal rule for SectionLabel (class name; distinct from --hairline token) */
+.hairline {
+  height: 1px;
+  min-height: 1px;
+  background-color: rgba(112, 112, 112, 0.45);
 }
 
 body {
@@ -116,4 +142,129 @@ body.air-cursor-active a,
 body.air-cursor-active button,
 body.air-cursor-active [role="button"] {
   cursor: none;
+}
+
+/* ── Hero: static pillow photo + layered motion (see ReferencePillowBackground) ── */
+.hero-pillow-stack {
+  --hero-tx: 0px;
+  --hero-ty: 0px;
+  --hero-rx: 0deg;
+  --hero-ry: 0deg;
+  --hero-light-x: 50%;
+  --hero-light-y: 50%;
+  --hero-vibrance: 0;
+  perspective: 1200px;
+  perspective-origin: 50% 38%;
+}
+
+.hero-bg-outer {
+  position: absolute;
+  inset: -14px;
+  transform-origin: center center;
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  transform-style: preserve-3d;
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background-image: url("/images/backg.PNG");
+  background-size: cover;
+  background-position: center;
+  filter: blur(1px);
+  transform: translate3d(var(--hero-tx, 0px), var(--hero-ty, 0px), 0)
+    rotateX(var(--hero-rx, 0deg)) rotateY(var(--hero-ry, 0deg));
+  transform-origin: center center;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.hero-light {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  /* Counter-shift reads as depth vs the photo plane */
+  transform: translate3d(
+    calc(var(--hero-tx, 0px) * -0.28),
+    calc(var(--hero-ty, 0px) * -0.24),
+    0
+  );
+  will-change: transform;
+  background: radial-gradient(
+    circle at var(--hero-light-x, 50%) var(--hero-light-y, 50%),
+    rgba(255, 255, 255, calc(0.12 + var(--hero-vibrance, 0) * 2.2)),
+    transparent 42%
+  );
+}
+
+.hero-sheen {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transform: translate3d(
+      calc(var(--hero-tx, 0px) * -0.45px),
+      calc(var(--hero-ty, 0px) * -0.35px),
+      0
+    )
+    rotateX(calc(var(--hero-rx, 0deg) * 0.35)) rotateY(calc(var(--hero-ry, 0deg) * 0.35));
+  opacity: 0.55;
+  mix-blend-mode: soft-light;
+  background: linear-gradient(
+    118deg,
+    transparent 36%,
+    rgba(255, 255, 255, 0.04) 47%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.04) 53%,
+    transparent 64%
+  );
+}
+
+.hero-noise {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: url("/images/noise.svg");
+  background-repeat: repeat;
+  background-size: 180px 180px;
+  opacity: 0.03;
+  mix-blend-mode: overlay;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  #top:hover .hero-bg-outer {
+    transform: scale3d(1.012, 1.012, 1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-pillow-stack {
+    perspective: none;
+  }
+
+  .hero-bg-outer {
+    transform: none;
+    transition: none;
+  }
+
+  .hero-bg {
+    transform: none;
+    filter: none;
+  }
+
+  .hero-light {
+    transform: none;
+    background: radial-gradient(
+      circle at 50% 45%,
+      rgba(255, 255, 255, 0.08),
+      transparent 42%
+    );
+  }
+
+  .hero-sheen {
+    display: none;
+  }
+
+  #top:hover .hero-bg-outer {
+    transform: none;
+  }
 }

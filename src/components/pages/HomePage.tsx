@@ -2,9 +2,8 @@
 
 import { SiteNav } from "@/components/site/SiteNav";
 import { ScrollProgress } from "@/components/site/ScrollProgress";
-import { Hero } from "@/components/sections/Hero";
-import { ConceptSection } from "@/components/sections/ConceptSection";
-import { MaterialSection } from "@/components/sections/MaterialSection";
+import DesignProcess from "@/components/pneumitecture/DesignProcess";
+import MaterialExploration from "@/components/pneumitecture/MaterialExploration";
 import { PrototypingSection } from "@/components/sections/PrototypingSection";
 import { SystemSection } from "@/components/sections/SystemSection";
 import { BehaviorSection } from "@/components/sections/BehaviorSection";
@@ -16,10 +15,9 @@ export function HomePage() {
     <>
       <SiteNav />
       <ScrollProgress />
-      <Hero />
-      <ConceptSection />
+      <DesignProcess />
       <SystemSection />
-      <MaterialSection />
+      <MaterialExploration />
       <PrototypingSection />
       <BehaviorSection />
       <PavilionSection />
