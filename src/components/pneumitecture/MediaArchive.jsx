@@ -42,7 +42,7 @@ export default function MediaArchive() {
 
   return (
     <section id="archive" className="py-32 md:py-48 max-w-7xl mx-auto px-8 md:px-16">
-      <SectionLabel number="09" text="Media / Archive" />
+      <SectionLabel number="10" text="Media / Archive" />
 
       <ScrollReveal>
         <p className="font-display font-extralight text-structural text-base md:text-lg tracking-wide mb-2">Every image, every diagram</p>

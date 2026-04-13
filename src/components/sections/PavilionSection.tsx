@@ -1,11 +1,12 @@
 "use client";
 
+import SectionLabel from "@/components/pneumitecture/SectionLabel";
 import { motion } from "framer-motion";
 
 export function PavilionSection() {
   return (
     <section
-      id="pavilion"
+      id="pavilion-walkthrough"
       className="relative scroll-mt-24 border-t border-[var(--hairline)] py-28 md:py-36"
     >
       <div
@@ -18,7 +19,10 @@ export function PavilionSection() {
       />
       <div className="absolute inset-0 bg-[var(--canvas)]/25 backdrop-blur-[2px]" aria-hidden />
 
-      <div className="relative z-10 mx-auto flex max-w-3xl flex-col items-center px-6 text-center">
+      <div className="relative z-10 mx-auto flex w-full max-w-3xl flex-col items-center px-6 text-center">
+        <div className="mb-10 w-full text-left">
+          <SectionLabel number="09" text="Walkthrough" />
+        </div>
         <motion.h2
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}

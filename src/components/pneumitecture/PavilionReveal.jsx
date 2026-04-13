@@ -1,35 +1,21 @@
+'use client';
+
 import ScrollReveal from './ScrollReveal';
 import SectionLabel from './SectionLabel';
 import FloatImage from './FloatImage';
 
-const PAVILION_IMG = 'https://media.base44.com/images/public/69da883791905282c2acac77/ab5c92bac_generated_b1619c65.png';
 const INTERACTION_IMG = '/images/pavilion.png';
 const PAVILION_COL_IMG_2 = '/images/pav1.PNG';
 const PAVILION_COL_IMG_3 = '/images/pav2.png';
 
 export default function PavilionReveal() {
   return (
-    <section id="pavilion" className="bg-transparent py-32 md:py-48">
-      {/* Full-width pavilion image */}
-      <ScrollReveal>
-        <div className="relative w-full aspect-video overflow-hidden">
-          <img
-            src={PAVILION_IMG}
-            alt="Final pneumatic pavilion"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-obsidian/60 via-transparent to-transparent" />
-          <div className="absolute bottom-8 md:bottom-16 left-8 md:left-16 max-w-2xl">
-            <p className="text-bone font-display font-extralight text-lg md:text-2xl leading-relaxed">
-              A responsive pneumatic pavilion that breathes, adapts, and responds to human presence through kinetic inflatable architecture.
-            </p>
-          </div>
-        </div>
-      </ScrollReveal>
-
-      {/* 2-column layout */}
-      <div className="max-w-7xl mx-auto px-8 md:px-16 mt-20 md:mt-32">
-        <SectionLabel number="01" text="The Pavilion" />
+    <section
+      id="pavilion"
+      className="relative z-[5] scroll-mt-24 bg-[#FBFBF9] pb-32 md:pb-48"
+    >
+      <div className="mx-auto max-w-7xl px-8 pt-12 md:px-16 md:pt-16">
+        <SectionLabel number="02" text="The Pavilion" />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-24">
           <ScrollReveal>
             <div className="mb-6 min-w-0">

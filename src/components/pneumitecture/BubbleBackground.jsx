@@ -1,5 +1,6 @@
-import { motion } from 'framer-motion';
-
+/**
+ * Ambient orbs — pure CSS keyframes (no Framer loop on scroll thread).
+ */
 const bubbles = [
   { size: 600, x: '5%', y: '8%', delay: 0, duration: 18 },
   { size: 400, x: '75%', y: '3%', delay: 3, duration: 22 },
@@ -15,30 +16,30 @@ const bubbles = [
 
 export default function BubbleBackground() {
   return (
-    <div className="fixed inset-0 z-0 overflow-hidden bg-[#FBFBF9] pointer-events-none">
+    <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden bg-[#FBFBF9]">
+      <style>{`
+        @keyframes bubble-drift {
+          0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+          50% { transform: translate3d(14px, -22px, 0) scale(1.035); }
+        }
+      `}</style>
       {bubbles.map((b, i) => (
-        <motion.div
+        <div
           key={i}
+          className="absolute rounded-full will-change-transform"
           style={{
             width: b.size,
             height: b.size,
             left: b.x,
             top: b.y,
-            position: 'absolute',
-            borderRadius: '50%',
-            background: `radial-gradient(circle at 35% 35%, rgba(225,229,232,0.18), rgba(225,229,232,0.04))`,
+            background:
+              'radial-gradient(circle at 35% 35%, rgba(225,229,232,0.18), rgba(225,229,232,0.04))',
             border: '0.5px solid rgba(112,112,112,0.06)',
-          }}
-          animate={{
-            y: [0, -30, 0],
-            x: [0, 15, 0],
-            scale: [1, 1.04, 1],
-          }}
-          transition={{
-            duration: b.duration,
-            delay: b.delay,
-            repeat: Infinity,
-            ease: 'easeInOut',
+            animationName: 'bubble-drift',
+            animationDuration: `${b.duration}s`,
+            animationDelay: `${b.delay}s`,
+            animationIterationCount: 'infinite',
+            animationTimingFunction: 'ease-in-out',
           }}
         />
       ))}

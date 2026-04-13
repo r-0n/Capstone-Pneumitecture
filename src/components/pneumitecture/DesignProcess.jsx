@@ -39,8 +39,8 @@ export default function DesignProcess() {
   const [hovered, setHovered] = useState(null);
 
   return (
-    <section id="concept" className="py-32 md:py-48 w-full px-4 md:px-8">
-      <SectionLabel number="02" text="Design Process" />
+    <section id="design-process" className="py-32 md:py-48 w-full px-4 md:px-8">
+      <SectionLabel number="04" text="Design Process" />
 
       <ScrollReveal>
         <p className="font-display font-extralight text-structural text-base md:text-lg tracking-wide mb-2">

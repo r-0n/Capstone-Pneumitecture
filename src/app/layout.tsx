@@ -28,7 +28,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${sans.variable} ${display.variable} theme-light h-full scroll-smooth antialiased`}
+      className={`${sans.variable} ${display.variable} theme-light h-full antialiased`}
       suppressHydrationWarning
     >
       <body

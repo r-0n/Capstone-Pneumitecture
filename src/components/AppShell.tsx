@@ -31,7 +31,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <CursorProvider>
       <AirCursor />
-      <div className="relative flex min-h-dvh flex-col pt-[52px] md:pt-[56px]">
+      <div className="relative flex min-h-dvh flex-col">
         {children}
       </div>
     </CursorProvider>

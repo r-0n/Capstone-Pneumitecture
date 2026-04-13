@@ -2,19 +2,39 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { SITE_SECTIONS } from "@/config/navigation";
+import { scrollToSection } from "@/lib/scrollToSection";
 
-/** Right-rail dots — one per major narrative block (matches mockup rhythm) */
+/** Right-rail dots — document order (see `siteLayout.ts`) */
 const PROGRESS_IDS = [
+  "pavilion-lead",
+  "pavilion",
   "concept",
+  "design-process",
   "system",
-  "material",
+  "materials",
   "prototyping",
   "behavior",
-  "pavilion",
+  "pavilion-walkthrough",
+  "archive",
 ] as const;
 
+const DOT_LABELS: Record<string, string> = {
+  "pavilion-lead": "01 · Pavilion premise",
+  pavilion: "02 · The Pavilion",
+  concept: "03 · Design concept",
+  "design-process": "04 · Design process",
+  system: "05 · System",
+  materials: "06 · Materials",
+  prototyping: "07 · Prototyping",
+  behavior: "08 · Behavior",
+  "pavilion-walkthrough": "09 · Walkthrough",
+  archive: "10 · Media archive",
+};
+
 function labelFor(id: string) {
-  return SITE_SECTIONS.find((s) => s.id === id)?.label ?? id;
+  return (
+    DOT_LABELS[id] ?? SITE_SECTIONS.find((s) => s.id === id)?.label ?? id.replace(/-/g, " ")
+  );
 }
 
 export function ScrollProgress() {
@@ -50,7 +70,7 @@ export function ScrollProgress() {
   }, []);
 
   const scrollTo = useCallback((id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    scrollToSection(id);
   }, []);
 
   return (

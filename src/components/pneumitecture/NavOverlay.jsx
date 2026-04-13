@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
+import { scrollToSection } from '@/lib/scrollToSection';
 
 const sections = [
   { label: 'Hero', id: 'hero' },
-  { label: 'Pavilion', id: 'pavilion' },
+  { label: 'Pavilion', id: 'pavilion-lead' },
   { label: 'Concept', id: 'concept' },
   { label: 'Materials', id: 'materials' },
   { label: 'System', id: 'system' },
@@ -20,9 +21,9 @@ export default function NavOverlay() {
 
   const scrollTo = (id) => {
     setOpen(false);
-    setTimeout(() => {
-      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
-    }, 300);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => scrollToSection(id));
+    });
   };
 
   return (

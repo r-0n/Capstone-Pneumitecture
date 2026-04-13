@@ -1,5 +1,6 @@
 "use client";
 
+import SectionLabel from "@/components/pneumitecture/SectionLabel";
 import { motion } from "framer-motion";
 
 const scenarios = [
@@ -30,6 +31,7 @@ export function BehaviorSection() {
       className="relative scroll-mt-24 border-t border-[var(--hairline)] bg-blueprint py-24 md:py-32"
     >
       <div className="relative z-10 mx-auto max-w-[1100px] px-5 md:px-10">
+        <SectionLabel number="08" text="Behavior" />
         <header className="text-center">
           <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--ink-muted)]">
             Responsive Behavior
@@ -81,7 +83,7 @@ export function BehaviorSection() {
 
         <div className="mt-16 flex justify-center">
           <a
-            href="#pavilion"
+            href="#pavilion-walkthrough"
             className="rounded-full border border-[var(--hairline-strong)] bg-white/85 px-10 py-3.5 text-sm font-medium text-[var(--ink)] shadow-sm transition hover:border-[var(--accent-soft)] hover:shadow-md"
           >
             Scale Up: Pavilion Vision

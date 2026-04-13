@@ -1,0 +1,28 @@
+/**
+ * Long-scroll order (top → bottom). Section numbers match `SectionLabel` / ScrollProgress dots.
+ */
+export const SITE_DOCUMENT_ORDER = [
+  "Hero (#hero)",
+  "SectionBreak",
+  "01 Pavilion premise — #pavilion-lead (PavilionLeadSection)",
+  "SectionBreak",
+  "02 The Pavilion — #pavilion (PavilionReveal)",
+  "SectionBreak",
+  "03 Design Concept — #concept (DesignConcept)",
+  "SectionBreak",
+  "04 Design Process — #design-process (DesignProcess)",
+  "ScrollProgress rail",
+  "05 System — #system",
+  "SectionBreak",
+  "06 Material Exploration — #materials",
+  "SectionBreak",
+  "07 Prototyping — #prototyping",
+  "SectionBreak",
+  "08 Behavior — #behavior",
+  "SectionBreak",
+  "09 Walkthrough — #pavilion-walkthrough (PavilionSection)",
+  "SectionBreak",
+  "10 Media / Archive — #archive (MediaArchive)",
+  "SectionBreak",
+  "Footer",
+] as const;
