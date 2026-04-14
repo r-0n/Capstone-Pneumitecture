@@ -19,6 +19,9 @@ const basePath = normalizeBasePath(process.env.BASE_PATH);
 const nextConfig: NextConfig = {
   output: "export",
   ...(basePath ? { basePath, assetPrefix: basePath } : {}),
+  experimental: {
+    optimizePackageImports: ["lucide-react"],
+  },
   env: {
     NEXT_PUBLIC_BASE_PATH: basePath ?? "",
   },

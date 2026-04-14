@@ -157,8 +157,10 @@ export default function PavilionLeadSection() {
                 width={img.width}
                 height={img.height}
                 className="h-auto max-h-[330px] w-auto max-w-full object-contain"
-                sizes="(max-width: 1400px) 100vw, 1400px"
-                priority={i < 2}
+                sizes="(max-width: 640px) 48vw, (max-width: 1024px) 24vw, 200px"
+                priority={i === 0}
+                loading={i === 0 ? "eager" : "lazy"}
+                fetchPriority={i === 0 ? "high" : "low"}
               />
             ))}
           </figure>

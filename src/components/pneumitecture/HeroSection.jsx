@@ -28,6 +28,10 @@ export default function HeroSection() {
         <img
           src={HERO_IMG}
           alt="Pneumatic membrane structure"
+          width={1920}
+          height={1080}
+          decoding="async"
+          fetchPriority="high"
           className="h-full min-h-dvh w-full scale-110 object-cover will-change-transform"
           style={{ animation: 'heroFloat 20s ease-in-out infinite' }}
         />
