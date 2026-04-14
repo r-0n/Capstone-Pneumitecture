@@ -2,14 +2,17 @@ import ScrollReveal from './ScrollReveal';
 import SectionLabel from './SectionLabel';
 import ConceptCard from './ConceptCard';
 import FloatImage from './FloatImage';
+import { publicAssetPath } from '@/lib/publicAssetPath';
 
 const CONCEPT_IMG = 'https://media.base44.com/images/public/69da883791905282c2acac77/f3d27552b_generated_1489b319.png';
 
-const SOFT_IMG =
-  '/images/' + encodeURIComponent('Gemini_Generated_Image_5wyv915wyv915wyv (2).png');
-const INFLATE_IMG =
-  '/images/' + encodeURIComponent('Gemini_Generated_Image_5wyv915wyv915wyv (1).png');
-const PNEUMA_IMG = '/images/pneumatics.PNG';
+const SOFT_IMG = publicAssetPath(
+  '/images/' + encodeURIComponent('Gemini_Generated_Image_5wyv915wyv915wyv (2).png'),
+);
+const INFLATE_IMG = publicAssetPath(
+  '/images/' + encodeURIComponent('Gemini_Generated_Image_5wyv915wyv915wyv (1).png'),
+);
+const PNEUMA_IMG = publicAssetPath('/images/pneumatics.PNG');
 
 const cards = [
   {

@@ -1,29 +1,32 @@
 "use client";
 
 import Image from "next/image";
+import { publicAssetPath } from "@/lib/publicAssetPath";
 
 const pillars = [
   {
     title: "Softness",
     copy:
       "Softness is explored as a spatial condition rather than a material quality. It enables architecture to move away from rigidity and towards adaptability, where form can deform, respond, and continuously shift in relation to external forces.",
-    image:
+    image: publicAssetPath(
       "/images/" +
-      encodeURIComponent("Gemini_Generated_Image_5wyv915wyv915wyv (2).png"),
+        encodeURIComponent("Gemini_Generated_Image_5wyv915wyv915wyv (2).png"),
+    ),
   },
   {
     title: "Inflatables",
     copy:
       "Inflatables introduce a lightweight system of spatial transformation driven by air. Their ability to expand and collapse allows architecture to exist in a state of constant change, challenging permanence and static form.",
-    image:
+    image: publicAssetPath(
       "/images/" +
-      encodeURIComponent("Gemini_Generated_Image_5wyv915wyv915wyv (1).png"),
+        encodeURIComponent("Gemini_Generated_Image_5wyv915wyv915wyv (1).png"),
+    ),
   },
   {
     title: "Pneumatics",
     copy:
       "Pneumatics act as the driving mechanism behind the system, translating air pressure into controlled movement. This enables responsive behavior, where structural form becomes directly linked to environmental and human interaction.",
-    image: "/images/pneumatics.PNG",
+    image: publicAssetPath("/images/pneumatics.PNG"),
   },
 ];
 

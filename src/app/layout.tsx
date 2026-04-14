@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import type { CSSProperties } from "react";
 import { Instrument_Sans, Inter } from "next/font/google";
 import { AppShell } from "@/components/AppShell";
+import { publicAssetPath } from "@/lib/publicAssetPath";
 import "./globals.css";
 
 const sans = Inter({
@@ -20,6 +22,9 @@ export const metadata: Metadata = {
     "Soft responsive architecture — pneumatic cellular modules, system design, and adaptive spatial design.",
 };
 
+const heroBgUrl = publicAssetPath("/images/backg.PNG");
+const heroNoiseUrl = publicAssetPath("/images/noise.svg");
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -29,6 +34,12 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${sans.variable} ${display.variable} theme-light h-full antialiased`}
+      style={
+        {
+          ["--hero-bg-image" as string]: `url('${heroBgUrl}')`,
+          ["--hero-noise-image" as string]: `url('${heroNoiseUrl}')`,
+        } as CSSProperties
+      }
       suppressHydrationWarning
     >
       <body

@@ -2,42 +2,19 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import Image from "next/image";
-import { useEffect, useState } from "react";
-
-const PEXELS_VIDEO_ID = "29603233";
+import { useState } from "react";
+import { publicAssetPath } from "@/lib/publicAssetPath";
 
 const FALLBACK_POSTER =
   "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=2000&q=80";
 
-/** Optional: paste a direct MP4 URL from Pexels (e.g. from API or download) to skip API route */
-const ENV_VIDEO_SRC = process.env.NEXT_PUBLIC_FEATURE_VIDEO_SRC?.trim() || null;
+/** Direct MP4 URL (optional locally; set in CI secret for GitHub Pages). Relative `/…` paths get `basePath`. */
+const rawVideoSrc = process.env.NEXT_PUBLIC_FEATURE_VIDEO_SRC?.trim();
+const ENV_VIDEO_SRC = rawVideoSrc ? publicAssetPath(rawVideoSrc) : null;
 
 export function FeatureVideoSection() {
   const reduceMotion = useReducedMotion();
   const [videoSrc, setVideoSrc] = useState<string | null>(() => ENV_VIDEO_SRC);
-  const [poster, setPoster] = useState<string>(FALLBACK_POSTER);
-
-  useEffect(() => {
-    if (ENV_VIDEO_SRC) return;
-
-    let cancelled = false;
-    (async () => {
-      try {
-        const res = await fetch(`/api/pexels/video/${PEXELS_VIDEO_ID}`);
-        if (!res.ok) return;
-        const data = (await res.json()) as { src?: string; poster?: string };
-        if (cancelled || !data.src) return;
-        setVideoSrc(data.src);
-        if (data.poster) setPoster(data.poster);
-      } catch {
-        /* keep poster fallback */
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
   const showVideo = Boolean(videoSrc) && !reduceMotion;
 
   return (
@@ -58,7 +35,7 @@ export function FeatureVideoSection() {
               <video
                 className="absolute inset-0 h-full w-full object-cover"
                 src={videoSrc ?? undefined}
-                poster={poster}
+                poster={FALLBACK_POSTER}
                 autoPlay
                 muted
                 loop
@@ -67,13 +44,13 @@ export function FeatureVideoSection() {
               />
             ) : (
               <Image
-                src={poster}
+                src={FALLBACK_POSTER}
                 alt="Video poster — rocky mountain landscape timelapse"
                 fill
                 className="object-cover"
                 sizes="(max-width: 1200px) 100vw, 1200px"
                 priority
-                unoptimized={poster.includes("images.pexels.com")}
+                unoptimized={FALLBACK_POSTER.includes("images.pexels.com")}
               />
             )}
             <div

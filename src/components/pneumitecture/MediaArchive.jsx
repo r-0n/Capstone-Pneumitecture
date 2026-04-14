@@ -2,34 +2,35 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ScrollReveal from './ScrollReveal';
 import SectionLabel from './SectionLabel';
+import { publicAssetPath } from '@/lib/publicAssetPath';
 
 const categories = ['All', 'Process', 'Diagrams', 'Final', 'AI Explorations'];
 
 const archiveItems = [
-  { src: '/process/P1.jpeg', cat: 'Process', alt: 'Process 1' },
-  { src: '/diagram/D1.PNG', cat: 'Diagrams', alt: 'Diagram D1' },
+  { src: publicAssetPath('/process/P1.jpeg'), cat: 'Process', alt: 'Process 1' },
+  { src: publicAssetPath('/diagram/D1.PNG'), cat: 'Diagrams', alt: 'Diagram D1' },
   { src: 'https://media.base44.com/images/public/69da883791905282c2acac77/f6f53df90_generated_4a8cfce4.png', cat: 'Final', alt: 'Evening installation' },
-  { src: '/AI/A1.PNG', cat: 'AI Explorations', alt: 'AI Exploration' },
-  { src: '/AI/A2.PNG', cat: 'AI Explorations', alt: 'AI Exploration' },
-  { src: '/AI/A3.JPG', cat: 'AI Explorations', alt: 'AI Exploration' },
-  { src: '/AI/A4.PNG', cat: 'AI Explorations', alt: 'AI Exploration' },
-  { src: '/AI/A5.png', cat: 'AI Explorations', alt: 'AI Exploration' },
-  { src: '/process/P2.jpeg', cat: 'Process', alt: 'Process 2' },
-  { src: '/diagram/D2.JPG', cat: 'Diagrams', alt: 'Diagram D2' },
+  { src: publicAssetPath('/AI/A1.PNG'), cat: 'AI Explorations', alt: 'AI Exploration' },
+  { src: publicAssetPath('/AI/A2.PNG'), cat: 'AI Explorations', alt: 'AI Exploration' },
+  { src: publicAssetPath('/AI/A3.JPG'), cat: 'AI Explorations', alt: 'AI Exploration' },
+  { src: publicAssetPath('/AI/A4.PNG'), cat: 'AI Explorations', alt: 'AI Exploration' },
+  { src: publicAssetPath('/AI/A5.png'), cat: 'AI Explorations', alt: 'AI Exploration' },
+  { src: publicAssetPath('/process/P2.jpeg'), cat: 'Process', alt: 'Process 2' },
+  { src: publicAssetPath('/diagram/D2.JPG'), cat: 'Diagrams', alt: 'Diagram D2' },
   { src: 'https://media.base44.com/images/public/69da883791905282c2acac77/35e41024e_generated_6a3cdc10.png', cat: 'Final', alt: 'Aerial view' },
-  { src: '/process/P3.jpeg', cat: 'Process', alt: 'Process 3' },
-  { src: '/diagram/D3.JPG', cat: 'Diagrams', alt: 'Diagram D3' },
+  { src: publicAssetPath('/process/P3.jpeg'), cat: 'Process', alt: 'Process 3' },
+  { src: publicAssetPath('/diagram/D3.JPG'), cat: 'Diagrams', alt: 'Diagram D3' },
   { src: 'https://media.base44.com/images/public/69da883791905282c2acac77/c83535d10_generated_00681be3.png', cat: 'Final', alt: 'Interior experience' },
-  { src: '/process/P4.jpeg', cat: 'Process', alt: 'Process 4' },
-  { src: '/diagram/D4.png', cat: 'Diagrams', alt: 'Diagram D4' },
-  { src: '/diagram/D5.png', cat: 'Diagrams', alt: 'Diagram D5' },
-  { src: '/diagram/D6.jpg', cat: 'Diagrams', alt: 'Diagram D6' },
-  { src: '/process/P5.jpeg', cat: 'Process', alt: 'Process 5' },
-  { src: '/process/P6.jpeg', cat: 'Process', alt: 'Process 6' },
-  { src: '/process/P7.jpeg', cat: 'Process', alt: 'Process 7' },
-  { src: '/process/P8.jpeg', cat: 'Process', alt: 'Process 8' },
-  { src: '/process/P9.jpeg', cat: 'Process', alt: 'Process 9' },
-  { src: '/process/P10.jpeg', cat: 'Process', alt: 'Process 10' },
+  { src: publicAssetPath('/process/P4.jpeg'), cat: 'Process', alt: 'Process 4' },
+  { src: publicAssetPath('/diagram/D4.png'), cat: 'Diagrams', alt: 'Diagram D4' },
+  { src: publicAssetPath('/diagram/D5.png'), cat: 'Diagrams', alt: 'Diagram D5' },
+  { src: publicAssetPath('/diagram/D6.jpg'), cat: 'Diagrams', alt: 'Diagram D6' },
+  { src: publicAssetPath('/process/P5.jpeg'), cat: 'Process', alt: 'Process 5' },
+  { src: publicAssetPath('/process/P6.jpeg'), cat: 'Process', alt: 'Process 6' },
+  { src: publicAssetPath('/process/P7.jpeg'), cat: 'Process', alt: 'Process 7' },
+  { src: publicAssetPath('/process/P8.jpeg'), cat: 'Process', alt: 'Process 8' },
+  { src: publicAssetPath('/process/P9.jpeg'), cat: 'Process', alt: 'Process 9' },
+  { src: publicAssetPath('/process/P10.jpeg'), cat: 'Process', alt: 'Process 10' },
 ];
 
 export default function MediaArchive() {

@@ -1,4 +1,38 @@
-import Section01AttachmentCarousel from "./Section01AttachmentCarousel";
+import Image from "next/image";
+import { publicAssetPath } from "@/lib/publicAssetPath";
+
+const ATTACHMENT_IMAGES = [
+  {
+    src: publicAssetPath("/images/section01/attachment-01.png"),
+    alt: "Attachment prototype: pneumatic TPU cells in a modular grid within a frame",
+    width: 1024,
+    height: 768,
+  },
+  {
+    src: publicAssetPath("/images/section01/attachment-02.png"),
+    alt: "Attachment prototype: kinetic pneumatic surface and studio lighting",
+    width: 800,
+    height: 600,
+  },
+  {
+    src: publicAssetPath("/images/section01/attachment-03.png"),
+    alt: "Attachment prototype: vertical pneumatic columns and actuation study",
+    width: 1024,
+    height: 768,
+  },
+  {
+    src: publicAssetPath("/images/section01/attachment-04.png"),
+    alt: "Attachment prototype: installation with scale reference",
+    width: 800,
+    height: 600,
+  },
+  {
+    src: publicAssetPath("/images/section01/attachment-05.png"),
+    alt: "Attachment prototype: distributed pneumatic cells render study",
+    width: 1024,
+    height: 768,
+  },
+];
 
 export default function PavilionLeadSection() {
   return (
@@ -10,20 +44,14 @@ export default function PavilionLeadSection() {
         <header className="flex flex-col justify-between gap-8 border-b border-neutral-200 pb-10 md:flex-row md:items-start md:gap-12">
           <div className="max-w-3xl">
             <h1 className="font-sans text-[clamp(1rem,2.4vw,1.35rem)] font-semibold uppercase leading-[1.15] tracking-[0.02em] text-black">
-              Pneumitecture — pneumatics &amp; architecture
+              Pneumitecture
             </h1>
             <p className="mt-3 max-w-2xl font-sans text-[10px] font-medium uppercase leading-relaxed tracking-[0.2em] text-neutral-500 md:text-[11px]">
-              Capstone Installation — built attachment, soft control
+              Capstone Project: Soft Pneumatic Installation 
             </p>
           </div>
           <div className="flex shrink-0 items-start gap-4 md:flex-col md:items-end">
-            <div
-              className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full border-2 border-black bg-black text-[13px] font-semibold tracking-[-0.04em] text-white"
-              aria-hidden
-            >
-              PN
-            </div>
-           
+            
           </div>
         </header>
 
@@ -95,13 +123,13 @@ export default function PavilionLeadSection() {
                   <br />
                   TPU fabric
                   <br />
-                  Silicone casting
+                  Silicone Sealing
                   <br />
                   Aluminium rods
                   <br />
-                  Carpentaring a Frame
+                  Carpentary
                   <br />
-                  Ai Pump
+                  Air Pump
                 </p>
               </div>
               <div>
@@ -116,7 +144,25 @@ export default function PavilionLeadSection() {
           </div>
         </div>
 
-        <Section01AttachmentCarousel />
+        <div className="mt-14 border-t border-neutral-200 pt-12 md:mt-16 md:pt-14">
+          <p className="mb-4 font-sans text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-500">
+            Attachment — render sequence
+          </p>
+          <figure className="flex flex-wrap items-start justify-center gap-4 md:gap-5">
+            {ATTACHMENT_IMAGES.map((img, i) => (
+              <Image
+                key={img.src}
+                src={img.src}
+                alt={img.alt}
+                width={img.width}
+                height={img.height}
+                className="h-auto max-h-[330px] w-auto max-w-full object-contain"
+                sizes="(max-width: 1400px) 100vw, 1400px"
+                priority={i < 2}
+              />
+            ))}
+          </figure>
+        </div>
       </div>
     </section>
   );

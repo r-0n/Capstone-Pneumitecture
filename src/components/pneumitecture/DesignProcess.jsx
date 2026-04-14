@@ -1,35 +1,36 @@
 import { useState } from 'react';
 import ScrollReveal from './ScrollReveal';
 import SectionLabel from './SectionLabel';
+import { publicAssetPath } from '@/lib/publicAssetPath';
 
 const phases = [
   {
     num: 1,
-    img: '/images2/base1.png',
+    img: publicAssetPath('/images2/base1.png'),
     title: 'Circular Geometry',
     sub: '& Plan Organisation',
   },
   {
     num: 2,
-    img: '/images2/' + encodeURIComponent('base 2.png'),
+    img: publicAssetPath('/images2/' + encodeURIComponent('base 2.png')),
     title: 'Space Frame',
     sub: '& Structural System',
   },
   {
     num: 3,
-    img: '/images2/' + encodeURIComponent('base 3.png'),
+    img: publicAssetPath('/images2/' + encodeURIComponent('base 3.png')),
     title: 'Volumetric Form',
     sub: 'Development',
   },
   {
     num: 4,
-    img: '/images2/base4.png',
+    img: publicAssetPath('/images2/base4.png'),
     title: 'Triangulated Skin',
     sub: '& Cladding Panels',
   },
   {
     num: 5,
-    img: '/images2/' + encodeURIComponent('base 5.png'),
+    img: publicAssetPath('/images2/' + encodeURIComponent('base 5.png')),
     title: 'Biomorphic Facade',
     sub: '& Final Envelope',
   },

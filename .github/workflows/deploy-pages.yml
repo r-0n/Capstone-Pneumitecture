@@ -1,0 +1,66 @@
+# Static export → GitHub Pages. Pushes to `main` rebuild and redeploy automatically.
+#
+# First-time setup (repo owner):
+# 1. GitHub → Settings → Pages → Build and deployment → Source: GitHub Actions
+# 2. Optional: Settings → Secrets and variables → Actions → add repository secret
+#    NEXT_PUBLIC_FEATURE_VIDEO_SRC = direct MP4 URL (static export has no /api route)
+#
+# Custom domain at site root (no /repo prefix): edit the "Set BASE_PATH" step below
+# to export BASE_PATH= (empty) and configure your domain under Pages settings.
+
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install
+        run: npm ci
+
+      - name: Set BASE_PATH for project Pages
+        # Default: https://<user>.github.io/<repo>/ — must match repository name in the URL.
+        run: echo "BASE_PATH=/${{ github.event.repository.name }}" >> "$GITHUB_ENV"
+
+      - name: Build static export
+        env:
+          NEXT_PUBLIC_FEATURE_VIDEO_SRC: ${{ secrets.NEXT_PUBLIC_FEATURE_VIDEO_SRC }}
+        run: npm run build
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: out
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

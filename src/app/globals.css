@@ -172,7 +172,7 @@ body.air-cursor-active [role="button"] {
 .hero-bg {
   position: absolute;
   inset: 0;
-  background-image: url("/images/backg.PNG");
+  background-image: var(--hero-bg-image);
   background-size: cover;
   background-position: center;
   filter: blur(1px);
@@ -227,7 +227,7 @@ body.air-cursor-active [role="button"] {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background-image: url("/images/noise.svg");
+  background-image: var(--hero-noise-image);
   background-repeat: repeat;
   background-size: 180px 180px;
   opacity: 0.03;

@@ -2,8 +2,9 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import Image from "next/image";
+import { publicAssetPath } from "@/lib/publicAssetPath";
 
-const SPLIT_IMAGE = "/images/pavilion.png";
+const SPLIT_IMAGE = publicAssetPath("/images/pavilion.png");
 
 export function FeatureSplitSection() {
   const reduceMotion = useReducedMotion();

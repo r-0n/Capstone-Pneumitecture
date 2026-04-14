@@ -1,8 +1,11 @@
 import ScrollReveal from './ScrollReveal';
 import SectionLabel from './SectionLabel';
+import { publicAssetPath } from '@/lib/publicAssetPath';
 
 const materialSrc = (filename) =>
-  `/${encodeURIComponent('images 2')}/${encodeURIComponent(filename)}`;
+  publicAssetPath(
+    `/${encodeURIComponent('images 2')}/${encodeURIComponent(filename)}`,
+  );
 
 const images = [
   { src: materialSrc('material exp 1.jpg'), alt: 'Heat-sealed seams and material testing' },

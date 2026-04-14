@@ -4,9 +4,11 @@ import ScrollReveal from './ScrollReveal';
 import SectionLabel from './SectionLabel';
 import FloatImage from './FloatImage';
 
-const INTERACTION_IMG = '/images/pavilion.png';
-const PAVILION_COL_IMG_2 = '/images/pav1.PNG';
-const PAVILION_COL_IMG_3 = '/images/pav2.png';
+import { publicAssetPath } from '@/lib/publicAssetPath';
+
+const INTERACTION_IMG = publicAssetPath('/images/pavilion.png');
+const PAVILION_COL_IMG_2 = publicAssetPath('/images/pav1.PNG');
+const PAVILION_COL_IMG_3 = publicAssetPath('/images/pav2.png');
 
 export default function PavilionReveal() {
   return (
