@@ -11,17 +11,19 @@ import { HomePage } from "@/components/pages/HomePage";
 export default function Home() {
   return (
     <div
-      className="relative min-h-screen overflow-x-hidden"
+      className="relative min-h-screen"
       style={{ backgroundColor: "#FBFBF9" }}
     >
       <BubbleBackground />
       <div className="relative z-10">
         <NavOverlay />
         <HeroSection />
+        <div>
+          <SectionTransition>
+            <PavilionLeadSection />
+          </SectionTransition>
+        </div>
         <SectionBreak />
-        <SectionTransition>
-          <PavilionLeadSection />
-        </SectionTransition>
         <main className="flex flex-1 flex-col">
           <HomePage />
         </main>

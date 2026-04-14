@@ -29,7 +29,7 @@ export function PrototypingSection() {
     >
       <div className="ethereal-layer pointer-events-none absolute inset-0 opacity-30" aria-hidden />
       <div className="relative z-10 mx-auto max-w-[1200px] px-5 md:px-10">
-        <SectionLabel number="07" text="Prototyping" />
+        <SectionLabel number="06" text="Prototyping" />
         <header className="text-center">
           <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--ink-muted)]">
             Prototyping

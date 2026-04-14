@@ -48,6 +48,7 @@
   background-color: rgba(112, 112, 112, 0.45);
 }
 
+/* Document is the scroll root; avoid global smooth here (stacks oddly with scrollIntoView). */
 html {
   scroll-behavior: auto;
 }

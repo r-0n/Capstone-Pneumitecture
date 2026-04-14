@@ -1,6 +1,7 @@
 "use client";
 
 import PavilionReveal from "@/components/pneumitecture/PavilionReveal";
+import ParadigmShiftSection from "@/components/pneumitecture/ParadigmShiftSection";
 import DesignConcept from "@/components/pneumitecture/DesignConcept";
 import DesignProcess from "@/components/pneumitecture/DesignProcess";
 import MaterialExploration from "@/components/pneumitecture/MaterialExploration";
@@ -21,7 +22,7 @@ export default function BelowFoldApp() {
     <>
       <SectionBreak />
       <SectionTransition>
-        <PavilionReveal />
+        <ParadigmShiftSection />
       </SectionTransition>
       <SectionBreak />
       <SectionTransition>
@@ -49,6 +50,10 @@ export default function BelowFoldApp() {
       <SectionBreak />
       <SectionTransition>
         <PavilionSection />
+      </SectionTransition>
+      <SectionBreak />
+      <SectionTransition>
+        <PavilionReveal />
       </SectionTransition>
       <SectionBreak />
       <SectionTransition>
