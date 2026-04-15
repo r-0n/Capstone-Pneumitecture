@@ -13,7 +13,6 @@ const PROGRESS_IDS = [
   "materials",
   "prototyping",
   "behavior",
-  "pavilion-walkthrough",
   "pavilion",
   "concept",
   "archive",
@@ -28,7 +27,6 @@ const DOT_LABELS: Record<string, string> = {
   materials: "06 · Materials",
   prototyping: "07 · Prototyping",
   behavior: "08 · Behavior",
-  "pavilion-walkthrough": "09 · Walkthrough",
   pavilion: "10 · The Pavilion",
   archive: "11 · Media archive",
 };

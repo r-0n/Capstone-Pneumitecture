@@ -9,7 +9,6 @@ import MediaArchive from "@/components/pneumitecture/MediaArchive";
 import { SectionBreak } from "@/components/site/SectionBreak";
 import { SectionTransition } from "@/components/site/SectionTransition";
 import { BehaviorSection } from "@/components/sections/BehaviorSection";
-import { PavilionSection } from "@/components/sections/PavilionSection";
 import { PrototypingSection } from "@/components/sections/PrototypingSection";
 import { SystemSection } from "@/components/sections/SystemSection";
 
@@ -40,10 +39,6 @@ export default function BelowFoldApp() {
       <SectionBreak />
       <SectionTransition>
         <BehaviorSection />
-      </SectionTransition>
-      <SectionBreak />
-      <SectionTransition>
-        <PavilionSection />
       </SectionTransition>
       <SectionBreak />
       <SectionTransition>

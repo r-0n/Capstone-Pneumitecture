@@ -18,8 +18,6 @@ export const SITE_DOCUMENT_ORDER = [
   "SectionBreak",
   "08 Behavior — #behavior",
   "SectionBreak",
-  "09 Walkthrough — #pavilion-walkthrough (PavilionSection)",
-  "SectionBreak",
   "10 The Pavilion — #pavilion (PavilionReveal)",
   "SectionBreak",
   "03 Design Concept — #concept (DesignConcept)",

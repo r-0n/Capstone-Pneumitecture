@@ -83,10 +83,10 @@ export function BehaviorSection() {
 
         <div className="mt-16 flex justify-center">
           <a
-            href="#pavilion-walkthrough"
+            href="#pavilion"
             className="rounded-full border border-[var(--hairline-strong)] bg-white/85 px-10 py-3.5 text-sm font-medium text-[var(--ink)] shadow-sm transition hover:border-[var(--accent-soft)] hover:shadow-md"
           >
-            Scale Up: Pavilion Vision
+            Scale Up: The Pavilion
           </a>
         </div>
       </div>
