@@ -1,0 +1,139 @@
+"use client";
+
+import { useState } from "react";
+import Image from "next/image";
+import { motion } from "framer-motion";
+
+const STACK = [
+  {
+    key: "schematics",
+    label: "Image 8: Schematics",
+    src: "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=800&q=80",
+    rotate: -1.2,
+    y: 56,
+    z: 10,
+  },
+  {
+    key: "hardware",
+    label: "Image 7: Hardware",
+    src: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80",
+    rotate: 1.8,
+    y: 28,
+    z: 20,
+  },
+] as const;
+
+const TOP = {
+  key: "exhibition",
+  label: "Image 6: Exhibition",
+  src: "https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=800&q=80",
+  rotate: -2.2,
+} as const;
+
+export function ArtifactsPeelStack() {
+  const [hovered, setHovered] = useState(false);
+  const peel = hovered ? 20 : 9;
+
+  return (
+    <div className="relative flex min-h-[420px] flex-col lg:min-h-[480px]">
+      <div className="mb-6 flex items-start justify-between gap-4 pr-8 lg:pr-10">
+        <p className="font-sans text-[10px] font-semibold uppercase tracking-[0.28em] text-white/55">
+          4. The artifacts
+        </p>
+        <nav
+          className="flex flex-col gap-2 border-l border-white/20 pl-3"
+          aria-label="Artifact index"
+        >
+          {[TOP, ...STACK].map((c, i) => (
+            <span
+              key={c.key}
+              className={`block h-1.5 w-1.5 rounded-full transition-colors ${
+                i === 0 ? "bg-white" : "bg-white/30"
+              }`}
+            />
+          ))}
+        </nav>
+      </div>
+
+      <div
+        className="relative mx-auto mt-4 w-full max-w-lg flex-1 lg:max-w-xl"
+        style={{ perspective: "1400px" }}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+      >
+        {STACK.map((c) => (
+          <div
+            key={c.key}
+            className="absolute left-[5%] right-[7%] overflow-hidden rounded-lg border border-white/25 bg-neutral-900 shadow-xl"
+            style={{
+              top: c.y,
+              zIndex: c.z,
+              transform: `rotate(${c.rotate}deg)`,
+            }}
+          >
+            <div className="relative aspect-[16/10] w-full">
+              <Image src={c.src} alt="" fill className="object-cover" sizes="400px" />
+              <div className="absolute inset-x-0 bottom-0 border-t border-white/40 bg-white/95 px-3 py-1.5">
+                <p className="font-sans text-[9px] font-semibold uppercase tracking-[0.2em] text-neutral-600">
+                  {c.label}
+                </p>
+              </div>
+            </div>
+          </div>
+        ))}
+
+        <motion.div
+          className="absolute left-[3%] right-[5%] top-0 z-40 overflow-visible rounded-lg border border-white/35 bg-white shadow-2xl"
+          style={{ transform: `rotate(${TOP.rotate}deg)` }}
+          animate={{ rotate: hovered ? TOP.rotate - 1.2 : TOP.rotate }}
+          transition={{ type: "spring", stiffness: 140, damping: 20 }}
+        >
+          <div className="relative aspect-[16/10] w-full overflow-hidden rounded-t-lg">
+            <Image src={TOP.src} alt="Exhibition pavilion" fill className="object-cover" sizes="400px" />
+            <div
+              className="pointer-events-none absolute bottom-0 right-0 origin-bottom-right transition-transform duration-500 ease-out"
+              style={{
+                width: "40%",
+                height: "44%",
+                transform: `rotate(${peel}deg)`,
+                boxShadow: hovered
+                  ? "-14px -10px 32px rgba(0,0,0,0.4)"
+                  : "-8px -6px 20px rgba(0,0,0,0.25)",
+              }}
+            >
+              <div
+                className="absolute inset-0 bg-gradient-to-br from-white via-neutral-100 to-neutral-400/90"
+                style={{ clipPath: "polygon(100% 0, 100% 100%, 0 100%)" }}
+              />
+              <div
+                className="absolute bottom-0 right-0 h-full w-full"
+                style={{
+                  background:
+                    "linear-gradient(125deg, rgba(255,255,255,0.2) 0%, rgba(200,200,200,0.55) 50%, rgba(140,140,140,0.35) 100%)",
+                  clipPath: "polygon(100% 6%, 88% 100%, 100% 100%)",
+                }}
+              />
+              <div
+                className="absolute bottom-2 right-2 h-[52%] w-[52%] overflow-hidden rounded-sm border border-white/50 shadow-md"
+                style={{ transform: "rotate(-5deg)" }}
+              >
+                <Image
+                  src={STACK[1].src}
+                  alt=""
+                  fill
+                  className="object-cover"
+                  sizes="200px"
+                />
+              </div>
+            </div>
+          </div>
+          <div className="border-t border-white/50 bg-white px-3 py-2">
+            <p className="font-sans text-[9px] font-semibold uppercase tracking-[0.2em] text-neutral-600">
+              {TOP.label}
+            </p>
+          </div>
+        </motion.div>
+      </div>
+    </div>
+  );
+}

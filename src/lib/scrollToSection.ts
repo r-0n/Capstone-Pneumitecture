@@ -1,10 +1,15 @@
+type ScrollToSectionOptions = {
+  /** Use `smooth` for short hops (e.g. hero → pavilion lead). Default keeps long nav snappy. */
+  behavior?: ScrollBehavior;
+};
+
 /**
- * Instant jumps feel responsive on long pages; motion design carries “transition”
- * (hero wash, SectionTransition). Avoid native smooth here — it stacks with browser
- * smoothing and feels laggy over large scroll distances.
+ * Default `auto` keeps long nav jumps responsive. Pass `{ behavior: "smooth" }` for
+ * deliberate short transitions (hero handoff into the next block).
  */
-export function scrollToSection(id: string): void {
+export function scrollToSection(id: string, opts?: ScrollToSectionOptions): void {
   const el = document.getElementById(id);
   if (!el) return;
-  el.scrollIntoView({ behavior: "auto", block: "start", inline: "nearest" });
+  const behavior = opts?.behavior ?? "auto";
+  el.scrollIntoView({ behavior, block: "start", inline: "nearest" });
 }

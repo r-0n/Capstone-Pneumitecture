@@ -6,6 +6,7 @@ import { scrollToSection } from '@/lib/scrollToSection';
 const sections = [
   { label: 'Hero', id: 'hero' },
   { label: 'Pavilion', id: 'pavilion-lead' },
+  { label: 'Paradigm', id: 'paradigm-shift' },
   { label: 'Concept', id: 'concept' },
   { label: 'Materials', id: 'materials' },
   { label: 'System', id: 'system' },
