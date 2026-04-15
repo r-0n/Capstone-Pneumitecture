@@ -19,7 +19,6 @@ type DesignProcessPhaseSliderProps = {
 export function DesignProcessPhaseSlider({ slides, priority = false }: DesignProcessPhaseSliderProps) {
   const [index, setIndex] = useState(0);
   const n = slides.length;
-  const current = slides[index]!;
 
   const go = useCallback(
     (delta: number) => {
@@ -38,6 +37,37 @@ export function DesignProcessPhaseSlider({ slides, priority = false }: DesignPro
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [go, n]);
+
+  if (n === 0) {
+    return (
+      <div className="w-full">
+        <div className="relative mb-2 aspect-[4/3] w-full overflow-hidden rounded-xl border border-[var(--hairline)] bg-bone shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]" />
+        <div className="flex items-stretch gap-2">
+          <button
+            type="button"
+            aria-label="Previous slide"
+            disabled
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[var(--hairline)] bg-bone text-lg font-light text-obsidian transition hover:bg-foreground/[0.03] disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            ‹
+          </button>
+          <div className="min-w-0 flex-1 overflow-hidden rounded-lg border border-[var(--hairline)] bg-bone/60 px-2.5 py-2">
+            <p className="text-center font-display text-[10px] font-light italic leading-snug text-structural sm:text-[11px]">&nbsp;</p>
+          </div>
+          <button
+            type="button"
+            aria-label="Next slide"
+            disabled
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[var(--hairline)] bg-bone text-lg font-light text-obsidian transition hover:bg-foreground/[0.03] disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            ›
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const current = slides[index]!;
 
   return (
     <div className="w-full">

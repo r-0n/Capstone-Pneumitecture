@@ -553,7 +553,7 @@ export function SystemSection() {
       className="relative scroll-mt-24 border-t border-[var(--hairline)] bg-blueprint py-24 md:py-32"
     >
       <div className="relative z-10 mx-auto max-w-[1100px] px-5 md:px-10">
-        <SectionLabel number="04" text="System" />
+        <SectionLabel number="04" text="System" textFirst />
         <header className="text-center">
           <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--ink-muted)]">
             System Dynamics

@@ -117,6 +117,94 @@ const PHASE1_SLIDES = [
   },
 ];
 
+/** Cell population process imagery (`public/CP/`). */
+const CELL_POPULATION_SLIDES = [
+  {
+    type: "image",
+    src: publicAssetPath("/CP/CP6.png"),
+    alt: "Cell population — bench study 6",
+    caption:
+      "Initial exploration – Initial manual exploration of cell behavior through physical arrangement and early aggregation tests.",
+  },
+  {
+    type: "image",
+    src: publicAssetPath("/CP/CP1.JPG"),
+    alt: "Cell population — bench study 1",
+    caption:
+      "Constraint testing – Constraint testing of pneumatic cells within a rigid boundary frame to study controlled expansion.",
+  },
+  {
+    type: "image",
+    src: publicAssetPath("/CP/CP2.PNG"),
+    alt: "Cell population — bench study 2",
+    caption:
+      "Sealing pattern development – Sealing pattern development defining inflatable zones and heat-pressed boundaries within the cell system.",
+  },
+  {
+    type: "image",
+    src: publicAssetPath("/CP/CP3.JPG"),
+    alt: "Cell population — bench study 3",
+    caption:
+      "Refined outline – Refined outline of the sealing logic, isolating the structural geometry of the inflatable network.",
+  },
+  {
+    type: "image",
+    src: publicAssetPath("/CP/CP4.JPG"),
+    alt: "Cell population — bench study 4",
+    caption:
+      "Aggregation study – Aggregation study of combined units showing directional expansion and airflow distribution across the system.",
+  },
+  {
+    type: "image",
+    src: publicAssetPath("/CP/CP5.png"),
+    alt: "Cell population — bench study 5",
+    caption:
+      "Controlled field setup – Physical setup using a hexagonal frame to allow cells to expand and operate within a controlled field.",
+  },
+  {
+    type: "image",
+    src: publicAssetPath("/CP/CP7.png"),
+    alt: "Cell population — bench study 7",
+    caption:
+      "Geometry development – Development of the inflatable unit's hexagonal geometry as a basis for population and repetition.",
+  },
+];
+
+const MOUNTING_PHASE_SLIDES = [
+  {
+    type: "image",
+    src: mountingImg(1),
+    alt: "Mounted translucent membrane test on aluminium rods",
+    caption: "Mounted assembly — membrane fixed on aluminium rods for full-span testing.",
+  },
+  {
+    type: "image",
+    src: mountingImg(2),
+    alt: "Aluminium-rod mounting close-up",
+    caption: "Mount detail — edge geometry and rod connection alignment.",
+  },
+  {
+    type: "image",
+    src: mountingImg(3),
+    alt: "Mounted sheet test layout on workbench",
+    caption: "Bench test — mounted panel behavior under handling and setup.",
+  },
+  {
+    type: "iframe",
+    src: MOUNTING_TEST_VIDEO_IFRAME_A,
+    poster: mountingImg(1),
+    alt: "Mounting onto aluminium rods test video A",
+    caption: "Test video A — mounting sequence and initial behavior.",
+  },
+  {
+    type: "iframe",
+    src: MOUNTING_TEST_VIDEO_IFRAME_B,
+    poster: mountingImg(3),
+    alt: "Mounting onto aluminium rods test video B",
+    caption: "Test video B — rod-mounted response during handling.",
+  },
+];
+
 const phases = [
   {
     num: 1,
@@ -126,7 +214,7 @@ const phases = [
   },
   {
     num: 2,
-    title: "Heat-sealing & Testing",
+    title: "Material Exploration",
     sub: "",
     slides: [
       ...HEAT_SEALING_SLIDES,
@@ -141,46 +229,50 @@ const phases = [
   },
   {
     num: 3,
-    title: "Mounting onto Aluminium Rods & Testing",
+    title: "Cell Population",
+    sub: "",
+    slides: CELL_POPULATION_SLIDES,
+  },
+  {
+    num: 4,
+    title: "Frame Fabrication",
     sub: "",
     slides: [
       {
         type: "image",
-        src: mountingImg(1),
-        alt: "Mounted translucent membrane test on aluminium rods",
-        caption: "Mounted assembly — membrane fixed on aluminium rods for full-span testing.",
+        src: frameImg(1),
+        alt: "Primary timber test frame on base platform",
+        caption: "Frame setup — primary timber rig assembled on the base platform.",
       },
       {
         type: "image",
-        src: mountingImg(2),
-        alt: "Aluminium-rod mounting close-up",
-        caption: "Mount detail — edge geometry and rod connection alignment.",
+        src: frameImg(2),
+        alt: "Concept sketch for dual vertical rails and membrane routing",
+        caption: "Frame concept — drawn guide for rail spacing and inflatable path.",
       },
       {
         type: "image",
-        src: mountingImg(3),
-        alt: "Mounted sheet test layout on workbench",
-        caption: "Bench test — mounted panel behavior under handling and setup.",
+        src: frameImg(3),
+        alt: "Second angle of timber frame prototype",
+        caption: "Build check — assembled frame geometry and joint stability.",
       },
       {
-        type: "iframe",
-        src: MOUNTING_TEST_VIDEO_IFRAME_A,
-        poster: mountingImg(1),
-        alt: "Mounting onto aluminium rods test video A",
-        caption: "Test video A — mounting sequence and initial behavior.",
+        type: "image",
+        src: frameImg(4),
+        alt: "Single-cell cross-section sketch between frame rails",
+        caption: "Cell profile — section sketch for one inflation bay between rails.",
       },
       {
-        type: "iframe",
-        src: MOUNTING_TEST_VIDEO_IFRAME_B,
-        poster: mountingImg(3),
-        alt: "Mounting onto aluminium rods test video B",
-        caption: "Test video B — rod-mounted response during handling.",
+        type: "image",
+        src: frameImg(5),
+        alt: "Mounted modular panel on timber frame",
+        caption: "Testing stage — mounted module panel inside completed frame.",
       },
     ],
   },
   {
-    num: 4,
-    title: "Building Arduino Circuit | Testing Controlled inflation with Solenoid Valves",
+    num: 5,
+    title: "Pneumatic System Design",
     sub: "",
     slides: [
       {
@@ -224,45 +316,14 @@ const phases = [
     ],
   },
   {
-    num: 5,
-    title: "Frame Design | Building | Testing",
+    num: 6,
+    title: "Scaling Up",
     sub: "",
-    slides: [
-      {
-        type: "image",
-        src: frameImg(1),
-        alt: "Primary timber test frame on base platform",
-        caption: "Frame setup — primary timber rig assembled on the base platform.",
-      },
-      {
-        type: "image",
-        src: frameImg(2),
-        alt: "Concept sketch for dual vertical rails and membrane routing",
-        caption: "Frame concept — drawn guide for rail spacing and inflatable path.",
-      },
-      {
-        type: "image",
-        src: frameImg(3),
-        alt: "Second angle of timber frame prototype",
-        caption: "Build check — assembled frame geometry and joint stability.",
-      },
-      {
-        type: "image",
-        src: frameImg(4),
-        alt: "Single-cell cross-section sketch between frame rails",
-        caption: "Cell profile — section sketch for one inflation bay between rails.",
-      },
-      {
-        type: "image",
-        src: frameImg(5),
-        alt: "Mounted modular panel on timber frame",
-        caption: "Testing stage — mounted module panel inside completed frame.",
-      },
-    ],
+    slides: [...MOUNTING_PHASE_SLIDES],
   },
   {
-    num: 6,
-    title: "Rhinoceros+Grasshopper 3D modeling",
+    num: 7,
+    title: "Project Digital Simulation",
     sub: "",
     slides: [
       ...RHINO_GH_SLIDES,
@@ -296,7 +357,7 @@ export default function DesignProcess() {
 
   return (
     <section id="design-process" className="py-32 md:py-48 w-full px-4 md:px-8">
-      <SectionLabel number="03" text="Design Process" />
+      <SectionLabel number="03" text="Design Process" textFirst />
 
       <ScrollReveal>
         <p className="font-display font-extralight text-structural text-base md:text-lg tracking-wide mb-2">
@@ -307,10 +368,14 @@ export default function DesignProcess() {
         </h2>
       </ScrollReveal>
 
-      <div className="space-y-3">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          {phases.slice(0, 3).map((phase, i) => (
-            <ScrollReveal key={phase.num} delay={i * 0.1}>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        {phases.map((phase, i) => (
+          <ScrollReveal
+            key={phase.num}
+            delay={i * 0.1}
+            className={i === phases.length - 1 ? "flex justify-center md:col-span-3" : ""}
+          >
+            <div className={i === phases.length - 1 ? "w-full md:w-2/3" : "w-full"}>
               <div
                 className="flex flex-col items-center text-center cursor-default"
                 onMouseEnter={() => setHovered(i)}
@@ -346,51 +411,9 @@ export default function DesignProcess() {
                   </span>
                 ) : null}
               </div>
-            </ScrollReveal>
-          ))}
-        </div>
-
-        <div className="flex flex-col md:flex-row justify-center gap-3">
-          {phases.slice(3).map((phase, i) => (
-            <ScrollReveal key={phase.num} delay={(i + 3) * 0.1} className="md:w-1/3">
-              <div
-                className="flex flex-col items-center text-center cursor-default"
-                onMouseEnter={() => setHovered(i + 3)}
-                onMouseLeave={() => setHovered(null)}
-              >
-                <div
-                  className="w-full transition-[transform,box-shadow] duration-300 ease-out"
-                  style={{
-                    transform: hovered === i + 3 ? "scale(1.03)" : "scale(1)",
-                    boxShadow: hovered === i + 3 ? "0 12px 40px rgba(0,0,0,0.09)" : "0 0 0 rgba(0,0,0,0)",
-                  }}
-                >
-                  <DesignProcessPhaseSlider slides={phase.slides} />
-                </div>
-                <div
-                  className="mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-obsidian transition-transform duration-300"
-                  style={{ transform: hovered === i + 3 ? "scale(1.15)" : "scale(1)" }}
-                >
-                  <span className="font-mono text-[10px] text-bone">{phase.num}</span>
-                </div>
-                <span
-                  className="tech-label mt-2 block text-obsidian"
-                  style={{ opacity: hovered === null || hovered === i + 3 ? 1 : 0.3, transition: "opacity 0.3s" }}
-                >
-                  {phase.title}
-                </span>
-                {phase.sub ? (
-                  <span
-                    className="tech-label block text-structural/60"
-                    style={{ opacity: hovered === null || hovered === i + 3 ? 1 : 0.2, transition: "opacity 0.3s" }}
-                  >
-                    {phase.sub}
-                  </span>
-                ) : null}
-              </div>
-            </ScrollReveal>
-          ))}
-        </div>
+            </div>
+          </ScrollReveal>
+        ))}
       </div>
     </section>
   );

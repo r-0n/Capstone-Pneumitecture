@@ -72,7 +72,7 @@ export function ArtifactsPeelStack({ tone = "dark" }: { tone?: ArtifactsTone }) 
       <ArtifactsImageSlider tone={tone} />
 
       <div
-        className="relative mx-auto mt-2 w-full max-w-lg flex-1 lg:max-w-xl"
+        className="relative mx-auto mt-2 w-full max-w-lg flex-1 overflow-hidden lg:max-w-xl"
         style={{ perspective: "1400px" }}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}

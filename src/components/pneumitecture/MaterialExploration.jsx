@@ -1,20 +1,91 @@
+import { useState } from 'react';
 import ScrollReveal from './ScrollReveal';
 import SectionLabel from './SectionLabel';
 import { publicImages2Path } from '@/lib/publicAssetPath';
 
 const images = [
-  { src: publicImages2Path('material exp 1.jpg'), alt: 'Heat-sealed seams and material testing' },
-  { src: publicImages2Path('material exp 2.JPG'), alt: 'Inflatable prototypes and samples' },
-  { src: publicImages2Path('material exp 3.jpg'), alt: 'Failed prototype analysis' },
-  { src: publicImages2Path('material exp 4.jpg'), alt: 'Assembly process documentation' },
-  { src: publicImages2Path('material exp 5.jpg'), alt: 'Membrane surface detail' },
-  { src: publicImages2Path('material exp 6.jpg'), alt: 'Scale testing with interaction' },
+  {
+    src: publicImages2Path('material exp 1.jpg'),
+    alt: 'Heat-sealed seams and material testing',
+    label: 'Heat-Sealed Seams',
+    desc: 'Controlled bonding of membrane layers using a soldering iron to form precise, curved seams.',
+  },
+  {
+    src: publicImages2Path('material exp 2.JPG'),
+    alt: 'Inflatable prototypes and samples',
+    label: 'Pattern Mapping',
+    desc: 'Translating geometric logic onto flat membranes to guide inflation behavior.',
+  },
+  {
+    src: publicImages2Path('material exp 3.jpg'),
+    alt: 'Failed prototype analysis',
+    label: '3D Printed TPU Joint',
+    desc: 'Flexible connector fabricated using TPU filament to link and stabilize pneumatic elements.',
+  },
+  {
+    src: publicImages2Path('material exp 4.jpg'),
+    alt: 'Assembly process documentation',
+    label: 'TPU Fabric Sandwich',
+    desc: 'TPU layer embedded between two Lycra fabrics to combine airtightness with flexibility.',
+  },
+  {
+    src: publicImages2Path('material exp 5.jpg'),
+    alt: 'Membrane surface detail',
+    label: 'Structural Rod Integration',
+    desc: 'Placing internal rods to support and maintain the form of inflated TPU elements.',
+  },
+  {
+    src: publicImages2Path('material exp 6.jpg'),
+    alt: 'Scale testing with interaction',
+    label: 'Modular Unit Testing',
+    desc: 'Exploration of repeatable connection nodes for scalable pneumatic assemblies.',
+  },
 ];
+
+function MaterialCard({ img, delay }) {
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <ScrollReveal delay={delay}>
+      <div
+        className="relative overflow-hidden aspect-square rounded-2xl bg-white shadow-md p-3"
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+      >
+        <div className="relative w-full h-full overflow-hidden rounded-xl">
+          <img
+            src={img.src}
+            alt={img.alt}
+            className="w-full h-full object-cover hover:scale-105 transition-all duration-700"
+          />
+          <div
+            className="absolute inset-0 flex flex-col justify-end p-3"
+            style={{
+              background: hovered ? 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 60%)' : 'transparent',
+              transition: 'background 0.4s ease',
+            }}
+          >
+            <div
+              style={{
+                opacity: hovered ? 1 : 0,
+                transform: hovered ? 'translateY(0)' : 'translateY(10px)',
+                transition: 'opacity 0.35s ease, transform 0.35s ease',
+              }}
+            >
+              <p className="tech-label text-white mb-1">{img.label}</p>
+              <p className="font-display font-extralight text-white/80 text-sm leading-relaxed">{img.desc}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ScrollReveal>
+  );
+}
 
 export default function MaterialExploration() {
   return (
     <section id="materials" className="py-32 md:py-48 max-w-7xl mx-auto px-8 md:px-16">
-      <SectionLabel number="05" text="Material Exploration" />
+      <SectionLabel number="05" text="Material Exploration" textFirst />
       <ScrollReveal>
         <p className="font-display font-extralight text-structural text-base md:text-lg tracking-wide mb-2">Before the form, the material</p>
       </ScrollReveal>
@@ -27,15 +98,7 @@ export default function MaterialExploration() {
       {/* 3x2 Grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
         {images.map((img, i) => (
-          <ScrollReveal key={i} delay={i * 0.08}>
-            <div className="overflow-hidden aspect-square bg-aero/20">
-              <img
-                src={img.src}
-                alt={img.alt}
-                className="w-full h-full object-cover grayscale hover:grayscale-0 hover:scale-105 transition-all duration-700"
-              />
-            </div>
-          </ScrollReveal>
+          <MaterialCard key={i} img={img} delay={i * 0.08} />
         ))}
       </div>
 
@@ -49,7 +112,7 @@ export default function MaterialExploration() {
             directly informed the final system's construction methodology.
           </p>
           <p className="tech-label text-structural mt-6">
-            <span className="font-bold">Materials:</span> TPU Coated Fabric (Silk, Cotton) · TPU 3D Print Filament ·
+            <span className="font-bold">Materials:</span> Lycra Fabric (Silk, Cotton) · TPU 3D Print Filament ·
           </p>
         </div>
       </ScrollReveal>

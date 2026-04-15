@@ -22,7 +22,7 @@ export default function ParadigmShiftSection() {
     <section id="paradigm-shift" className="relative isolate scroll-mt-24 overflow-hidden">
       <div className="relative bg-bone text-foreground">
         <div className="mx-auto max-w-[1580px] px-4 pb-5 pt-8 sm:px-6 md:px-10 lg:px-12 lg:pb-6 lg:pt-9">
-          <SectionLabel number="02" text="Concept" />
+          <SectionLabel number="02" text="Concept" textFirst />
 
           <h1 className="mx-auto max-w-[min(100%,1240px)] text-center font-display text-[clamp(2rem,6.5vw,5rem)] font-extralight uppercase leading-[0.92] tracking-[0.04em] text-foreground/90">
             A SHIFT IN PARADIGM
