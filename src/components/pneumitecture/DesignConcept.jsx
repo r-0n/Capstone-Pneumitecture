@@ -1,39 +1,8 @@
 import ScrollReveal from './ScrollReveal';
 import SectionLabel from './SectionLabel';
-import ConceptCard from './ConceptCard';
 import FloatImage from './FloatImage';
-import { publicAssetPath } from '@/lib/publicAssetPath';
 
 const CONCEPT_IMG = 'https://media.base44.com/images/public/69da883791905282c2acac77/f3d27552b_generated_1489b319.png';
-
-const SOFT_IMG = publicAssetPath(
-  '/images/' + encodeURIComponent('Gemini_Generated_Image_5wyv915wyv915wyv (2).png'),
-);
-const INFLATE_IMG = publicAssetPath(
-  '/images/' + encodeURIComponent('Gemini_Generated_Image_5wyv915wyv915wyv (1).png'),
-);
-const PNEUMA_IMG = publicAssetPath('/images/pneumatics.PNG');
-
-const cards = [
-  {
-    title: 'Softness',
-    image: SOFT_IMG,
-    description:
-      'Softness is explored as a spatial condition rather than a material quality. It enables architecture to move away from rigidity and towards adaptability, where form can deform, respond, and continuously shift in relation to external forces.',
-  },
-  {
-    title: 'Inflatables',
-    image: INFLATE_IMG,
-    description:
-      'Inflatables introduce a lightweight system of spatial transformation driven by air. Their ability to expand and collapse allows architecture to exist in a state of constant change, challenging permanence and static form.',
-  },
-  {
-    title: 'Pneumatics',
-    image: PNEUMA_IMG,
-    description:
-      'Pneumatics act as the driving mechanism behind the system, translating air pressure into controlled movement. This enables responsive behavior, where structural form becomes directly linked to environmental and human interaction.',
-  },
-];
 
 export default function DesignConcept() {
   return (
@@ -69,19 +38,6 @@ export default function DesignConcept() {
             />
           </div>
         </ScrollReveal>
-      </div>
-
-      {/* Conceptual Foundations */}
-      <ScrollReveal>
-        <h3 className="font-display font-extralight text-xl md:text-2xl tracking-tight mb-12">
-          Conceptual Foundations
-        </h3>
-      </ScrollReveal>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {cards.map((card, i) => (
-          <ConceptCard key={card.title} {...card} index={i} />
-        ))}
       </div>
     </section>
   );
