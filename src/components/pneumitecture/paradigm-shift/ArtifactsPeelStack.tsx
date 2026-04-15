@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { ArtifactsImageSlider } from "@/components/pneumitecture/paradigm-shift/ArtifactsImageSlider";
 
 const STACK = [
   {
@@ -30,33 +31,48 @@ const TOP = {
   rotate: -2.2,
 } as const;
 
-export function ArtifactsPeelStack() {
+type ArtifactsTone = "dark" | "light";
+
+export function ArtifactsPeelStack({ tone = "dark" }: { tone?: ArtifactsTone }) {
   const [hovered, setHovered] = useState(false);
   const peel = hovered ? 20 : 9;
 
+  const isLight = tone === "light";
+  const labelMuted = isLight ? "text-neutral-500" : "text-white/55";
+  const navBorder = isLight ? "border-neutral-300/80" : "border-white/20";
+  const dotActive = isLight ? "bg-neutral-800" : "bg-white";
+  const dotIdle = isLight ? "bg-neutral-800/30" : "bg-white/30";
+  const cardBorder = isLight ? "border-neutral-300/70" : "border-white/25";
+  const cardBg = isLight ? "bg-neutral-100" : "bg-neutral-900";
+  const topCardBorder = isLight ? "border-neutral-400/60" : "border-white/35";
+  const captionBar = isLight ? "border-neutral-300/80 bg-white/95" : "border-white/40 bg-white/95";
+  const captionText = "text-neutral-600";
+
   return (
-    <div className="relative flex min-h-[420px] flex-col lg:min-h-[480px]">
-      <div className="mb-6 flex items-start justify-between gap-4 pr-8 lg:pr-10">
-        <p className="font-sans text-[10px] font-semibold uppercase tracking-[0.28em] text-white/55">
-          4. The artifacts
+    <div className="relative flex min-h-[380px] flex-col lg:min-h-[440px]">
+      <div className="mb-5 flex items-start justify-between gap-4 pr-6 lg:pr-8">
+        <p className={`font-sans text-[10px] font-semibold uppercase tracking-[0.28em] ${labelMuted}`}>
+          4. Initial sketches
         </p>
         <nav
-          className="flex flex-col gap-2 border-l border-white/20 pl-3"
+          className={`flex flex-col gap-2 border-l pl-3 ${navBorder}`}
           aria-label="Artifact index"
         >
           {[TOP, ...STACK].map((c, i) => (
             <span
               key={c.key}
               className={`block h-1.5 w-1.5 rounded-full transition-colors ${
-                i === 0 ? "bg-white" : "bg-white/30"
+                i === 0 ? dotActive : dotIdle
               }`}
             />
           ))}
         </nav>
       </div>
 
+      <ArtifactsImageSlider tone={tone} />
+
       <div
-        className="relative mx-auto mt-4 w-full max-w-lg flex-1 lg:max-w-xl"
+        className="relative mx-auto mt-2 w-full max-w-lg flex-1 lg:max-w-xl"
         style={{ perspective: "1400px" }}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
@@ -64,7 +80,7 @@ export function ArtifactsPeelStack() {
         {STACK.map((c) => (
           <div
             key={c.key}
-            className="absolute left-[5%] right-[7%] overflow-hidden rounded-lg border border-white/25 bg-neutral-900 shadow-xl"
+            className={`absolute left-[5%] right-[7%] overflow-hidden rounded-lg border shadow-xl ${cardBorder} ${cardBg}`}
             style={{
               top: c.y,
               zIndex: c.z,
@@ -73,8 +89,8 @@ export function ArtifactsPeelStack() {
           >
             <div className="relative aspect-[16/10] w-full">
               <Image src={c.src} alt="" fill className="object-cover" sizes="400px" />
-              <div className="absolute inset-x-0 bottom-0 border-t border-white/40 bg-white/95 px-3 py-1.5">
-                <p className="font-sans text-[9px] font-semibold uppercase tracking-[0.2em] text-neutral-600">
+              <div className={`absolute inset-x-0 bottom-0 border-t px-3 py-1.5 ${captionBar}`}>
+                <p className={`font-sans text-[9px] font-semibold uppercase tracking-[0.2em] ${captionText}`}>
                   {c.label}
                 </p>
               </div>
@@ -83,7 +99,7 @@ export function ArtifactsPeelStack() {
         ))}
 
         <motion.div
-          className="absolute left-[3%] right-[5%] top-0 z-40 overflow-visible rounded-lg border border-white/35 bg-white shadow-2xl"
+          className={`absolute left-[3%] right-[5%] top-0 z-40 overflow-visible rounded-lg border bg-white shadow-2xl ${topCardBorder}`}
           style={{ transform: `rotate(${TOP.rotate}deg)` }}
           animate={{ rotate: hovered ? TOP.rotate - 1.2 : TOP.rotate }}
           transition={{ type: "spring", stiffness: 140, damping: 20 }}
@@ -127,8 +143,8 @@ export function ArtifactsPeelStack() {
               </div>
             </div>
           </div>
-          <div className="border-t border-white/50 bg-white px-3 py-2">
-            <p className="font-sans text-[9px] font-semibold uppercase tracking-[0.2em] text-neutral-600">
+          <div className={`border-t bg-white px-3 py-2 ${isLight ? "border-neutral-200" : "border-white/50"}`}>
+            <p className={`font-sans text-[9px] font-semibold uppercase tracking-[0.2em] ${captionText}`}>
               {TOP.label}
             </p>
           </div>

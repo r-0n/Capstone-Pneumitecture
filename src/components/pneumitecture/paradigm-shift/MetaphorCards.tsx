@@ -9,10 +9,10 @@ const cardBase =
 export function MetaphorCards() {
   return (
     <div>
-      <p className="mb-6 font-sans text-[10px] font-semibold uppercase tracking-[0.28em] text-white/55">
+      <p className="mb-4 font-sans text-[10px] font-semibold uppercase tracking-[0.28em] text-white/55">
         3. The metaphor
       </p>
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <motion.div
           whileHover={{ scale: 1.03 }}
           transition={{ type: "spring", stiffness: 400, damping: 28 }}
@@ -59,7 +59,7 @@ export function MetaphorCards() {
           </div>
         </motion.div>
       </div>
-      <p className="mx-auto mt-8 max-w-xl text-center font-sans text-sm font-light leading-relaxed text-white/70 md:text-[15px]">
+      <p className="mx-auto mt-5 max-w-xl text-center font-sans text-sm font-light leading-relaxed text-white/70 md:text-[15px]">
         Spatial empathy is breaking physical and digital boundaries — softness as signal, pressure as
         dialogue, and atmosphere as something you feel before you name it.
       </p>
