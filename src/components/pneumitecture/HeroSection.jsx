@@ -394,11 +394,11 @@ export default function HeroSection() {
         </div>
       )}
 
-      {false && heroPhase === 'video' && !ytUnavailable && !userAudible && scrollFade < 0.12 && (
+      {heroPhase === 'video' && !ytUnavailable && !userAudible && (
         <button
           type="button"
           onClick={enableSound}
-          className="absolute bottom-24 right-6 z-[25] flex items-center gap-2 rounded-full border border-white/25 bg-black/45 px-3 py-2 text-[11px] font-medium uppercase tracking-[0.14em] text-bone/90 shadow-lg backdrop-blur-sm transition hover:bg-black/60 md:bottom-28"
+          className="absolute bottom-6 right-6 z-[25] flex items-center gap-2 rounded-full border border-white/25 bg-black/45 px-3 py-2 text-[11px] font-medium uppercase tracking-[0.14em] text-bone/90 shadow-lg backdrop-blur-sm transition hover:bg-black/60 md:bottom-7"
         >
           <Volume2 className="size-3.5 shrink-0 opacity-90" aria-hidden />
           Sound on

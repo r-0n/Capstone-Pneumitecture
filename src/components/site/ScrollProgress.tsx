@@ -4,36 +4,27 @@ import { useCallback, useEffect, useState } from "react";
 import { SITE_SECTIONS } from "@/config/navigation";
 import { scrollToSection } from "@/lib/scrollToSection";
 
-/** Right-rail dots — document order (see `siteLayout.ts`) */
-const PROGRESS_IDS = [
-  "pavilion-lead",
-  "paradigm-shift",
-  "design-process",
-  "system",
-  "materials",
-  "prototyping",
-  "behavior",
-  "pavilion",
-  "concept",
-  "archive",
+/** Right-rail dots in exact on-page visual order */
+const PROGRESS_STEPS = [
+  { id: "pavilion-lead", label: "01 · Pavilion Premise" },
+  { id: "paradigm-shift", label: "02 · Concept" },
+  { id: "design-process", label: "03 · Design Process" },
+  { id: "system", label: "04 · System Design" },
+  { id: "materials", label: "05 · Material Exploration" },
+  { id: "prototyping", label: "06 · Prototype Iterations" },
+  { id: "behavior", label: "07 · Human Interaction" },
+  { id: "pavilion", label: "08 · The Pavilion" },
+  { id: "concept", label: "09 · Design Concept" },
+  { id: "archive", label: "10 · Media / Archive" },
 ] as const;
 
-const DOT_LABELS: Record<string, string> = {
-  "pavilion-lead": "01 · Pavilion premise",
-  "paradigm-shift": "02 · The Paradigm Shift",
-  concept: "03 · Design concept",
-  "design-process": "04 · Design process",
-  system: "05 · System",
-  materials: "06 · Materials",
-  prototyping: "07 · Prototyping",
-  behavior: "08 · Behavior",
-  pavilion: "10 · The Pavilion",
-  archive: "11 · Media archive",
-};
+const PROGRESS_IDS = PROGRESS_STEPS.map((s) => s.id);
 
 function labelFor(id: string) {
   return (
-    DOT_LABELS[id] ?? SITE_SECTIONS.find((s) => s.id === id)?.label ?? id.replace(/-/g, " ")
+    PROGRESS_STEPS.find((step) => step.id === id)?.label ??
+    SITE_SECTIONS.find((s) => s.id === id)?.label ??
+    id.replace(/-/g, " ")
   );
 }
 
@@ -78,7 +69,7 @@ export function ScrollProgress() {
       className="pointer-events-auto fixed right-4 top-1/2 z-[190] hidden -translate-y-1/2 flex-col gap-2.5 md:flex"
       aria-label="Section progress"
     >
-      {PROGRESS_IDS.map((id) => {
+      {PROGRESS_STEPS.map(({ id }) => {
         const isActive = active !== null && active === id;
         return (
           <button

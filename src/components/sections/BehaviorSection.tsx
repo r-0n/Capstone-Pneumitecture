@@ -10,7 +10,7 @@ export function BehaviorSection() {
       className="relative scroll-mt-24 border-t border-[var(--hairline)] bg-blueprint py-24 md:py-32"
     >
       <div className="relative z-10 mx-auto max-w-[1100px] px-5 md:px-10">
-        <SectionLabel number="08" text="Behavior" />
+        <SectionLabel number="07" text="Behavior" />
         <motion.article
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}

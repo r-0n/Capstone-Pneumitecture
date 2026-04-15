@@ -1,19 +1,16 @@
 "use client";
 
-/**
- * Hard boundary between narrative blocks — high contrast so it never “disappears”
- * into the page background (#FBFBF9).
- */
+/** Soft separator between narrative blocks for a seamless scroll rhythm. */
 export function SectionBreak() {
   return (
     <div
       aria-hidden
-      className="relative left-1/2 z-20 w-screen -translate-x-1/2 border-y border-slate-400/25 bg-[#cfd8e8] py-10 shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_8px_28px_rgba(15,23,42,0.06)]"
+      className="relative left-1/2 z-10 w-screen -translate-x-1/2 border-y border-slate-300/25 bg-linear-to-b from-[#eef2f8] via-[#e9eef6] to-[#eef2f8] py-5"
     >
-      <div className="mx-auto flex max-w-2xl items-center gap-4 px-6">
-        <span className="h-px min-h-px flex-1 rounded-full bg-slate-500/35" />
-        <span className="h-2 w-2 shrink-0 rounded-full bg-[var(--accent-soft)] shadow-[0_0_0_3px_rgba(107,140,255,0.2)]" />
-        <span className="h-px min-h-px flex-1 rounded-full bg-slate-500/35" />
+      <div className="mx-auto flex max-w-3xl items-center gap-3 px-6">
+        <span className="h-px min-h-px flex-1 rounded-full bg-slate-400/25" />
+        <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--accent-soft)]/80 shadow-[0_0_0_2px_rgba(107,140,255,0.15)]" />
+        <span className="h-px min-h-px flex-1 rounded-full bg-slate-400/25" />
       </div>
     </div>
   );
