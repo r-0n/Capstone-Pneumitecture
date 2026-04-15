@@ -6,7 +6,9 @@ import { AnimatePresence, motion } from "framer-motion";
 
 export type DesignProcessSlide =
   | { type: "image"; src: string; caption: string; alt: string }
-  | { type: "video"; src: string; caption: string; alt: string; poster?: string };
+  | { type: "video"; src: string; caption: string; alt: string; poster?: string }
+  /** Google Drive preview, YouTube embed, etc. `src` is the iframe `src` URL. */
+  | { type: "iframe"; src: string; caption: string; alt: string; poster?: string };
 
 type DesignProcessPhaseSliderProps = {
   slides: readonly DesignProcessSlide[];
@@ -50,7 +52,7 @@ export function DesignProcessPhaseSlider({ slides, priority = false }: DesignPro
         >
           {slides.map((slide, i) => (
             <div
-              key={`${slide.type}-${i}-${slide.src}`}
+              key={`${slide.type}-${i}-${"src" in slide ? slide.src : i}`}
               className="relative h-full shrink-0 self-stretch"
               style={{ flex: `0 0 ${100 / n}%` }}
             >
@@ -64,25 +66,45 @@ export function DesignProcessPhaseSlider({ slides, priority = false }: DesignPro
                   priority={priority && i === 0}
                   draggable={false}
                 />
-              ) : i === index ? (
-                <video
-                  key={slide.src}
-                  className="absolute inset-0 h-full w-full object-contain p-1"
-                  controls
-                  playsInline
-                  preload="metadata"
-                  poster={slide.poster}
-                  aria-label={slide.alt}
-                >
-                  <source src={slide.src} />
-                </video>
-              ) : slide.poster ? (
-                <Image src={slide.poster} alt={slide.alt} fill className="object-contain p-1 opacity-80" sizes="(max-width:768px) 92vw, 33vw" />
-              ) : (
-                <div className="absolute inset-0 flex items-center justify-center bg-bone p-4">
-                  <span className="font-sans text-[9px] font-light uppercase tracking-widest text-structural/45">Video</span>
-                </div>
-              )}
+              ) : slide.type === "iframe" ? (
+                i === index ? (
+                  <iframe
+                    key={slide.src}
+                    src={slide.src}
+                    title={slide.alt}
+                    className="absolute inset-0 h-full w-full rounded-sm border-0 bg-bone p-0.5"
+                    allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+                    allowFullScreen
+                    referrerPolicy="strict-origin-when-cross-origin"
+                  />
+                ) : slide.poster ? (
+                  <Image src={slide.poster} alt={slide.alt} fill className="object-contain p-1 opacity-80" sizes="(max-width:768px) 92vw, 33vw" />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center bg-bone p-4">
+                    <span className="font-sans text-[9px] font-light uppercase tracking-widest text-structural/45">Embed</span>
+                  </div>
+                )
+              ) : slide.type === "video" ? (
+                i === index ? (
+                  <video
+                    key={slide.src}
+                    className="absolute inset-0 h-full w-full object-contain p-1"
+                    controls
+                    playsInline
+                    preload="metadata"
+                    poster={slide.poster}
+                    aria-label={slide.alt}
+                  >
+                    <source src={slide.src} />
+                  </video>
+                ) : slide.poster ? (
+                  <Image src={slide.poster} alt={slide.alt} fill className="object-contain p-1 opacity-80" sizes="(max-width:768px) 92vw, 33vw" />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center bg-bone p-4">
+                    <span className="font-sans text-[9px] font-light uppercase tracking-widest text-structural/45">Video</span>
+                  </div>
+                )
+              ) : null}
             </div>
           ))}
         </div>
@@ -116,30 +138,60 @@ export function DesignProcessPhaseSlider({ slides, priority = false }: DesignPro
       </div>
 
       {n > 1 ? (
-        <div className="mb-2 flex gap-1.5 px-0.5 py-1" role="tablist" aria-label="Process media slides">
-          {slides.map((slide, i) => (
-            <button
-              key={`dot-${i}`}
-              type="button"
-              role="tab"
-              aria-selected={i === index}
-              aria-label={`Slide ${i + 1}`}
-              onClick={() => setIndex(i)}
-              className="relative flex min-h-8 flex-1 items-center overflow-hidden rounded-full bg-structural/15 px-0.5"
-            >
-              <span className="pointer-events-none absolute inset-x-1 top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-structural/20" />
-              <motion.span
-                layout
-                className="pointer-events-none absolute left-1 top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-obsidian"
-                initial={false}
-                animate={{
-                  width: i === index ? "calc(100% - 0.5rem)" : "22%",
-                  opacity: i === index ? 1 : 0.35,
-                }}
-                transition={{ type: "spring", stiffness: 420, damping: 34 }}
-              />
-            </button>
-          ))}
+        <div
+          className="mb-2 flex min-h-[2.75rem] w-full flex-col items-center justify-center gap-1.5 px-1"
+          role="tablist"
+          aria-label="Process media slides"
+        >
+          <span
+            className="pointer-events-none h-px w-[min(100%,18rem)] shrink-0 bg-gradient-to-r from-transparent via-structural/25 to-transparent"
+            aria-hidden
+          />
+          <div className="flex max-h-[4.5rem] max-w-full flex-wrap justify-center gap-x-2 gap-y-2 overflow-y-auto py-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {slides.map((_, i) => {
+              const active = i === index;
+              return (
+                <button
+                  key={`dot-${i}`}
+                  type="button"
+                  role="tab"
+                  aria-selected={active}
+                  aria-label={`Slide ${i + 1} of ${n}`}
+                  onClick={() => setIndex(i)}
+                  className="group relative flex h-7 w-7 shrink-0 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50"
+                >
+                  <span
+                    className="pointer-events-none absolute inset-0 rounded-full opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                    style={{
+                      background:
+                        "radial-gradient(circle at 50% 50%, rgba(107,140,255,0.12) 0%, transparent 70%)",
+                    }}
+                    aria-hidden
+                  />
+                  <motion.span
+                    layout
+                    className={`rounded-full border border-structural/20 bg-bone shadow-inner ${
+                      active
+                        ? "bg-obsidian ring-2 ring-cyan-400/35 shadow-[0_0_14px_rgba(107,140,255,0.45)]"
+                        : "bg-structural/15 group-hover:bg-structural/25"
+                    }`}
+                    initial={false}
+                    animate={{
+                      width: active ? 10 : 6,
+                      height: active ? 10 : 6,
+                    }}
+                    transition={{ type: "spring", stiffness: 520, damping: 28 }}
+                  />
+                  {active ? (
+                    <span
+                      className="pointer-events-none absolute inset-0 animate-pulse rounded-full border border-cyan-400/20 motion-reduce:animate-none"
+                      aria-hidden
+                    />
+                  ) : null}
+                </button>
+              );
+            })}
+          </div>
         </div>
       ) : null}
 
@@ -181,7 +233,9 @@ export function DesignProcessPhaseSlider({ slides, priority = false }: DesignPro
       </div>
 
       {n > 1 ? (
-        <p className="mt-1 text-center font-sans text-[8px] font-light tracking-wide text-structural/50">← → keys · arrows on image</p>
+        <p className="mt-1 text-center font-sans text-[8px] font-light tracking-wide text-structural/50">
+          ← → keys · arrows on image · orbit dots
+        </p>
       ) : null}
     </div>
   );

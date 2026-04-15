@@ -6,7 +6,86 @@ import SectionLabel from "./SectionLabel";
 import { publicAssetPath, publicImages2Path } from "@/lib/publicAssetPath";
 import { DesignProcessPhaseSlider } from "./DesignProcessPhaseSlider";
 
-/** Phase 1: your uploaded process imagery (`public/images/design-process/phase1-slide0*.png`). */
+/** Google Drive preview (share: anyone with link can view). */
+const PROCESS_DRIVE_IFRAME =
+  "https://drive.google.com/file/d/1Q5lOm8fj7E4ZU8Q0P8gw5YoUdD-n5RZ0/preview";
+
+const heatImg = (n) =>
+  publicAssetPath(`/images/design-process/heat-sealing/${String(n).padStart(2, "0")}.png`);
+
+const mountingImg = (n) =>
+  publicAssetPath(`/images/design-process/mounting-rods/${String(n).padStart(2, "0")}.png`);
+
+const MOUNTING_TEST_VIDEO_IFRAME_A =
+  "https://drive.google.com/file/d/1ikSUiOJzLn-oxtvjNdaSKWz1vevogtTZ/preview";
+const MOUNTING_TEST_VIDEO_IFRAME_B =
+  "https://drive.google.com/file/d/1UNXmqvHuG1tgUvb4lcKx-CTSmjbxRWj5/preview";
+const ARDUINO_TEST_VIDEO_IFRAME_A =
+  "https://drive.google.com/file/d/1TT4enFtedAvIoGcyQMHh5onOeebDkuSz/preview";
+const ARDUINO_TEST_VIDEO_IFRAME_B =
+  "https://drive.google.com/file/d/1ZnFgcApK-7O6e3EUslGnDBkalMxwu1Ht/preview";
+const RHINO_GH_VIDEO_IFRAME_A =
+  "https://drive.google.com/file/d/1yEIp8EeoqVb-49s7lg82Hja2zv9A0w9R/preview";
+const RHINO_GH_VIDEO_IFRAME_B =
+  "https://drive.google.com/file/d/15LPcn--R-cZZXUlfOctfqLajAIJmroL5/preview";
+const RHINO_GH_VIDEO_IFRAME_C =
+  "https://drive.google.com/file/d/1WeAxBJEg7rBfVf8Zh_8egIQhuaDbYUiG/preview";
+
+const HEAT_CAPTIONS = [
+  "Film layout — red-line geometry taped to the bench for seam planning.",
+  "Template pass — octagram / two-square diagram with centre guides on vellum.",
+  "Pattern study — tessellated marks on translucent film before sealing.",
+  "Fabric leaf — hand-tacked black layer beside the film study.",
+  "Heat trace — tool-guided seam along drawn channels on the membrane.",
+  "Sealing pass — bonding translucent panels along the layout lines.",
+  "Inflation layout — tubes taped at intersections for chamber testing.",
+  "Workbench — iron, fabric leaf, and film cutouts in one station.",
+  "Two-panel spread — ruler, impulse sealer, and marked geometry on film.",
+  "Star cutout — iron tip at a sealed junction on the workshop table.",
+  "Flat assembly — large sealed sheets laid out on the rug for review.",
+  "Paired prototypes — stitched fabric leaf and sealed film leaf with inflation tube.",
+];
+
+const HEAT_SEALING_SLIDES = HEAT_CAPTIONS.map((caption, idx) => ({
+  type: "image",
+  src: heatImg(idx + 1),
+  alt: `Heat-sealing and testing — bench study ${idx + 1}`,
+  caption,
+}));
+
+const arduinoImg = (n) =>
+  publicAssetPath(`/images/design-process/arduino-circuit/${String(n).padStart(2, "0")}.png`);
+
+const frameImg = (n) =>
+  publicAssetPath(`/images/design-process/frame-design/${String(n).padStart(2, "0")}.png`);
+const rhinoImg = (n) =>
+  publicAssetPath(`/images/design-process/rhino-gh/${String(n).padStart(2, "0")}.png`);
+
+const RHINO_GH_CAPTIONS = [
+  "Grasshopper flow — triangulation and pressure setup blocks.",
+  "Single strip study — parametric panel profile in Rhino.",
+  "Three-strip array — replicated panel strips for facade assembly.",
+  "Definition check — selective activation with gene pools.",
+  "Simulation stage — inflated and resting cells across the frame.",
+  "Perspective stage — alternating inflation pattern behavior.",
+  "Viewport capture — white/red inflation distribution test.",
+  "Rendered preview — frame and membrane atmosphere test.",
+  "Pipeline graph — full Kangaroo/Weaverbird wiring map.",
+  "Data setup — geometry extraction and rule conditioning.",
+  "Dispatch stage — mesh split and custom preview channels.",
+  "Human interaction setup — proximity influence and frame anchors.",
+  "Combined Rhino + Grasshopper workspace for system assembly.",
+  "Final viewport tune — display settings and composed frame scene.",
+];
+
+const RHINO_GH_SLIDES = RHINO_GH_CAPTIONS.map((caption, idx) => ({
+  type: "image",
+  src: rhinoImg(idx + 1),
+  alt: `Rhinoceros+Grasshopper modeling capture ${idx + 1}`,
+  caption,
+}));
+
+/** Phase 1: ideation imagery. */
 const PHASE1_SLIDES = [
   {
     type: "image",
@@ -41,60 +120,172 @@ const PHASE1_SLIDES = [
 const phases = [
   {
     num: 1,
-    title: "Circular Geometry",
-    sub: "& Plan Organisation",
+    title: "Ideating & sketching",
+    sub: "",
     slides: PHASE1_SLIDES,
   },
   {
     num: 2,
-    title: "Space Frame",
-    sub: "& Structural System",
+    title: "Heat-sealing & Testing",
+    sub: "",
     slides: [
+      ...HEAT_SEALING_SLIDES,
       {
-        type: "image",
-        src: publicImages2Path("base 2.png"),
-        alt: "Space frame and structural system diagram",
-        caption: "Space frame — structural system and assembly logic.",
+        type: "iframe",
+        src: PROCESS_DRIVE_IFRAME,
+        poster: heatImg(12),
+        alt: "Heat-sealing and testing — process video on Google Drive",
+        caption: "Process recap — walkthrough on Google Drive.",
       },
-      // Example: { type: "video", src: publicAssetPath("/videos/space-frame.mp4"), poster: publicImages2Path("base 2.png"), alt: "Process video", caption: "Walkthrough or screen recording." },
     ],
   },
   {
     num: 3,
-    title: "Volumetric Form",
-    sub: "Development",
+    title: "Mounting onto Aluminium Rods & Testing",
+    sub: "",
     slides: [
       {
         type: "image",
-        src: publicImages2Path("base 3.png"),
-        alt: "Volumetric form development study",
-        caption: "Volumetric form — massing and envelope development.",
+        src: mountingImg(1),
+        alt: "Mounted translucent membrane test on aluminium rods",
+        caption: "Mounted assembly — membrane fixed on aluminium rods for full-span testing.",
+      },
+      {
+        type: "image",
+        src: mountingImg(2),
+        alt: "Aluminium-rod mounting close-up",
+        caption: "Mount detail — edge geometry and rod connection alignment.",
+      },
+      {
+        type: "image",
+        src: mountingImg(3),
+        alt: "Mounted sheet test layout on workbench",
+        caption: "Bench test — mounted panel behavior under handling and setup.",
+      },
+      {
+        type: "iframe",
+        src: MOUNTING_TEST_VIDEO_IFRAME_A,
+        poster: mountingImg(1),
+        alt: "Mounting onto aluminium rods test video A",
+        caption: "Test video A — mounting sequence and initial behavior.",
+      },
+      {
+        type: "iframe",
+        src: MOUNTING_TEST_VIDEO_IFRAME_B,
+        poster: mountingImg(3),
+        alt: "Mounting onto aluminium rods test video B",
+        caption: "Test video B — rod-mounted response during handling.",
       },
     ],
   },
   {
     num: 4,
-    title: "Triangulated Skin",
-    sub: "& Cladding Panels",
+    title: "Building Arduino Circuit | Testing Controlled inflation with Solenoid Valves",
+    sub: "",
     slides: [
       {
         type: "image",
-        src: publicImages2Path("base4.png"),
-        alt: "Triangulated skin and cladding panel study",
-        caption: "Triangulated skin — panel logic and cladding studies.",
+        src: arduinoImg(1),
+        alt: "Solenoid valve manifold and tubing layout",
+        caption: "Valve network — routed pneumatic lines and solenoid distribution.",
+      },
+      {
+        type: "image",
+        src: arduinoImg(2),
+        alt: "Arduino with jumper-wire harness",
+        caption: "Control core — Arduino wiring and relay path prototyping.",
+      },
+      {
+        type: "image",
+        src: arduinoImg(3),
+        alt: "Top-down tubing and valve board",
+        caption: "Bench map — channel routing and valve placement checks.",
+      },
+      {
+        type: "image",
+        src: arduinoImg(4),
+        alt: "Close-up of breadboard and driver components",
+        caption: "Circuit build — breadboard drivers for controlled inflation cycles.",
+      },
+      {
+        type: "iframe",
+        src: ARDUINO_TEST_VIDEO_IFRAME_A,
+        poster: arduinoImg(1),
+        alt: "Arduino and solenoid inflation test video A",
+        caption: "Test video A — solenoid-actuated inflation sequence.",
+      },
+      {
+        type: "iframe",
+        src: ARDUINO_TEST_VIDEO_IFRAME_B,
+        poster: arduinoImg(4),
+        alt: "Arduino and solenoid inflation test video B",
+        caption: "Test video B — timing and control response check.",
       },
     ],
   },
   {
     num: 5,
-    title: "Biomorphic Facade",
-    sub: "& Final Envelope",
+    title: "Frame Design | Building | Testing",
+    sub: "",
     slides: [
       {
         type: "image",
-        src: publicImages2Path("base 5.png"),
-        alt: "Biomorphic facade and final envelope study",
-        caption: "Biomorphic facade — final envelope and surface resolution.",
+        src: frameImg(1),
+        alt: "Primary timber test frame on base platform",
+        caption: "Frame setup — primary timber rig assembled on the base platform.",
+      },
+      {
+        type: "image",
+        src: frameImg(2),
+        alt: "Concept sketch for dual vertical rails and membrane routing",
+        caption: "Frame concept — drawn guide for rail spacing and inflatable path.",
+      },
+      {
+        type: "image",
+        src: frameImg(3),
+        alt: "Second angle of timber frame prototype",
+        caption: "Build check — assembled frame geometry and joint stability.",
+      },
+      {
+        type: "image",
+        src: frameImg(4),
+        alt: "Single-cell cross-section sketch between frame rails",
+        caption: "Cell profile — section sketch for one inflation bay between rails.",
+      },
+      {
+        type: "image",
+        src: frameImg(5),
+        alt: "Mounted modular panel on timber frame",
+        caption: "Testing stage — mounted module panel inside completed frame.",
+      },
+    ],
+  },
+  {
+    num: 6,
+    title: "Rhinoceros+Grasshopper 3D modeling",
+    sub: "",
+    slides: [
+      ...RHINO_GH_SLIDES,
+      {
+        type: "iframe",
+        src: RHINO_GH_VIDEO_IFRAME_A,
+        poster: rhinoImg(14),
+        alt: "Rhinoceros+Grasshopper simulation video A",
+        caption: "Simulation video A — parametric behavior playback.",
+      },
+      {
+        type: "iframe",
+        src: RHINO_GH_VIDEO_IFRAME_B,
+        poster: rhinoImg(13),
+        alt: "Rhinoceros+Grasshopper simulation video B",
+        caption: "Simulation video B — inflation sequence and logic check.",
+      },
+      {
+        type: "iframe",
+        src: RHINO_GH_VIDEO_IFRAME_C,
+        poster: rhinoImg(12),
+        alt: "Rhinoceros+Grasshopper simulation video C",
+        caption: "Simulation video C — final behavior pass.",
       },
     ],
   },
@@ -146,19 +337,21 @@ export default function DesignProcess() {
                 >
                   {phase.title}
                 </span>
-                <span
-                  className="tech-label block text-structural/60"
-                  style={{ opacity: hovered === null || hovered === i ? 1 : 0.2, transition: "opacity 0.3s" }}
-                >
-                  {phase.sub}
-                </span>
+                {phase.sub ? (
+                  <span
+                    className="tech-label block text-structural/60"
+                    style={{ opacity: hovered === null || hovered === i ? 1 : 0.2, transition: "opacity 0.3s" }}
+                  >
+                    {phase.sub}
+                  </span>
+                ) : null}
               </div>
             </ScrollReveal>
           ))}
         </div>
 
         <div className="flex flex-col md:flex-row justify-center gap-3">
-          {phases.slice(3, 5).map((phase, i) => (
+          {phases.slice(3).map((phase, i) => (
             <ScrollReveal key={phase.num} delay={(i + 3) * 0.1} className="md:w-1/3">
               <div
                 className="flex flex-col items-center text-center cursor-default"
@@ -186,12 +379,14 @@ export default function DesignProcess() {
                 >
                   {phase.title}
                 </span>
-                <span
-                  className="tech-label block text-structural/60"
-                  style={{ opacity: hovered === null || hovered === i + 3 ? 1 : 0.2, transition: "opacity 0.3s" }}
-                >
-                  {phase.sub}
-                </span>
+                {phase.sub ? (
+                  <span
+                    className="tech-label block text-structural/60"
+                    style={{ opacity: hovered === null || hovered === i + 3 ? 1 : 0.2, transition: "opacity 0.3s" }}
+                  >
+                    {phase.sub}
+                  </span>
+                ) : null}
               </div>
             </ScrollReveal>
           ))}
