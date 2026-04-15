@@ -26,9 +26,6 @@ export default function BelowFoldApp() {
       </SectionTransition>
       <SectionBreak />
       <SectionTransition>
-        <DesignConcept />
-      </SectionTransition>
-      <SectionTransition>
         <DesignProcess />
       </SectionTransition>
       <SectionBreak />
@@ -54,6 +51,10 @@ export default function BelowFoldApp() {
       <SectionBreak />
       <SectionTransition>
         <PavilionReveal />
+      </SectionTransition>
+      <SectionBreak />
+      <SectionTransition>
+        <DesignConcept />
       </SectionTransition>
       <SectionBreak />
       <SectionTransition>

@@ -22,22 +22,12 @@ export default function ParadigmShiftSection() {
     <section id="paradigm-shift" className="relative isolate scroll-mt-24 overflow-hidden">
       <div className="relative bg-bone text-foreground">
         <div className="mx-auto max-w-[1580px] px-4 pb-5 pt-8 sm:px-6 md:px-10 lg:px-12 lg:pb-6 lg:pt-9">
-          <div className="mb-4 flex flex-wrap items-end justify-between gap-3 border-b border-[var(--hairline)] pb-4">
-            <SectionLabel number="02" text="The Paradigm Shift" />
-            <button
-              type="button"
-              className="font-sans text-[9px] font-medium uppercase tracking-[0.28em] text-structural transition hover:text-foreground hover:underline underline-offset-4"
-            >
-              MENU (O)
-            </button>
-          </div>
+          
 
           <h1 className="mx-auto max-w-[min(100%,1240px)] text-center font-display text-[clamp(2rem,6.5vw,5rem)] font-extralight uppercase leading-[0.92] tracking-[0.04em] text-foreground/90">
             THE PARADIGM SHIFT
           </h1>
-          <p className="mx-auto mt-2 max-w-2xl text-center font-sans text-[10px] font-light uppercase tracking-[0.22em] text-structural">
-            Four registers · one thesis
-          </p>
+        
         </div>
       </div>
 

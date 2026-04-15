@@ -8,7 +8,6 @@ import { scrollToSection } from "@/lib/scrollToSection";
 const PROGRESS_IDS = [
   "pavilion-lead",
   "paradigm-shift",
-  "concept",
   "design-process",
   "system",
   "materials",
@@ -16,6 +15,7 @@ const PROGRESS_IDS = [
   "behavior",
   "pavilion-walkthrough",
   "pavilion",
+  "concept",
   "archive",
 ] as const;
 
