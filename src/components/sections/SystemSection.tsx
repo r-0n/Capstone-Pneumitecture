@@ -26,6 +26,24 @@ const GRAPH_H = 620;
 const WORLD_CENTER = { x: 760, y: 330, z: 210 };
 const DEFAULT_CAMERA = { yaw: -0.34, pitch: 0.18, zoom: 1 };
 const BASE_FOCAL_LENGTH = 520;
+const GRID_SIZE = 3;
+
+function buildGrid3x3(
+  origin: { x: number; y: number; z: number },
+  spacing: { x: number; y: number; z: number },
+) {
+  const out: Array<[number, number, number]> = [];
+  for (let row = 0; row < GRID_SIZE; row += 1) {
+    for (let col = 0; col < GRID_SIZE; col += 1) {
+      out.push([
+        origin.x + col * spacing.x,
+        origin.y + row * spacing.y,
+        origin.z + row * spacing.z,
+      ]);
+    }
+  }
+  return out;
+}
 
 const BASE_NODES: NodeDef[] = [
   {
@@ -70,29 +88,17 @@ const BASE_NODES: NodeDef[] = [
   },
 ];
 
-const VALVE_POSITIONS = [
-  [560, 430, 90],
-  [660, 430, 90],
-  [760, 430, 90],
-  [560, 430, 220],
-  [660, 430, 220],
-  [760, 430, 220],
-  [560, 430, 350],
-  [660, 430, 350],
-  [760, 430, 350],
-] as const;
+// Valves are flat on the same surface plane (same y), equally spaced in 3x3.
+const VALVE_POSITIONS = buildGrid3x3(
+  { x: 540, y: 442, z: 100 },
+  { x: 108, y: 0, z: 116 },
+) as ReadonlyArray<[number, number, number]>;
 
-const CELL_POSITIONS = [
-  [900, 420, 90],
-  [970, 420, 90],
-  [1040, 420, 90],
-  [900, 300, 220],
-  [970, 300, 220],
-  [1040, 300, 220],
-  [900, 180, 350],
-  [970, 180, 350],
-  [1040, 180, 350],
-] as const;
+// TPU cells stand vertical (vary x+y, fixed z), equally spaced in 3x3.
+const CELL_POSITIONS = buildGrid3x3(
+  { x: 900, y: 170, z: 362 },
+  { x: 92, y: 108, z: 0 },
+) as ReadonlyArray<[number, number, number]>;
 
 const VALVE_NODES: NodeDef[] = VALVE_POSITIONS.map(([x, y, z], i) => ({
   id: `valve-${i + 1}`,
@@ -100,7 +106,7 @@ const VALVE_NODES: NodeDef[] = VALVE_POSITIONS.map(([x, y, z], i) => ({
   y,
   z,
   label: `Solenoid Valve ${i + 1}`,
-  icon: "◌",
+  icon: "▭",
   color: "#73f2da",
   description: `Valve ${i + 1}/9. Opens/closes airflow into TPU Cell ${i + 1}.`,
 }));
@@ -116,10 +122,12 @@ const CELL_NODES: NodeDef[] = CELL_POSITIONS.map(([x, y, z], i) => ({
   description: `TPU Cell ${i + 1}/9. Inflates on command, then deflates when flow is cut.`,
 }));
 
-const NODES: NodeDef[] = [...BASE_NODES, ...VALVE_NODES, ...CELL_NODES];
+const INITIAL_NODES: NodeDef[] = [...BASE_NODES, ...VALVE_NODES, ...CELL_NODES];
 
 const EDGES: EdgeDef[] = [
   { a: "pump", b: "manifold", type: "air" },
+  { a: "controller", b: "manifold", type: "electrical" },
+  { a: "frame", b: "manifold", type: "mount" },
   ...VALVE_NODES.flatMap((v, i) => [
     { a: "manifold", b: v.id, type: "air" as const },
     { a: "controller", b: v.id, type: "electrical" as const },
@@ -132,9 +140,19 @@ const EDGES: EdgeDef[] = [
     b: VALVE_NODES[i + 1].id,
     type: "mesh" as const,
   })),
+  ...VALVE_NODES.filter((_, i) => i < 6).map((v, i) => ({
+    a: v.id,
+    b: VALVE_NODES[i + 3].id,
+    type: "mesh" as const,
+  })),
   ...CELL_NODES.filter((_, i) => i % 3 !== 2).map((c, i) => ({
     a: c.id,
     b: CELL_NODES[i + 1].id,
+    type: "mesh" as const,
+  })),
+  ...CELL_NODES.filter((_, i) => i < 6).map((c, i) => ({
+    a: c.id,
+    b: CELL_NODES[i + 3].id,
     type: "mesh" as const,
   })),
 ];
@@ -185,6 +203,7 @@ function SystemSchematic() {
   const [activeId, setActiveId] = useState<string | null>("pump");
   const [lockedId, setLockedId] = useState<string | null>(null);
   const [camera, setCamera] = useState(DEFAULT_CAMERA);
+  const [nodes, setNodes] = useState<NodeDef[]>(INITIAL_NODES);
   const canvasRef = useRef<HTMLDivElement | null>(null);
   const orbitRef = useRef<{
     startX: number;
@@ -192,14 +211,22 @@ function SystemSchematic() {
     startYaw: number;
     startPitch: number;
   } | null>(null);
+  const dragRef = useRef<{
+    id: string;
+    startX: number;
+    startY: number;
+    originX: number;
+    originY: number;
+    originZ: number;
+  } | null>(null);
 
-  const nodeMap = useMemo(() => Object.fromEntries(NODES.map((n) => [n.id, n])), []);
+  const nodeMap = useMemo(() => Object.fromEntries(nodes.map((n) => [n.id, n])), [nodes]);
   const projectedMap = useMemo(
     () =>
       Object.fromEntries(
-        NODES.map((n) => [n.id, projectWithCamera(n, camera.yaw, camera.pitch, camera.zoom)]),
+        nodes.map((n) => [n.id, projectWithCamera(n, camera.yaw, camera.pitch, camera.zoom)]),
       ) as Record<string, { x: number; y: number; depth: number }>,
-    [camera.pitch, camera.yaw, camera.zoom],
+    [camera.pitch, camera.yaw, camera.zoom, nodes],
   );
   const selectedId = activeId ?? lockedId;
   const selected = selectedId ? nodeMap[selectedId] : null;
@@ -207,6 +234,26 @@ function SystemSchematic() {
 
   useEffect(() => {
     const handlePointerMove = (e: PointerEvent) => {
+      const drag = dragRef.current;
+      if (drag) {
+        const worldFactor = 1.25 / camera.zoom;
+        const nextX = drag.originX + (e.clientX - drag.startX) * worldFactor;
+        const nextY = drag.originY + (e.clientY - drag.startY) * worldFactor;
+        setNodes((curr) =>
+          curr.map((n) =>
+            n.id === drag.id
+              ? {
+                  ...n,
+                  x: Math.max(840, Math.min(1080, nextX)),
+                  y: Math.max(130, Math.min(430, nextY)),
+                  z: drag.originZ,
+                }
+              : n,
+          ),
+        );
+        return;
+      }
+
       const orbit = orbitRef.current;
       if (!orbit) return;
 
@@ -219,6 +266,7 @@ function SystemSchematic() {
 
     const handlePointerUp = () => {
       orbitRef.current = null;
+      dragRef.current = null;
     };
 
     window.addEventListener("pointermove", handlePointerMove);
@@ -227,7 +275,7 @@ function SystemSchematic() {
       window.removeEventListener("pointermove", handlePointerMove);
       window.removeEventListener("pointerup", handlePointerUp);
     };
-  }, []);
+  }, [camera.zoom]);
 
   const startOrbit = (e: React.PointerEvent<HTMLDivElement>) => {
     const target = e.target as HTMLElement;
@@ -271,7 +319,7 @@ function SystemSchematic() {
             Hover or click any node to inspect its role in the system.
           </p>
           <p className="mt-4 text-[11px] uppercase tracking-[0.2em] text-white/45">
-            Hover or click a node to learn more
+            Hover/click nodes · drag TPU cells to reposition
           </p>
 
           <div className="mt-7 rounded-2xl border border-white/10 bg-black/25 p-4">
@@ -349,13 +397,13 @@ function SystemSchematic() {
               </radialGradient>
             </defs>
             <polygon
-              points="420,440 845,440 990,330 560,330"
+              points="430,455 860,455 1018,338 580,338"
               fill="rgba(126, 193, 255, 0.08)"
               stroke="rgba(126, 193, 255, 0.22)"
               strokeDasharray="5 8"
             />
             <polygon
-              points="830,170 1088,170 1088,432 830,432"
+              points="850,145 1095,145 1095,455 850,455"
               fill="rgba(255, 183, 112, 0.06)"
               stroke="rgba(255, 183, 112, 0.22)"
               strokeDasharray="5 8"
@@ -410,7 +458,7 @@ function SystemSchematic() {
                 />
               );
             })}
-            {NODES.map((n) => (
+            {nodes.map((n) => (
               <circle
                 key={`point-${n.id}`}
                 cx={projectedMap[n.id].x}
@@ -422,8 +470,9 @@ function SystemSchematic() {
             ))}
           </svg>
 
-          {NODES.map((n) => {
+          {nodes.map((n) => {
             const isActive = selectedId === n.id;
+            const isCell = n.id.startsWith("cell-");
             return (
               <button
                 key={n.id}
@@ -432,10 +481,23 @@ function SystemSchematic() {
                 onMouseEnter={() => setActiveId(n.id)}
                 onMouseLeave={() => setActiveId(null)}
                 onClick={() => setLockedId((curr) => (curr === n.id ? null : n.id))}
+                onPointerDown={(e) => {
+                  if (!isCell) return;
+                  e.stopPropagation();
+                  dragRef.current = {
+                    id: n.id,
+                    startX: e.clientX,
+                    startY: e.clientY,
+                    originX: n.x,
+                    originY: n.y,
+                    originZ: n.z,
+                  };
+                }}
                 className="absolute -translate-x-1/2 -translate-y-1/2 text-left"
                 style={{
                   left: `${(projectedMap[n.id].x / GRAPH_W) * 100}%`,
                   top: `${(projectedMap[n.id].y / GRAPH_H) * 100}%`,
+                  cursor: isCell ? "grab" : "pointer",
                 }}
                 aria-label={n.label}
               >
