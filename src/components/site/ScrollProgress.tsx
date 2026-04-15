@@ -7,7 +7,7 @@ import { scrollToSection } from "@/lib/scrollToSection";
 /** Right-rail dots — document order (see `siteLayout.ts`) */
 const PROGRESS_IDS = [
   "pavilion-lead",
-  "paradigm-shift",
+  "pavilion",
   "concept",
   "design-process",
   "system",
@@ -15,21 +15,19 @@ const PROGRESS_IDS = [
   "prototyping",
   "behavior",
   "pavilion-walkthrough",
-  "pavilion",
   "archive",
 ] as const;
 
 const DOT_LABELS: Record<string, string> = {
   "pavilion-lead": "01 · Pavilion premise",
-  "paradigm-shift": "Paradigm shift",
-  concept: "02 · Design concept",
-  "design-process": "03 · Design process",
-  system: "04 · System",
-  materials: "05 · Materials",
-  prototyping: "06 · Prototyping",
-  behavior: "07 · Behavior",
-  "pavilion-walkthrough": "08 · Walkthrough",
-  pavilion: "09 · The Pavilion",
+  pavilion: "02 · The Pavilion",
+  concept: "03 · Design concept",
+  "design-process": "04 · Design process",
+  system: "05 · System",
+  materials: "06 · Materials",
+  prototyping: "07 · Prototyping",
+  behavior: "08 · Behavior",
+  "pavilion-walkthrough": "09 · Walkthrough",
   archive: "10 · Media archive",
 };
 

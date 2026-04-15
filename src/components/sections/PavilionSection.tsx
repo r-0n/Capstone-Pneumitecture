@@ -21,7 +21,7 @@ export function PavilionSection() {
 
       <div className="relative z-10 mx-auto flex w-full max-w-3xl flex-col items-center px-6 text-center">
         <div className="mb-10 w-full text-left">
-          <SectionLabel number="08" text="Walkthrough" />
+          <SectionLabel number="09" text="Walkthrough" />
         </div>
         <motion.h2
           initial={{ opacity: 0, y: 16 }}

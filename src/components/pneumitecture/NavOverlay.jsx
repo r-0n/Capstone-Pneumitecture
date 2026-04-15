@@ -6,7 +6,6 @@ import { scrollToSection } from '@/lib/scrollToSection';
 const sections = [
   { label: 'Hero', id: 'hero' },
   { label: 'Pavilion', id: 'pavilion-lead' },
-  { label: 'Paradigm', id: 'paradigm-shift' },
   { label: 'Concept', id: 'concept' },
   { label: 'Materials', id: 'materials' },
   { label: 'System', id: 'system' },
@@ -30,10 +29,8 @@ export default function NavOverlay() {
   return (
     <>
       <button
-        id="site-menu-trigger"
-        type="button"
         onClick={() => setOpen(true)}
-        className="fixed top-6 right-6 z-50 flex h-12 w-12 items-center justify-center mix-blend-difference"
+        className="fixed top-6 right-6 z-50 w-12 h-12 flex items-center justify-center mix-blend-difference"
         aria-label="Open menu"
       >
         <Menu className="w-6 h-6 text-white" />

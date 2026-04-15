@@ -17,7 +17,7 @@ export default function PavilionReveal() {
       className="relative z-[5] scroll-mt-24 bg-[#FBFBF9] pb-32 md:pb-48"
     >
       <div className="mx-auto max-w-7xl px-8 pt-12 md:px-16 md:pt-16">
-        <SectionLabel number="09" text="The Pavilion" />
+        <SectionLabel number="02" text="The Pavilion" />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-24">
           <ScrollReveal>
             <div className="mb-6 min-w-0">
