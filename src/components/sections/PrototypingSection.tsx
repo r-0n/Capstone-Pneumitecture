@@ -1,27 +1,142 @@
 "use client";
 
 import SectionLabel from "@/components/pneumitecture/SectionLabel";
+import { publicAssetPath } from "@/lib/publicAssetPath";
 import { motion } from "framer-motion";
+import Image from "next/image";
 
-const versions = [
+type PrototypeMediaItem =
+  | {
+      type: "image";
+      src: string;
+      alt: string;
+      label?: string;
+    }
+  | {
+      type: "video";
+      src: string;
+      title: string;
+      label?: string;
+    }
+
+type PrototypeVersion = {
+  id: string;
+  phase: string;
+  title: string;
+  copy: string;
+  media: PrototypeMediaItem[];
+};
+
+type RoadmapItem = {
+  key: string;
+  versionId: string;
+  phase: string;
+  title: string;
+  copy: string;
+  media: PrototypeMediaItem;
+};
+
+const versions: PrototypeVersion[] = [
   {
     id: "V1",
-    title: "Early sealing",
-    copy: "Square pillow geometry — crude heat sealing, limited articulation.",
+    phase: "Origin",
+    title: "First ideation attempt",
+    copy: "Our very first prototype concept study.",
+    media: [
+      {
+        type: "image",
+        src: publicAssetPath("/images/prototyping/prototype-v1.png"),
+        alt: "V1 first ideation prototype concept image",
+        label: "Concept sketch prototype",
+      },
+    ],
   },
   {
     id: "V2",
-    title: "Modularity",
-    copy: "Cell clusters with proximity response — hand-scale sensing and first valve choreography.",
+    phase: "Exploration",
+    title: "ProtoEllipse Model",
+    copy: "Second prototypical exploration of the concept.",
+    media: [
+      {
+        type: "video",
+        src: "https://drive.google.com/file/d/1v7CAfBKotMHACjqYL1g7JzN3Co_-_Hpr/preview",
+        title: "V2 prototypical exploration video",
+        label: "Modular response test",
+      },
+    ],
   },
   {
     id: "V3",
-    title: "Full module",
+    phase: "Maturation",
+    title: "Hexagonal Breathing Grid",
     copy: "Transparent cellular module with refined logic — exhibition-ready responsiveness.",
+    media: [
+      {
+        type: "video",
+        src: "https://drive.google.com/file/d/1S9HCrs4D9AX2rWAZKvv_8I3tH-EtQGu1/preview",
+        title: "V3 hexagonal breathing grid video",
+        label: "Hexagonal breathing test",
+      },
+    ],
+  },
+  {
+    id: "V4",
+    phase: "Scale",
+    title: "Scaling Up",
+    copy: "Transitioning the prototype logic toward larger spatial deployment.",
+    media: [
+      {
+        type: "video",
+        src: "https://drive.google.com/file/d/1ZnFgcApK-7O6e3EUslGnDBkalMxwu1Ht/preview",
+        title: "V4 scaling up video",
+        label: "Scaling up study",
+      },
+    ],
+  },
+  {
+    id: "V5",
+    phase: "Simulation",
+    title: "Rhino+Grasshopper Physics Prototyping",
+    copy: "The war forced us to branch into digital simulation, which let us test and push the capstone idea to further limits.",
+    media: [
+      {
+        type: "video",
+        src: "https://drive.google.com/file/d/1yEIp8EeoqVb-49s7lg82Hja2zv9A0w9R/preview",
+        title: "V5 Rhino Grasshopper physics prototyping video",
+        label: "Digital physics simulation study",
+      },
+    ],
   },
 ];
 
 export function PrototypingSection() {
+  const items: RoadmapItem[] = versions.flatMap((v) =>
+    v.media.length > 0
+      ? v.media.map((media, idx) => ({
+          key: `${v.id}-${idx}`,
+          versionId: v.id,
+          phase: v.phase,
+          title: v.title,
+          copy: v.copy,
+          media,
+        }))
+      : [
+          {
+            key: `${v.id}-placeholder`,
+            versionId: v.id,
+            phase: v.phase,
+            title: v.title,
+            copy: v.copy,
+            media: {
+              type: "image",
+              src: publicAssetPath("/images/pillow-bg.jpeg"),
+              alt: `${v.id} placeholder`,
+              label: "Awaiting media",
+            },
+          },
+        ],
+  );
+
   return (
     <section
       id="prototyping"
@@ -38,51 +153,50 @@ export function PrototypingSection() {
             Prototype Iterations
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-sm text-[var(--ink-muted)]">
-            Soft responsive architecture — from first seal tests to a full-scale cellular module.
+            Prototype progression shown as a clean visual process set.
           </p>
         </header>
 
-        <div className="mt-16 flex flex-col gap-10 md:flex-row md:items-stretch md:justify-between md:gap-6">
-          {versions.map((v, i) => (
-            <motion.div
-              key={v.id}
-              initial={{ opacity: 0, y: 20 }}
+        <div className="mt-14 grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-5">
+          {items.map((item, idx) => (
+            <motion.article
+              key={item.key}
+              initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: i * 0.1, duration: 0.6 }}
-              className="glass-card relative flex-1 rounded-2xl p-8 text-center md:p-10"
+              transition={{ duration: 0.45, delay: idx * 0.05 }}
+              className="glass-card overflow-hidden rounded-2xl p-3"
             >
-              {i < versions.length - 1 ? (
-                <span
-                  className="absolute -right-3 top-1/2 hidden -translate-y-1/2 text-lg text-[var(--ink-muted)] md:block"
-                  aria-hidden
-                >
-                  →
-                </span>
-              ) : null}
-              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--accent-soft)]">
-                {v.id}
-              </span>
-              <h3 className="font-display mt-3 text-lg font-semibold text-[var(--ink)]">{v.title}</h3>
-              <p className="mt-4 text-sm leading-relaxed text-[var(--ink-muted)]">{v.copy}</p>
-              <div className="mt-8 aspect-video w-full rounded-xl bg-linear-to-br from-white to-slate-200/80 shadow-inner" />
-            </motion.div>
+              <div className="relative min-h-[240px] overflow-hidden rounded-xl border border-[var(--hairline)] bg-slate-100 md:min-h-[260px]">
+                {item.media.type === "video" ? (
+                  <iframe
+                    src={item.media.src}
+                    className="absolute inset-0 h-full w-full border-0"
+                    loading="lazy"
+                    allow="autoplay; encrypted-media; picture-in-picture"
+                    referrerPolicy="strict-origin-when-cross-origin"
+                    title={item.media.title}
+                    allowFullScreen
+                  />
+                ) : (
+                  <Image
+                    src={item.media.src}
+                    alt={item.media.alt}
+                    fill
+                    className="h-full w-full object-cover"
+                    sizes="(min-width: 1024px) 31vw, (min-width: 768px) 32vw, 95vw"
+                  />
+                )}
+              </div>
+              <div className="mt-2.5 space-y-1">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--accent-soft)]">
+                  {item.versionId} · {item.phase}
+                </p>
+                <p className="text-sm font-semibold text-[var(--ink)]">{item.title}</p>
+                {item.copy ? <p className="text-xs text-[var(--ink-muted)]">{item.copy}</p> : null}
+              </div>
+            </motion.article>
           ))}
-        </div>
-
-        <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {[1, 2, 3, 4, 5].map((n) => (
-            <div
-              key={n}
-              className="glass-card aspect-[4/3] overflow-hidden rounded-2xl bg-linear-to-br from-slate-100 to-slate-200/90"
-            />
-          ))}
-          <div className="glass-card flex aspect-[4/3] flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-[var(--hairline-strong)] bg-white/50 text-center">
-            <span className="rounded-full border border-[var(--ink)]/15 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-[var(--ink-muted)]">
-              GIF
-            </span>
-            <p className="px-4 text-xs font-medium text-[var(--ink)]">V3 in Action — responsive sequence</p>
-          </div>
         </div>
 
         <p className="mt-16 text-center text-sm font-medium text-[var(--ink-muted)]">

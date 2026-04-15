@@ -55,8 +55,7 @@ export default function BelowFoldApp() {
       <SectionBreak />
       <SectionTransition>
         <footer className="border-t border-[var(--hairline)] bg-[var(--canvas-deep)] py-12 text-center text-[11px] text-[var(--ink-muted)]">
-          Pneumitecture — portfolio shell aligned to design boards. Replace placeholders with your
-          photography & video.
+          Pneumitecture- Capstone Project 2026
         </footer>
       </SectionTransition>
     </>

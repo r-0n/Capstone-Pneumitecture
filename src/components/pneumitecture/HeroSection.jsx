@@ -195,7 +195,7 @@ export default function HeroSection() {
     return () => window.removeEventListener('scroll', applyHeroScroll);
   }, [applyHeroScroll, heroPhase, ytUnavailable, ytSuspended]);
 
-  const titleExitMs = reduceMotion ? 650 : 2000;
+  const titleExitMs = reduceMotion ? 500 : 1200;
 
   useEffect(() => {
     if (heroPhase !== 'exit') return;
@@ -238,10 +238,9 @@ export default function HeroSection() {
     ytPostCommand(iframe, 'playVideo');
   }, [ytUnavailable]);
 
-  const handoffOpacity = heroPhase === 'video' ? 0.35 + scrollFade * 0.55 : 0.45;
-  const mediaOpacity =
-    heroPhase !== 'video' ? 0 : Math.max(0, Math.min(1, 1 - scrollFade * 0.98));
-  const mediaDim = heroPhase === 'video' ? Math.max(0.35, 1 - scrollFade * 0.55) : 1;
+  const handoffOpacity = heroPhase === 'video' ? 0 : 0.45;
+  const mediaOpacity = heroPhase === 'video' ? 1 : 0;
+  const mediaDim = 1;
 
   const posterUnderYt =
     heroPhase === 'video' && !ytUnavailable && ytEmbedSrc && !ytSuspended;
@@ -257,11 +256,14 @@ export default function HeroSection() {
           className="absolute inset-0 min-h-dvh bg-cover bg-center transition-[opacity,filter] duration-300 ease-out"
           style={{
             backgroundImage: `url(${HERO_POSTER})`,
-            opacity: posterUnderYt
-              ? 0.35 + scrollFade * 0.5
-              : heroPhase === 'video'
-                ? 0.95
-                : 0.85,
+            opacity:
+              heroPhase === 'video'
+                ? ytUnavailable
+                  ? 0.9
+                  : 0
+                : posterUnderYt
+                  ? 0
+                  : 0.85,
             filter: heroPhase === 'video' ? `brightness(${mediaDim})` : undefined,
           }}
         />
@@ -342,10 +344,12 @@ export default function HeroSection() {
           </div>
         )}
 
-        <div
-          className="pointer-events-none absolute inset-0 min-h-dvh bg-gradient-to-b from-black/50 via-black/25 to-black/60"
-          style={{ opacity: heroPhase === 'video' ? 0.55 + scrollFade * 0.25 : 0.75 }}
-        />
+        {heroPhase !== 'video' && (
+          <div
+            className="pointer-events-none absolute inset-0 min-h-dvh bg-gradient-to-b from-black/50 via-black/25 to-black/60 transition-opacity duration-500 ease-out"
+            style={{ opacity: 0.75 }}
+          />
+        )}
       </div>
 
       {heroPhase === 'intro' && (
@@ -390,7 +394,7 @@ export default function HeroSection() {
         </div>
       )}
 
-      {heroPhase === 'video' && !ytUnavailable && !userAudible && scrollFade < 0.12 && (
+      {false && heroPhase === 'video' && !ytUnavailable && !userAudible && scrollFade < 0.12 && (
         <button
           type="button"
           onClick={enableSound}
@@ -401,37 +405,41 @@ export default function HeroSection() {
         </button>
       )}
 
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-40 bg-gradient-to-b from-transparent via-[#eceee9]/95 to-[#FBFBF9] transition-opacity duration-500 ease-out md:h-52"
-        style={{ opacity: handoffOpacity }}
-      />
+      {heroPhase !== 'video' && (
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-40 bg-gradient-to-b from-transparent via-[#eceee9]/95 to-[#FBFBF9] transition-opacity duration-500 ease-out md:h-52"
+          style={{ opacity: handoffOpacity }}
+        />
+      )}
 
-      <button
-        type="button"
-        onClick={() => scrollToSection('pavilion-lead', { behavior: 'smooth' })}
-        aria-label="Go to pavilion premise section"
-        tabIndex={scrollHintVisible ? 0 : -1}
-        className={`absolute bottom-3 left-1/2 z-30 -translate-x-1/2 cursor-pointer border-0 bg-transparent p-1 text-left transition-[opacity,transform] duration-200 ease-out focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white/60 md:bottom-4 ${
-          scrollHintVisible
-            ? 'pointer-events-auto translate-y-0 opacity-100'
-            : 'pointer-events-none translate-y-1 opacity-0'
-        }`}
-      >
-        <span className="flex flex-col items-center gap-0.5 rounded border border-white/12 bg-black/35 px-1.5 py-1 shadow-[0_2px_10px_rgba(0,0,0,0.25)]">
-          <Mouse className="size-2 shrink-0 text-bone/30" strokeWidth={1} aria-hidden />
-          <span className="tech-label text-bone/45 text-[6px] leading-none tracking-[0.22em]">
-            Scroll
+      {heroPhase !== 'video' && (
+        <button
+          type="button"
+          onClick={() => scrollToSection('pavilion-lead', { behavior: 'smooth' })}
+          aria-label="Go to pavilion premise section"
+          tabIndex={scrollHintVisible ? 0 : -1}
+          className={`absolute bottom-3 left-1/2 z-30 -translate-x-1/2 cursor-pointer border-0 bg-transparent p-1 text-left transition-[opacity,transform] duration-200 ease-out focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white/60 md:bottom-4 ${
+            scrollHintVisible
+              ? 'pointer-events-auto translate-y-0 opacity-100'
+              : 'pointer-events-none translate-y-1 opacity-0'
+          }`}
+        >
+          <span className="flex flex-col items-center gap-0.5 rounded border border-white/12 bg-black/35 px-1.5 py-1 shadow-[0_2px_10px_rgba(0,0,0,0.25)]">
+            <Mouse className="size-2 shrink-0 text-bone/30" strokeWidth={1} aria-hidden />
+            <span className="tech-label text-bone/45 text-[6px] leading-none tracking-[0.22em]">
+              Scroll
+            </span>
+            <span
+              className="text-bone/35"
+              style={{ animation: 'scroll-nudge 1.5s ease-in-out infinite' }}
+              aria-hidden
+            >
+              <ChevronDown className="size-2" strokeWidth={2.5} />
+            </span>
           </span>
-          <span
-            className="text-bone/35"
-            style={{ animation: 'scroll-nudge 1.5s ease-in-out infinite' }}
-            aria-hidden
-          >
-            <ChevronDown className="size-2" strokeWidth={2.5} />
-          </span>
-        </span>
-      </button>
+        </button>
+      )}
 
       <style>{`
         @keyframes scroll-nudge {
