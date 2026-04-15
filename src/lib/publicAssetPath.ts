@@ -15,3 +15,10 @@ export function publicAssetPath(path: string): string {
   if (path.startsWith(BASE + "/") || path === BASE) return path;
   return `${BASE}${path}`;
 }
+
+/** Asset in `public/images 2/` (folder name includes a space; encode for URLs). */
+export function publicImages2Path(filename: string): string {
+  return publicAssetPath(
+    `/${encodeURIComponent("images 2")}/${encodeURIComponent(filename)}`,
+  );
+}

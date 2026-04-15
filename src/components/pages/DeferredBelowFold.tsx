@@ -1,13 +1,16 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useDeferredVisible } from "@/hooks/useDeferredVisible";
 
+/**
+ * Code-splits below-the-fold sections without waiting for scroll.
+ * (Scroll-based deferral hid Design Process / Material Exploration from authors until deep scroll or ~8s.)
+ */
 const BelowFoldApp = dynamic(() => import("@/components/pages/BelowFoldApp"), {
   ssr: false,
   loading: () => (
     <div
-      className="min-h-[min(72vh,820px)] bg-[#FBFBF9]"
+      className="min-h-[min(48vh,560px)] bg-[#FBFBF9]"
       aria-busy="true"
       aria-label="Loading rest of page"
     />
@@ -15,17 +18,5 @@ const BelowFoldApp = dynamic(() => import("@/components/pages/BelowFoldApp"), {
 });
 
 export function DeferredBelowFold() {
-  const { placeholderRef, visible } = useDeferredVisible();
-
-  if (!visible) {
-    return (
-      <div
-        ref={placeholderRef}
-        className="min-h-[min(100vh,960px)] bg-[#FBFBF9]"
-        aria-hidden
-      />
-    );
-  }
-
   return <BelowFoldApp />;
 }

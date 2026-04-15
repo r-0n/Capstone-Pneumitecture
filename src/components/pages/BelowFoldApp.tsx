@@ -13,10 +13,7 @@ import { PavilionSection } from "@/components/sections/PavilionSection";
 import { PrototypingSection } from "@/components/sections/PrototypingSection";
 import { SystemSection } from "@/components/sections/SystemSection";
 
-/**
- * Everything below the first pavilion lead block — loaded as a separate JS chunk
- * after the user scrolls near this region (see DeferredBelowFold).
- */
+/** Everything below the first pavilion lead block — loaded as a separate JS chunk from the home shell. */
 export default function BelowFoldApp() {
   return (
     <>

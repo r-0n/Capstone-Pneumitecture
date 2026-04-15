@@ -1,19 +1,14 @@
 import ScrollReveal from './ScrollReveal';
 import SectionLabel from './SectionLabel';
-import { publicAssetPath } from '@/lib/publicAssetPath';
-
-const materialSrc = (filename) =>
-  publicAssetPath(
-    `/${encodeURIComponent('images 2')}/${encodeURIComponent(filename)}`,
-  );
+import { publicImages2Path } from '@/lib/publicAssetPath';
 
 const images = [
-  { src: materialSrc('material exp 1.jpg'), alt: 'Heat-sealed seams and material testing' },
-  { src: materialSrc('material exp 2.JPG'), alt: 'Inflatable prototypes and samples' },
-  { src: materialSrc('material exp 3.jpg'), alt: 'Failed prototype analysis' },
-  { src: materialSrc('material exp 4.jpg'), alt: 'Assembly process documentation' },
-  { src: materialSrc('material exp 5.jpg'), alt: 'Membrane surface detail' },
-  { src: materialSrc('material exp 6.jpg'), alt: 'Scale testing with interaction' },
+  { src: publicImages2Path('material exp 1.jpg'), alt: 'Heat-sealed seams and material testing' },
+  { src: publicImages2Path('material exp 2.JPG'), alt: 'Inflatable prototypes and samples' },
+  { src: publicImages2Path('material exp 3.jpg'), alt: 'Failed prototype analysis' },
+  { src: publicImages2Path('material exp 4.jpg'), alt: 'Assembly process documentation' },
+  { src: publicImages2Path('material exp 5.jpg'), alt: 'Membrane surface detail' },
+  { src: publicImages2Path('material exp 6.jpg'), alt: 'Scale testing with interaction' },
 ];
 
 export default function MaterialExploration() {
