@@ -33,7 +33,7 @@ const CARDS = [
 /** Light band after the Paradigm section — three conceptual pillars. */
 export function ConceptualFoundationsBand() {
   return (
-    <div className="relative bg-[#f3f3f5] text-foreground">
+    <div className="relative border-t border-[var(--hairline)] bg-[#f3f3f5] text-foreground">
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.5]"
         style={{

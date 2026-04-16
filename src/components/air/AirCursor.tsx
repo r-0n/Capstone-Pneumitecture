@@ -7,9 +7,10 @@ import { useCursor } from "@/contexts/CursorContext";
 export function AirCursor() {
   const { mouseX, mouseY, finePointer, reducedMotion } = useCursor();
 
+  /** Snappy spring — high stiffness / tuned damping so the cursor tracks with minimal lag */
   const springConfig = reducedMotion
-    ? { stiffness: 800, damping: 60, mass: 0.2 }
-    : { stiffness: 1200, damping: 42, mass: 0.18 };
+    ? { stiffness: 2400, damping: 72, mass: 0.12 }
+    : { stiffness: 4200, damping: 58, mass: 0.09 };
 
   const x = useSpring(mouseX, springConfig);
   const y = useSpring(mouseY, springConfig);

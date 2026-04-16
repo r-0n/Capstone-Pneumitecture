@@ -6,7 +6,7 @@ const CONCEPT_IMG = 'https://media.base44.com/images/public/69da883791905282c2ac
 
 export default function DesignConcept() {
   return (
-    <section id="concept" className="py-32 md:py-48 max-w-7xl mx-auto px-8 md:px-16">
+    <section id="concept" className="border-t border-[var(--hairline)] bg-[var(--canvas)] py-32 md:py-48 max-w-7xl mx-auto px-8 md:px-16">
       <SectionLabel number="03" text="Design Concept" textFirst />
       <ScrollReveal>
         <p className="font-display font-extralight text-structural text-base md:text-lg tracking-wide mb-2">The Central Thesis</p>

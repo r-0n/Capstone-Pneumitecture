@@ -91,7 +91,12 @@ function card1LayoutClass(focus: FocusIndex) {
   return "bottom-3 right-2 z-10 w-[min(100%,11rem)] sm:bottom-4 sm:right-3 sm:w-[min(100%,12rem)] md:w-[38%] opacity-[0.55]";
 }
 
-export function MetaphorCards() {
+type MetaphorCardsProps = {
+  /** When true, scales min-heights to fit the Paradigm bento cell. */
+  fillContainer?: boolean;
+};
+
+export function MetaphorCards({ fillContainer = false }: MetaphorCardsProps) {
   const reduceMotion = useReducedMotion();
   const [focus, setFocus] = useState<FocusIndex>(null);
   const stackRef = useRef<HTMLDivElement>(null);
@@ -147,21 +152,33 @@ export function MetaphorCards() {
     setFocus(idx);
   };
 
+  const stackClass =
+    fillContainer && focus !== null
+      ? "relative mx-auto min-h-[22rem] w-full px-1 py-4 sm:min-h-[26rem] sm:px-3 md:min-h-[30rem] md:py-8"
+      : fillContainer
+        ? "relative mx-auto min-h-[20rem] w-full px-1 py-4 sm:min-h-[22rem] sm:px-3 md:min-h-[26rem] md:py-6"
+        : focus !== null
+          ? "relative mx-auto min-h-[min(100vw,32rem)] w-full px-1 py-6 sm:min-h-[min(100vw,36rem)] sm:px-3 md:min-h-[min(100vw,42rem)] md:py-10"
+          : "relative mx-auto min-h-[min(100vw,28rem)] w-full px-1 py-6 sm:min-h-[min(100vw,32rem)] sm:px-3 md:min-h-[min(100vw,36rem)] md:py-10";
+
   return (
-    <div className="w-full min-w-0">
-      <p className="mb-4 font-sans text-[11px] font-semibold uppercase tracking-[0.26em] text-white/55 md:text-[12px]">
+    <div
+      className={
+        fillContainer ? "flex h-full min-h-0 w-full min-w-0 flex-1 flex-col" : "w-full min-w-0"
+      }
+    >
+      <p className="mb-4 shrink-0 font-sans text-[11px] font-semibold uppercase tracking-[0.26em] text-white/55 md:text-[12px]">
         3. The metaphor
       </p>
 
-      <div className="mx-auto w-full min-w-0 max-w-xl sm:max-w-2xl lg:max-w-3xl">
-        <div
-          ref={stackRef}
-          className={
-            focus !== null
-              ? "relative mx-auto min-h-[min(100vw,32rem)] w-full px-1 py-6 sm:min-h-[min(100vw,36rem)] sm:px-3 md:min-h-[min(100vw,42rem)] md:py-10"
-              : "relative mx-auto min-h-[min(100vw,28rem)] w-full px-1 py-6 sm:min-h-[min(100vw,32rem)] sm:px-3 md:min-h-[min(100vw,36rem)] md:py-10"
-          }
-        >
+      <div
+        className={
+          fillContainer
+            ? "mx-auto flex min-h-0 w-full min-w-0 flex-1 flex-col max-w-none"
+            : "mx-auto w-full min-w-0 max-w-xl sm:max-w-2xl lg:max-w-3xl"
+        }
+      >
+        <div ref={stackRef} className={stackClass}>
           {/* Back / balanced — upper left */}
           <motion.div
             key={clipKey(METAPHOR_VIDEOS[0])}
@@ -228,7 +245,11 @@ export function MetaphorCards() {
         </div>
       </div>
 
-      <p className="mx-auto mt-5 max-w-xl text-center font-sans text-sm font-light leading-relaxed text-white/70 md:text-[15px]">
+      <p
+        className={`mx-auto max-w-xl text-center font-sans text-sm font-light leading-relaxed text-white/70 md:text-[15px] ${
+          fillContainer ? "mt-auto shrink-0 pt-3" : "mt-5"
+        }`}
+      >
         Rather than being purely functional, the motion of the system is designed to be expressive and
         choreographic.
       </p>

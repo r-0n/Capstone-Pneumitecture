@@ -295,17 +295,6 @@ function SystemSchematic() {
     }));
   };
 
-  const handleWheelZoom = (e: React.WheelEvent<HTMLDivElement>) => {
-    // Do not preventDefault on plain wheel: that blocks page scroll (mouse wheel) while the pointer
-    // is over this canvas. Touchpads often still move the page; Ctrl/Meta + wheel zooms the diagram.
-    if (!e.ctrlKey && !e.metaKey) {
-      return;
-    }
-    e.preventDefault();
-    const direction = e.deltaY > 0 ? -0.08 : 0.08;
-    zoomBy(direction);
-  };
-
   return (
     <div className="relative overflow-hidden rounded-[1.8rem] border border-white/10 bg-[#070e1f] px-4 py-5 shadow-[0_40px_80px_rgba(2,6,18,0.55)] md:px-7 md:py-7">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_14%,rgba(84,143,255,0.18),transparent_46%),radial-gradient(circle_at_85%_15%,rgba(109,224,209,0.14),transparent_42%),radial-gradient(circle_at_75%_80%,rgba(236,116,255,0.10),transparent_42%),linear-gradient(180deg,rgba(255,255,255,0.025),rgba(255,255,255,0)_45%)]" />
@@ -324,7 +313,7 @@ function SystemSchematic() {
             Hover or click any node to inspect its role in the system.
           </p>
           <p className="mt-4 text-[11px] uppercase tracking-[0.2em] text-white/45">
-            Hover/click nodes · drag TPU cells · Ctrl + wheel to zoom
+            Hover/click nodes · drag TPU cells · zoom with +/−
           </p>
 
           <div className="mt-7 rounded-2xl border border-white/10 bg-black/25 p-4">
@@ -361,7 +350,6 @@ function SystemSchematic() {
         <div
           ref={canvasRef}
           onPointerDown={startOrbit}
-          onWheel={handleWheelZoom}
           className="relative min-h-[560px] cursor-grab rounded-2xl border border-white/8 bg-black/20 active:cursor-grabbing"
         >
           <div className="absolute right-3 top-3 z-20 flex items-center gap-2 rounded-full border border-white/14 bg-[#081227]/85 px-2.5 py-1.5 text-[11px] text-white/85 backdrop-blur-sm">
