@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ChevronDown, CirclePlay, Mouse, Volume2 } from 'lucide-react';
+import { ChevronDown, CirclePlay, Mouse, Volume2, VolumeX } from 'lucide-react';
 import { scrollToSection } from '@/lib/scrollToSection';
 import { publicAssetPath } from '@/lib/publicAssetPath';
 
@@ -66,6 +66,7 @@ const IFRAME_STALL_MS = 14000;
 const PAST_HERO_Y_RATIO = 0.92;
 /** Back at top of document — show intro again */
 const BACK_TO_TOP_Y = 140;
+const MAX_AUDIBLE_VOLUME = 42;
 
 export default function HeroSection() {
   const [reduceMotion, setReduceMotion] = useState(false);
@@ -175,7 +176,10 @@ export default function HeroSection() {
 
     const audible = userAudibleRef.current;
     if (audible) {
-      const vol = Math.max(0, Math.min(100, Math.round((1 - p) * 100)));
+      const vol = Math.max(
+        0,
+        Math.min(MAX_AUDIBLE_VOLUME, Math.round((1 - p) * MAX_AUDIBLE_VOLUME)),
+      );
       ytPostCommand(iframe, 'setVolume', [vol]);
       if (p > 0.93) ytPostCommand(iframe, 'mute');
       else ytPostCommand(iframe, 'unMute');
@@ -218,10 +222,25 @@ export default function HeroSection() {
   const onYtIframeLoad = useCallback(() => {
     ytShellOkRef.current = true;
     setYtUnavailable(false);
+    if (userAudibleRef.current) {
+      const iframe = ytIframeRef.current;
+      if (!iframe) return;
+      const fadeEnd = window.innerHeight * FADE_SCROLL_VH;
+      const p = fadeEnd > 0 ? Math.min(1, Math.max(0, getScrollY() / fadeEnd)) : 0;
+      const vol = Math.max(
+        0,
+        Math.min(MAX_AUDIBLE_VOLUME, Math.round((1 - p) * MAX_AUDIBLE_VOLUME)),
+      );
+      ytPostCommand(iframe, 'unMute');
+      ytPostCommand(iframe, 'setVolume', [vol]);
+      ytPostCommand(iframe, 'playVideo');
+    }
   }, []);
 
   const startPlaySequence = useCallback(() => {
     if (heroPhase !== 'intro') return;
+    userAudibleRef.current = true;
+    setUserAudible(true);
     setHeroPhase('exit');
   }, [heroPhase]);
 
@@ -232,11 +251,28 @@ export default function HeroSection() {
     setUserAudible(true);
     const fadeEnd = window.innerHeight * FADE_SCROLL_VH;
     const p = fadeEnd > 0 ? Math.min(1, Math.max(0, getScrollY() / fadeEnd)) : 0;
-    const vol = Math.max(0, Math.min(100, Math.round((1 - p) * 100)));
+    const vol = Math.max(
+      0,
+      Math.min(MAX_AUDIBLE_VOLUME, Math.round((1 - p) * MAX_AUDIBLE_VOLUME)),
+    );
     ytPostCommand(iframe, 'unMute');
     ytPostCommand(iframe, 'setVolume', [vol]);
     ytPostCommand(iframe, 'playVideo');
   }, [ytUnavailable]);
+
+  const disableSound = useCallback(() => {
+    const iframe = ytIframeRef.current;
+    userAudibleRef.current = false;
+    setUserAudible(false);
+    if (!iframe || ytUnavailable) return;
+    ytPostCommand(iframe, 'setVolume', [0]);
+    ytPostCommand(iframe, 'mute');
+  }, [ytUnavailable]);
+
+  const toggleSound = useCallback(() => {
+    if (userAudibleRef.current) disableSound();
+    else enableSound();
+  }, [disableSound, enableSound]);
 
   const handoffOpacity = heroPhase === 'video' ? 0 : 0.45;
   const mediaOpacity = heroPhase === 'video' ? 1 : 0;
@@ -394,14 +430,18 @@ export default function HeroSection() {
         </div>
       )}
 
-      {heroPhase === 'video' && !ytUnavailable && !userAudible && (
+      {heroPhase === 'video' && !ytUnavailable && (
         <button
           type="button"
-          onClick={enableSound}
+          onClick={toggleSound}
           className="absolute bottom-6 right-6 z-[25] flex items-center gap-2 rounded-full border border-white/25 bg-black/45 px-3 py-2 text-[11px] font-medium uppercase tracking-[0.14em] text-bone/90 shadow-lg backdrop-blur-sm transition hover:bg-black/60 md:bottom-7"
         >
-          <Volume2 className="size-3.5 shrink-0 opacity-90" aria-hidden />
-          Sound on
+          {userAudible ? (
+            <VolumeX className="size-3.5 shrink-0 opacity-90" aria-hidden />
+          ) : (
+            <Volume2 className="size-3.5 shrink-0 opacity-90" aria-hidden />
+          )}
+          {userAudible ? 'Mute' : 'Unmute'}
         </button>
       )}
 
