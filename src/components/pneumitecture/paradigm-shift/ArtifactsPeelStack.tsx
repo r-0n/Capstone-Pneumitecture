@@ -51,7 +51,7 @@ export function ArtifactsPeelStack({ tone = "dark" }: { tone?: ArtifactsTone }) 
   return (
     <div className="relative flex min-h-[380px] flex-col lg:min-h-[440px]">
       <div className="mb-5 flex items-start justify-between gap-4 pr-6 lg:pr-8">
-        <p className={`font-sans text-[10px] font-semibold uppercase tracking-[0.28em] ${labelMuted}`}>
+        <p className={`font-sans text-[11px] font-semibold uppercase tracking-[0.26em] md:text-[12px] ${labelMuted}`}>
           4. Initial sketches
         </p>
         <nav

@@ -1,39 +1,3 @@
-import Image from "next/image";
-import { publicAssetPath } from "@/lib/publicAssetPath";
-
-const ATTACHMENT_IMAGES = [
-  {
-    src: publicAssetPath("/images/section01/attachment-01.png"),
-    alt: "Attachment prototype: pneumatic TPU cells in a modular grid within a frame",
-    width: 1024,
-    height: 768,
-  },
-  {
-    src: publicAssetPath("/images/section01/attachment-02.png"),
-    alt: "Attachment prototype: kinetic pneumatic surface and studio lighting",
-    width: 800,
-    height: 600,
-  },
-  {
-    src: publicAssetPath("/images/section01/attachment-03.png"),
-    alt: "Attachment prototype: vertical pneumatic columns and actuation study",
-    width: 1024,
-    height: 768,
-  },
-  {
-    src: publicAssetPath("/images/section01/attachment-04.png"),
-    alt: "Attachment prototype: installation with scale reference",
-    width: 800,
-    height: 600,
-  },
-  {
-    src: publicAssetPath("/images/section01/attachment-05.png"),
-    alt: "Attachment prototype: distributed pneumatic cells render study",
-    width: 1024,
-    height: 768,
-  },
-];
-
 export default function PavilionLeadSection() {
   return (
     <section
@@ -139,32 +103,19 @@ export default function PavilionLeadSection() {
                   <br />
                   Rhino + Grasshopper
                 </p>
+                <div className="mt-4 aspect-[4/3] w-full max-w-[420px] overflow-hidden rounded-md border border-neutral-200 bg-neutral-50 shadow-sm md:-ml-10 lg:-ml-60">
+                  <iframe
+                    src="https://drive.google.com/file/d/1WeAxBJEg7rBfVf8Zh_8egIQhuaDbYUiG/preview"
+                    title="Pneumitecture software video"
+                    className="h-full w-full border-0"
+                    allow="autoplay"
+                  />
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="mt-14 border-t border-neutral-200 pt-12 md:mt-16 md:pt-14">
-          <p className="mb-4 font-sans text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-500">
-            Attachment — render sequence
-          </p>
-          <figure className="flex flex-wrap items-start justify-center gap-4 md:gap-5">
-            {ATTACHMENT_IMAGES.map((img, i) => (
-              <Image
-                key={img.src}
-                src={img.src}
-                alt={img.alt}
-                width={img.width}
-                height={img.height}
-                className="h-auto max-h-[330px] w-auto max-w-full object-contain"
-                sizes="(max-width: 640px) 48vw, (max-width: 1024px) 24vw, 200px"
-                priority={i === 0}
-                loading={i === 0 ? "eager" : "lazy"}
-                fetchPriority={i === 0 ? "high" : "low"}
-              />
-            ))}
-          </figure>
-        </div>
       </div>
     </section>
   );
