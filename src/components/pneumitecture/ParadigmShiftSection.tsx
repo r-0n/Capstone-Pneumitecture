@@ -24,10 +24,9 @@ export default function ParadigmShiftSection() {
         <div className="mx-auto max-w-[1580px] px-4 pb-5 pt-8 sm:px-6 md:px-10 lg:px-12 lg:pb-6 lg:pt-9">
           <SectionLabel number="02" text="Concept" textFirst />
 
-          <h1 className="mx-auto max-w-[min(100%,1240px)] text-center font-display text-[clamp(1.7rem,5.6vw,4.2rem)] font-extralight uppercase leading-[0.92] tracking-[0.04em] text-foreground/90">
-            A SHIFT IN PARADIGM
+          <h1 className="mt-[-1.25rem] max-w-[min(100%,1240px)] font-display text-[clamp(1.15rem,2.8vw,2rem)] font-light leading-[1.02] tracking-[0.01em] text-foreground/90 md:mt-[-1.75rem]">
+            A Shift in Paradigm
           </h1>
-        
         </div>
       </div>
 
