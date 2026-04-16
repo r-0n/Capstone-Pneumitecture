@@ -456,7 +456,7 @@ export default function HeroSection() {
       {heroPhase !== 'video' && (
         <button
           type="button"
-          onClick={() => scrollToSection('pavilion-lead', { behavior: 'smooth' })}
+          onClick={() => scrollToSection('pavilion-lead')}
           aria-label="Go to pavilion premise section"
           tabIndex={scrollHintVisible ? 0 : -1}
           className={`absolute bottom-3 left-1/2 z-30 -translate-x-1/2 cursor-pointer border-0 bg-transparent p-1 text-left transition-[opacity,transform] duration-200 ease-out focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white/60 md:bottom-4 ${

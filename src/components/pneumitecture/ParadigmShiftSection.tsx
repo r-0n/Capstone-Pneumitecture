@@ -20,7 +20,7 @@ const FOUNDATIONS = "#f3f3f5";
 
 export default function ParadigmShiftSection() {
   return (
-    <section id="paradigm-shift" className="relative isolate scroll-mt-24 overflow-hidden">
+    <section id="paradigm-shift" className="relative isolate scroll-mt-24 overflow-x-hidden">
       <div className="relative bg-bone text-foreground">
         <div className="mx-auto max-w-[1580px] px-4 pb-5 pt-8 sm:px-6 md:px-10 lg:px-12 lg:pb-6 lg:pt-9">
           <SectionLabel number="02" text="Concept" textFirst />

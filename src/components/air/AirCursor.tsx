@@ -9,7 +9,7 @@ export function AirCursor() {
 
   const springConfig = reducedMotion
     ? { stiffness: 800, damping: 60, mass: 0.2 }
-    : { stiffness: 320, damping: 28, mass: 0.55 };
+    : { stiffness: 1200, damping: 42, mass: 0.18 };
 
   const x = useSpring(mouseX, springConfig);
   const y = useSpring(mouseY, springConfig);
@@ -26,20 +26,20 @@ export function AirCursor() {
     >
       <div className="relative flex h-0 w-0 -translate-x-1/2 -translate-y-1/2 items-center justify-center">
         <div
-          className="absolute h-12 w-12 rounded-full opacity-35 blur-md"
+          className="absolute h-10 w-10 rounded-full opacity-40 blur-sm"
           style={{
             background:
               "radial-gradient(circle, rgba(107,140,255,0.45) 0%, rgba(94,184,212,0.2) 50%, transparent 70%)",
           }}
         />
         <div
-          className="relative h-2.5 w-2.5 rounded-full border border-slate-400/70 bg-white shadow-[0_2px_12px_rgba(15,23,42,0.12)]"
+          className="relative h-2 w-2 rounded-full border border-slate-500/80 bg-white shadow-[0_1px_8px_rgba(15,23,42,0.18)]"
           style={{
             boxShadow:
-              "0 0 0 1px rgba(255,255,255,0.9), 0 4px 20px rgba(107,140,255,0.25)",
+              "0 0 0 1px rgba(255,255,255,0.95), 0 2px 14px rgba(107,140,255,0.22)",
           }}
         />
-        <div className="absolute h-9 w-9 rounded-full border border-slate-300/40" />
+        <div className="absolute h-8 w-8 rounded-full border border-slate-400/55" />
       </div>
     </motion.div>
   );

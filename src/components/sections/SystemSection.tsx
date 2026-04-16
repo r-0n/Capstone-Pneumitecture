@@ -296,6 +296,11 @@ function SystemSchematic() {
   };
 
   const handleWheelZoom = (e: React.WheelEvent<HTMLDivElement>) => {
+    // Do not preventDefault on plain wheel: that blocks page scroll (mouse wheel) while the pointer
+    // is over this canvas. Touchpads often still move the page; Ctrl/Meta + wheel zooms the diagram.
+    if (!e.ctrlKey && !e.metaKey) {
+      return;
+    }
     e.preventDefault();
     const direction = e.deltaY > 0 ? -0.08 : 0.08;
     zoomBy(direction);
@@ -319,7 +324,7 @@ function SystemSchematic() {
             Hover or click any node to inspect its role in the system.
           </p>
           <p className="mt-4 text-[11px] uppercase tracking-[0.2em] text-white/45">
-            Hover/click nodes · drag TPU cells to reposition
+            Hover/click nodes · drag TPU cells · Ctrl + wheel to zoom
           </p>
 
           <div className="mt-7 rounded-2xl border border-white/10 bg-black/25 p-4">
