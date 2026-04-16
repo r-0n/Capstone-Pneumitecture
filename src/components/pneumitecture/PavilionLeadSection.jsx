@@ -34,6 +34,7 @@ const ATTACHMENT_IMAGES = [
   },
 ];
 
+const SOFTWARE_IMAGE = ATTACHMENT_IMAGES[1];
 export default function PavilionLeadSection() {
   return (
     <section
@@ -139,32 +140,23 @@ export default function PavilionLeadSection() {
                   <br />
                   Rhino + Grasshopper
                 </p>
+                <div className="mt-4 max-w-[320px] mr-auto md:-ml-10 lg:-ml-50">
+                  <Image
+                    src={SOFTWARE_IMAGE.src}
+                    alt={SOFTWARE_IMAGE.alt}
+                    width={SOFTWARE_IMAGE.width}
+                    height={SOFTWARE_IMAGE.height}
+                    className="block h-auto w-full object-contain object-left"
+                    sizes="(max-width: 768px) 78vw, 320px"
+                    loading="lazy"
+                    fetchPriority="low"
+                  />
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="mt-14 border-t border-neutral-200 pt-12 md:mt-16 md:pt-14">
-          <p className="mb-4 font-sans text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-500">
-            Attachment — render sequence
-          </p>
-          <figure className="flex flex-wrap items-start justify-center gap-4 md:gap-5">
-            {ATTACHMENT_IMAGES.map((img, i) => (
-              <Image
-                key={img.src}
-                src={img.src}
-                alt={img.alt}
-                width={img.width}
-                height={img.height}
-                className="h-auto max-h-[330px] w-auto max-w-full object-contain"
-                sizes="(max-width: 640px) 48vw, (max-width: 1024px) 24vw, 200px"
-                priority={i === 0}
-                loading={i === 0 ? "eager" : "lazy"}
-                fetchPriority={i === 0 ? "high" : "low"}
-              />
-            ))}
-          </figure>
-        </div>
       </div>
     </section>
   );

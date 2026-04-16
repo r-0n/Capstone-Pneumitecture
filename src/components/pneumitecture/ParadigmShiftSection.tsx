@@ -24,7 +24,7 @@ export default function ParadigmShiftSection() {
         <div className="mx-auto max-w-[1580px] px-4 pb-5 pt-8 sm:px-6 md:px-10 lg:px-12 lg:pb-6 lg:pt-9">
           <SectionLabel number="02" text="Concept" textFirst />
 
-          <h1 className="mx-auto max-w-[min(100%,1240px)] text-center font-display text-[clamp(2rem,6.5vw,5rem)] font-extralight uppercase leading-[0.92] tracking-[0.04em] text-foreground/90">
+          <h1 className="mx-auto max-w-[min(100%,1240px)] text-center font-display text-[clamp(1.7rem,5.6vw,4.2rem)] font-extralight uppercase leading-[0.92] tracking-[0.04em] text-foreground/90">
             A SHIFT IN PARADIGM
           </h1>
         
@@ -37,7 +37,7 @@ export default function ParadigmShiftSection() {
             <ParadigmGridWaveCross />
             <div className="relative z-[2] flex flex-col lg:grid lg:grid-cols-2 lg:grid-rows-2 lg:gap-[3px] lg:bg-[#060607] lg:p-[3px]">
               <div className="relative z-[2] bg-bone px-4 py-5 text-foreground sm:px-5 sm:py-6 md:px-6 md:py-7">
-                <p className="mb-3 font-sans text-[9px] font-semibold uppercase tracking-[0.32em] text-structural">
+                <p className="mb-3 font-sans text-[11px] font-semibold uppercase tracking-[0.28em] text-structural md:text-[12px]">
                   1. THE PHILOSOPHY
                 </p>
                 <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:gap-6">

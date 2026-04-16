@@ -9,7 +9,7 @@ const cardBase =
 export function MetaphorCards() {
   return (
     <div>
-      <p className="mb-4 font-sans text-[10px] font-semibold uppercase tracking-[0.28em] text-white/55">
+      <p className="mb-4 font-sans text-[11px] font-semibold uppercase tracking-[0.26em] text-white/55 md:text-[12px]">
         3. The metaphor
       </p>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

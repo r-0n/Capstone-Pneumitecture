@@ -96,7 +96,7 @@ export function InspirationWall() {
       }}
     >
       <div className="mb-2 flex items-start justify-between gap-4">
-        <p className="font-sans text-[10px] font-semibold uppercase tracking-[0.28em] text-white/50">
+        <p className="font-sans text-[11px] font-semibold uppercase tracking-[0.26em] text-white/50 md:text-[12px]">
           2. The inspiration
         </p>
         <p className="max-w-[10rem] text-right font-sans text-[9px] font-light leading-snug text-white/35">
