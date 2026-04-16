@@ -1,40 +1,3 @@
-import Image from "next/image";
-import { publicAssetPath } from "@/lib/publicAssetPath";
-
-const ATTACHMENT_IMAGES = [
-  {
-    src: publicAssetPath("/images/section01/attachment-01.png"),
-    alt: "Attachment prototype: pneumatic TPU cells in a modular grid within a frame",
-    width: 1024,
-    height: 768,
-  },
-  {
-    src: publicAssetPath("/images/section01/attachment-02.png"),
-    alt: "Attachment prototype: kinetic pneumatic surface and studio lighting",
-    width: 800,
-    height: 600,
-  },
-  {
-    src: publicAssetPath("/images/section01/attachment-03.png"),
-    alt: "Attachment prototype: vertical pneumatic columns and actuation study",
-    width: 1024,
-    height: 768,
-  },
-  {
-    src: publicAssetPath("/images/section01/attachment-04.png"),
-    alt: "Attachment prototype: installation with scale reference",
-    width: 800,
-    height: 600,
-  },
-  {
-    src: publicAssetPath("/images/section01/attachment-05.png"),
-    alt: "Attachment prototype: distributed pneumatic cells render study",
-    width: 1024,
-    height: 768,
-  },
-];
-
-const SOFTWARE_IMAGE = ATTACHMENT_IMAGES[1];
 export default function PavilionLeadSection() {
   return (
     <section
@@ -140,16 +103,12 @@ export default function PavilionLeadSection() {
                   <br />
                   Rhino + Grasshopper
                 </p>
-                <div className="mt-4 max-w-[320px] mr-auto md:-ml-10 lg:-ml-50">
-                  <Image
-                    src={SOFTWARE_IMAGE.src}
-                    alt={SOFTWARE_IMAGE.alt}
-                    width={SOFTWARE_IMAGE.width}
-                    height={SOFTWARE_IMAGE.height}
-                    className="block h-auto w-full object-contain object-left"
-                    sizes="(max-width: 768px) 78vw, 320px"
-                    loading="lazy"
-                    fetchPriority="low"
+                <div className="mt-4 aspect-[4/3] w-full max-w-[420px] overflow-hidden rounded-md border border-neutral-200 bg-neutral-50 shadow-sm md:-ml-10 lg:-ml-60">
+                  <iframe
+                    src="https://drive.google.com/file/d/1WeAxBJEg7rBfVf8Zh_8egIQhuaDbYUiG/preview"
+                    title="Pneumitecture software video"
+                    className="h-full w-full border-0"
+                    allow="autoplay"
                   />
                 </div>
               </div>
