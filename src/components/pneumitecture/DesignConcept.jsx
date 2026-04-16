@@ -7,7 +7,7 @@ const CONCEPT_IMG = 'https://media.base44.com/images/public/69da883791905282c2ac
 export default function DesignConcept() {
   return (
     <section id="concept" className="py-32 md:py-48 max-w-7xl mx-auto px-8 md:px-16">
-      <SectionLabel number="09" text="Design Concept" textFirst />
+      <SectionLabel number="03" text="Design Concept" textFirst />
       <ScrollReveal>
         <p className="font-display font-extralight text-structural text-base md:text-lg tracking-wide mb-2">The Central Thesis</p>
         <h2 className="font-display font-extralight text-3xl md:text-5xl tracking-tight mb-16 max-w-3xl">Softness as an Atmospheric Structure</h2>

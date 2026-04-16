@@ -17,7 +17,7 @@ export default function PavilionReveal() {
       className="relative z-[5] scroll-mt-24 bg-[#FBFBF9] pb-32 md:pb-48"
     >
       <div className="mx-auto max-w-7xl px-8 pt-12 md:px-16 md:pt-16">
-        <SectionLabel number="08" text="The Pavilion" textFirst />
+        <SectionLabel number="09" text="Future Vision" textFirst />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-24">
           <ScrollReveal>
             <div className="mb-6 min-w-0">
@@ -25,38 +25,41 @@ export default function PavilionReveal() {
                 A constructed atmosphere rather than a constructed object.
               </p>
               <p className="font-display font-bold text-foreground whitespace-nowrap text-sm sm:text-base md:text-lg lg:text-xl tracking-tight overflow-x-auto">
-                THE PAVILION
+                FUTURE VISION
               </p>
             </div>
             <p className="font-display font-extralight text-foreground/80 text-base leading-relaxed mb-3">
-              The Pavilion is an extension of the Pneumitecture investigation, where ideas of air, softness, and atmospheric behavior become spatially tangible. It is not defined as a fixed architectural object, but as a condition that temporarily takes form.
+              The Pavilion emerges as a continuation of the Pneumitecture investigation, projecting a future where air, softness, and atmospheric behavior become spatially tangible. It is no longer understood as a fixed architectural object, but as a condition—one that forms, adapts, and dissolves over time.
             </p>
             <p className="font-display font-extralight text-foreground/80 text-base leading-relaxed mb-3">
-              Instead of relying on solidity or permanence, the Pavilion operates as a porous system. Boundaries remain unstable, and space is continuously shaped by light, air, and movement.
+              Rather than relying on solidity or permanence, the Pavilion operates as a porous and responsive system. Boundaries remain unstable, continuously reshaped by light, air, and human presence.
             </p>
             <p className="font-display font-extralight text-foreground/80 text-base leading-relaxed mb-3">
-              It shifts the role of architecture away from enclosure and toward transformation.
+              In this vision, architecture shifts away from enclosure and toward transformation.
             </p>
             <p className="font-display font-bold text-foreground text-base leading-relaxed mt-8 mb-3">
-              Architecture as breath.
+              Architecture as breath
             </p>
             <p className="font-display font-extralight text-foreground/80 text-base leading-relaxed mb-3">
-              Within Pneumitecture, architecture is understood as a breathing system that is responsive, light, and constantly in flux. The Pavilion embodies this by resisting a single reading. It exists as a sequence of atmospheric states rather than a fixed form.
+              Within this future, architecture behaves as a living, breathing system—responsive, lightweight, and in constant flux. The Pavilion resists a singular interpretation, existing instead as a sequence of evolving atmospheric states.
             </p>
             <p className="font-display font-extralight text-foreground/80 text-base leading-relaxed mb-3">
-              Depending on environmental conditions, it appears to thicken, dissolve, or almost disappear entirely.
+              Its presence is never fixed. It thickens, softens, or dissipates depending on environmental and human conditions, creating a dynamic relationship between body and space.
             </p>
             <p className="font-display font-extralight text-foreground/80 text-base leading-relaxed mb-3">
-              This instability is intentional. It reflects a shift toward architecture that is alive within its environment, rather than imposed upon it.
+              This instability is intentional. It proposes an architecture that is not imposed, but one that lives, reacts, and coexists with its surroundings.
             </p>
             <p className="font-display font-bold text-foreground text-base leading-relaxed mt-8 mb-3">
-              Material becomes atmosphere.
+              Material becomes atmosphere
             </p>
             <p className="font-display font-extralight text-foreground/80 text-base leading-relaxed mb-3">
-              The Pavilion explores the threshold where material stops acting as surface and begins behaving as atmosphere. Surfaces function less as boundaries and more as filters, softening edges, diffusing light, and blurring spatial definition.
+              Here, materiality moves beyond surface. The Pavilion explores a threshold where matter begins to behave as atmosphere—where boundaries blur and dissolve into gradients.
             </p>
             <p className="font-display font-extralight text-foreground/80 text-base leading-relaxed mb-3">
-              Here, architecture is not experienced as form, but as feeling. The experience is defined by immersion, ambiguity, and quiet spatial tension.
+              Surfaces act as filters rather than edges, diffusing light, softening spatial limits, and allowing space to feel fluid and indeterminate.
+            </p>
+            <p className="font-display font-extralight text-foreground/80 text-base leading-relaxed mb-3">
+              In this future vision, architecture is no longer experienced as form, but as sensation—defined by immersion, ambiguity, and a quiet, responsive tension between body, material, and air.
             </p>
           </ScrollReveal>
 

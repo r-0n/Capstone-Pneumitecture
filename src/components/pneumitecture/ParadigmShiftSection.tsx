@@ -10,6 +10,7 @@ import { InspirationWall } from "@/components/pneumitecture/paradigm-shift/Inspi
 import { MetaphorCards } from "@/components/pneumitecture/paradigm-shift/MetaphorCards";
 import { ArtifactsPeelStack } from "@/components/pneumitecture/paradigm-shift/ArtifactsPeelStack";
 import { ConceptualFoundationsBand } from "@/components/pneumitecture/paradigm-shift/ConceptualFoundationsBand";
+import DesignConcept from "@/components/pneumitecture/DesignConcept";
 
 const BREATHING_DOME_SKETCH = publicAssetPath("/images/breathing-dome-sketch.png");
 
@@ -98,6 +99,7 @@ export default function ParadigmShiftSection() {
         </ParadigmDarkWaveShell>
       </div>
 
+      <DesignConcept />
       <ParadigmWaveRibbon topFill="#060607" bottomFill={FOUNDATIONS} className="h-10 md:h-14 lg:h-16" />
 
       <ConceptualFoundationsBand />

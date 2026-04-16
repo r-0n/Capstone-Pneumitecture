@@ -139,6 +139,24 @@ export function DesignProcessPhaseSlider({ slides, priority = false }: DesignPro
           ))}
         </div>
 
+        {/* Caption overlay on image */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30">
+          <div className="bg-gradient-to-t from-black/85 via-black/55 to-transparent px-5 pb-3.5 pt-8">
+            <AnimatePresence mode="wait">
+              <motion.p
+                key={current.caption}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+                className="text-center font-display text-[12px] font-light italic leading-snug text-bone sm:text-[13px]"
+              >
+                {current.caption}
+              </motion.p>
+            </AnimatePresence>
+          </div>
+        </div>
+
         {n > 1 ? (
           <>
             <div
@@ -236,20 +254,7 @@ export function DesignProcessPhaseSlider({ slides, priority = false }: DesignPro
           ‹
         </button>
 
-        <div className="min-w-0 flex-1 overflow-hidden rounded-lg border border-[var(--hairline)] bg-bone/60 px-2.5 py-2">
-          <AnimatePresence mode="wait">
-            <motion.p
-              key={current.caption}
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -4 }}
-              transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-              className="text-center font-display text-[10px] font-light italic leading-snug text-structural sm:text-[11px]"
-            >
-              {current.caption}
-            </motion.p>
-          </AnimatePresence>
-        </div>
+        <div className="min-w-0 flex-1" />
 
         <button
           type="button"

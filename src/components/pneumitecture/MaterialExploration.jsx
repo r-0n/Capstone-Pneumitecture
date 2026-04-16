@@ -85,7 +85,7 @@ function MaterialCard({ img, delay }) {
 export default function MaterialExploration() {
   return (
     <section id="materials" className="py-32 md:py-48 max-w-7xl mx-auto px-8 md:px-16">
-      <SectionLabel number="05" text="Material Exploration" textFirst />
+      <SectionLabel number="06" text="Material Exploration" textFirst />
       <ScrollReveal>
         <p className="font-display font-extralight text-structural text-base md:text-lg tracking-wide mb-2">Before the form, the material</p>
       </ScrollReveal>

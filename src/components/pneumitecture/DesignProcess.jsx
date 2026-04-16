@@ -231,6 +231,8 @@ const phases = [
     num: 3,
     title: "Cell Population",
     sub: "",
+    body:
+      "The shift from singular experimentation to collective behavior. As cells were combined, new spatial conditions began to emerge — driven by interaction, pressure, and constraint. What was once a unit became a system, defining the project’s architectural direction.",
     slides: CELL_POPULATION_SLIDES,
   },
   {
@@ -325,6 +327,7 @@ const phases = [
     num: 7,
     title: "Project Digital Simulation",
     sub: "",
+    body: "Ron Placeholder",
     slides: [
       ...RHINO_GH_SLIDES,
       {
@@ -352,68 +355,143 @@ const phases = [
   },
 ];
 
+/** Small card for non-featured phases. */
+function PhaseCard({ phase, index, hovered, setHovered }) {
+  const isHovered = hovered === index;
+
+  return (
+    <div
+      className="flex cursor-default flex-col items-center text-center"
+      onMouseEnter={() => setHovered(index)}
+      onMouseLeave={() => setHovered(null)}
+    >
+      <div
+        className="w-full transition-[transform,box-shadow] duration-300 ease-out"
+        style={{
+          transform: isHovered ? "scale(1.03)" : "scale(1)",
+          boxShadow: isHovered ? "0 12px 40px rgba(0,0,0,0.09)" : "0 0 0 rgba(0,0,0,0)",
+        }}
+      >
+        <DesignProcessPhaseSlider slides={phase.slides} priority={phase.num === 1} />
+      </div>
+      <div
+        className="mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-obsidian transition-transform duration-300"
+        style={{ transform: isHovered ? "scale(1.15)" : "scale(1)" }}
+      >
+        <span className="font-mono text-[10px] text-bone">{phase.num}</span>
+      </div>
+      <span
+        className="tech-label mt-2 block text-obsidian"
+        style={{
+          opacity: hovered === null || isHovered ? 1 : 0.3,
+          transition: "opacity 0.3s",
+        }}
+      >
+        {phase.title}
+      </span>
+      {phase.sub ? (
+        <span
+          className="tech-label block text-structural/60"
+          style={{
+            opacity: hovered === null || isHovered ? 1 : 0.2,
+            transition: "opacity 0.3s",
+          }}
+        >
+          {phase.sub}
+        </span>
+      ) : null}
+    </div>
+  );
+}
+
+/** Full-width hero card for featured phases (3 & 7). */
+function FeaturedPhaseCard({ phase }) {
+  return (
+    <div className="my-12 border-y border-[var(--hairline)] px-4 py-12 md:my-16 md:px-6 md:py-20">
+      <div className="mb-8 flex items-center gap-4">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-obsidian">
+          <span className="font-mono text-xs text-bone">{phase.num}</span>
+        </div>
+        <div className="hairline flex-1" />
+      </div>
+      <div className="grid grid-cols-1 items-center gap-8 md:grid-cols-[minmax(0,1.05fr)_minmax(0,1.2fr)] md:gap-12 md:items-center md:justify-items-center">
+        <div className="w-full max-w-xl">
+          {phase.sub ? (
+            <p className="tech-label mb-3 text-structural/50">{phase.sub}</p>
+          ) : null}
+          <h3 className="font-display mb-4 text-3xl font-extralight tracking-tight md:text-4xl">
+            {phase.title}
+          </h3>
+          {phase.body ? (
+            <p className="font-display font-extralight text-foreground/70 text-base md:text-lg leading-relaxed">
+              {phase.body}
+            </p>
+          ) : null}
+        </div>
+        <div className="w-full max-w-[32rem] md:justify-self-center md:mx-auto lg:max-w-[36rem]">
+          <div className="h-full w-full" style={{ aspectRatio: "16/10" }}>
+            <DesignProcessPhaseSlider slides={phase.slides} tall />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function DesignProcess() {
   const [hovered, setHovered] = useState(null);
 
+  // Segments following the reference layout: [1,2] | 3 | [4,5,6] | 7
+  const seg1 = phases.filter((p) => p.num === 1 || p.num === 2);
+  const feat3 = phases.find((p) => p.num === 3);
+  const seg2 = phases.filter((p) => p.num === 4 || p.num === 5 || p.num === 6);
+  const feat7 = phases.find((p) => p.num === 7);
+
   return (
-    <section id="design-process" className="py-32 md:py-48 w-full px-4 md:px-8">
-      <SectionLabel number="03" text="Design Process" textFirst />
+    <section id="design-process" className="w-full py-32 px-4 md:py-48 md:px-8">
+      <div className="mx-auto max-w-7xl">
+        <SectionLabel number="04" text="Design Process" textFirst />
 
-      <ScrollReveal>
-        <p className="font-display font-extralight text-structural text-base md:text-lg tracking-wide mb-2">
-          The central thesis
-        </p>
-        <h2 className="font-display font-extralight text-3xl md:text-5xl tracking-tight mb-16 max-w-3xl">
-          From geometry to form
-        </h2>
-      </ScrollReveal>
+        <ScrollReveal>
+          <p className="font-display font-extralight text-structural text-base md:text-lg tracking-wide mb-2">
+            The central thesis
+          </p>
+          <h2 className="font-display font-extralight text-3xl md:text-5xl tracking-tight mb-16 max-w-3xl">
+            From geometry to form
+          </h2>
+        </ScrollReveal>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        {phases.map((phase, i) => (
-          <ScrollReveal
-            key={phase.num}
-            delay={i * 0.1}
-            className={i === phases.length - 1 ? "flex justify-center md:col-span-3" : ""}
-          >
-            <div className={i === phases.length - 1 ? "w-full md:w-2/3" : "w-full"}>
-              <div
-                className="flex flex-col items-center text-center cursor-default"
-                onMouseEnter={() => setHovered(i)}
-                onMouseLeave={() => setHovered(null)}
-              >
-                <div
-                  className="w-full transition-[transform,box-shadow] duration-300 ease-out"
-                  style={{
-                    transform: hovered === i ? "scale(1.03)" : "scale(1)",
-                    boxShadow: hovered === i ? "0 12px 40px rgba(0,0,0,0.09)" : "0 0 0 rgba(0,0,0,0)",
-                  }}
-                >
-                  <DesignProcessPhaseSlider slides={phase.slides} priority={phase.num === 1} />
-                </div>
-                <div
-                  className="mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-obsidian transition-transform duration-300"
-                  style={{ transform: hovered === i ? "scale(1.15)" : "scale(1)" }}
-                >
-                  <span className="font-mono text-[10px] text-bone">{phase.num}</span>
-                </div>
-                <span
-                  className="tech-label mt-2 block text-obsidian"
-                  style={{ opacity: hovered === null || hovered === i ? 1 : 0.3, transition: "opacity 0.3s" }}
-                >
-                  {phase.title}
-                </span>
-                {phase.sub ? (
-                  <span
-                    className="tech-label block text-structural/60"
-                    style={{ opacity: hovered === null || hovered === i ? 1 : 0.2, transition: "opacity 0.3s" }}
-                  >
-                    {phase.sub}
-                  </span>
-                ) : null}
-              </div>
-            </div>
+        {/* Segment 1: phases 1–2 */}
+        <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-8">
+          {seg1.map((phase, i) => (
+            <ScrollReveal key={phase.num} delay={i * 0.1}>
+              <PhaseCard phase={phase} index={i} hovered={hovered} setHovered={setHovered} />
+            </ScrollReveal>
+          ))}
+        </div>
+
+        {/* Featured: Phase 3 */}
+        {feat3 ? (
+          <ScrollReveal>
+            <FeaturedPhaseCard phase={feat3} />
           </ScrollReveal>
-        ))}
+        ) : null}
+
+        {/* Segment 2: phases 4–6 */}
+        <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-3 md:gap-8">
+          {seg2.map((phase, i) => (
+            <ScrollReveal key={phase.num} delay={i * 0.1}>
+              <PhaseCard phase={phase} index={i + 10} hovered={hovered} setHovered={setHovered} />
+            </ScrollReveal>
+          ))}
+        </div>
+
+        {/* Featured: Phase 7 */}
+        {feat7 ? (
+          <ScrollReveal>
+            <FeaturedPhaseCard phase={feat7} />
+          </ScrollReveal>
+        ) : null}
       </div>
     </section>
   );
