@@ -1,8 +1,12 @@
-import ScrollReveal from './ScrollReveal';
-import SectionLabel from './SectionLabel';
-import DesignConceptFloatGallery from './DesignConceptFloatGallery';
+import { motion } from "framer-motion";
+import ScrollReveal from "./ScrollReveal";
+import SectionLabel from "./SectionLabel";
 
-const contentPad = 'mx-auto max-w-[min(100%,1200px)] px-5 sm:px-8 md:px-12 lg:px-14';
+const SOFT_1 = "https://media.base44.com/images/public/69da883791905282c2acac77/c6cce64a4_generated_image.png";
+const SOFT_2 = "https://media.base44.com/images/public/69da883791905282c2acac77/a8704d1c6_generated_image.png";
+const SOFT_3 = "https://media.base44.com/images/public/69da883791905282c2acac77/af3c113a0_generated_image.png";
+
+const contentPad = "mx-auto max-w-[min(100%,1200px)] px-5 sm:px-8 md:px-12 lg:px-14";
 
 export default function DesignConcept() {
   return (
@@ -10,44 +14,70 @@ export default function DesignConcept() {
       <div className={contentPad}>
         <SectionLabel number="03" text="Design Concept" textFirst />
         <ScrollReveal>
-          <h2 className="font-display font-extralight text-3xl md:text-5xl tracking-tight mb-16 max-w-3xl">Softness as an Atmospheric Structure</h2>
+          <h2 className="mb-16 max-w-3xl font-display text-3xl font-extralight tracking-tight md:text-5xl">
+            Softness as an Atmospheric Structure
+          </h2>
         </ScrollReveal>
 
-        {/* Split layout */}
-        <div className="mb-24 grid grid-cols-1 gap-12 md:mb-36 md:grid-cols-12 md:items-stretch md:gap-16">
-          <ScrollReveal className="md:col-span-5">
-            <p className="font-display font-extralight text-foreground/70 text-base md:text-lg leading-relaxed mb-8">
-              At its core, the project explores the dynimism of architecture based on human presence.
-              Traditional architecture is typically conceived as static: walls, 
-              ceilings, and surfaces that remain fixed once constructed. This project challenges that 
-              paradigm by imagining a spatial system composed of soft pneumatic cells capable of continuous
-              transformation through cycles of inflation and deflation.
+        <div className="mb-24 grid grid-cols-1 gap-8 md:mb-36 md:grid-cols-[0.9fr_1.3fr] md:gap-12">
+          <ScrollReveal>
+            <div className="flex h-full flex-col justify-center py-4">
+              <p className="font-display font-extralight text-foreground/70 text-base md:text-lg leading-relaxed mb-8">
+                At its core, the project explores the dynimism of architecture based on human presence.
+                Traditional architecture is typically conceived as static: walls,
+                ceilings, and surfaces that remain fixed once constructed. This project challenges that
+                paradigm by imagining a spatial system composed of soft pneumatic cells capable of continuous
+                transformation through cycles of inflation and deflation.
 
-              Pneumitecture is conceived as a responsive atmospheric structure, where space becomes dynamic 
-              through softness rather than solidity. Instead of fixed architectural elements, it is composed 
-              of inflatable forms that continuously performs choreography in response to human presence.
-            </p>
-            <p className="font-display font-extralight text-foreground/70 text-base md:text-lg leading-relaxed mb-6">
-              Its spatial condition is not static. It is produced through cycles of expansion and release, 
-              allowing it to subtly reconfigure itself over time. This creates an environment that feels less 
-              constructed and more emergent, as if space is forming and unforming within the same gesture.
-            </p>
-            <p className="font-display font-extralight text-foreground/70 text-base md:text-lg leading-relaxed">
-              The design draws from natural respiratory systems, where rhythm, pressure, and flow generate 
-              continuity between body and environment. In this sense, the Pavilion behaves less like an 
-              object and more like a breathing field, where architecture is experienced as a living atmospheric 
-              condition.
-            </p>
-          </ScrollReveal>
-
-          <ScrollReveal
-            delay={0.2}
-            className="flex min-h-[min(52vh,22rem)] flex-col md:col-span-7 md:min-h-0 md:h-full"
-          >
-            <div className="flex min-h-0 flex-1 flex-col">
-              <DesignConceptFloatGallery />
+                Pneumitecture is conceived as a responsive atmospheric structure, where space becomes dynamic
+                through softness rather than solidity. Instead of fixed architectural elements, it is composed
+                of inflatable forms that continuously performs choreography in response to human presence.
+              </p>
+              <p className="font-display font-extralight text-foreground/70 text-base md:text-lg leading-relaxed mb-6">
+                Its spatial condition is not static. It is produced through cycles of expansion and release,
+                allowing it to subtly reconfigure itself over time. This creates an environment that feels less
+                constructed and more emergent, as if space is forming and unforming within the same gesture.
+              </p>
+              <p className="font-display font-extralight text-foreground/70 text-base md:text-lg leading-relaxed">
+                The design draws from natural respiratory systems, where rhythm, pressure, and flow generate
+                continuity between body and environment. In this sense, the Pavilion behaves less like an
+                object and more like a breathing field, where architecture is experienced as a living atmospheric
+                condition.
+              </p>
             </div>
           </ScrollReveal>
+
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-12 md:gap-5 lg:gap-6">
+            <ScrollReveal delay={0.15} className="md:col-span-12">
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
+                className="overflow-hidden aspect-[16/9] rounded-xl bg-[var(--paper)]/95 shadow-sm md:aspect-[14/7]"
+              >
+                <img src={SOFT_3} alt="Hand touching soft membrane" className="h-full w-full object-cover" />
+              </motion.div>
+            </ScrollReveal>
+
+            <ScrollReveal delay={0.1} className="md:col-span-6 md:mt-3">
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
+                className="overflow-hidden aspect-[4/5] rounded-xl bg-[var(--paper)]/95 shadow-sm md:aspect-[1/1]"
+              >
+                <img src={SOFT_2} alt="Pneumatic pillow forms" className="h-full w-full object-cover" />
+              </motion.div>
+            </ScrollReveal>
+
+            <ScrollReveal delay={0.25} className="md:col-span-6 md:-mt-4">
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
+                className="overflow-hidden aspect-[7/4] rounded-xl bg-[var(--paper)]/95 shadow-sm md:aspect-[6/4]"
+              >
+                <img src={SOFT_1} alt="Translucent membrane folds" className="h-full w-full object-cover" />
+              </motion.div>
+            </ScrollReveal>
+          </div>
         </div>
       </div>
     </section>
