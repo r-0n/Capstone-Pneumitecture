@@ -3,7 +3,7 @@ export type NavItem = { id: string; label: string; shortLabel?: string };
 /** Mirrors the long-scroll mockup nav — hash links on one page */
 export const SITE_SECTIONS: NavItem[] = [
   { id: "hero", label: "00 Hero", shortLabel: "00 Hero" },
-  { id: "pavilion-lead", label: "01 Pavilion Premise", shortLabel: "01 Pavilion" },
+  { id: "pavilion-lead", label: "01 Overview", shortLabel: "01 Overview" },
   { id: "paradigm-shift", label: "02 Paradigm Shift", shortLabel: "02 Paradigm" },
   { id: "concept", label: "03 Design Concept", shortLabel: "03 Concept" },
   { id: "design-process", label: "04 Design Process", shortLabel: "04 Process" },
