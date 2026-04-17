@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { SITE_SECTIONS } from "@/config/navigation";
 import { scrollToSection } from "@/lib/scrollToSection";
 
@@ -30,17 +30,40 @@ function labelFor(id: string) {
 
 export function ScrollProgress() {
   const [active, setActive] = useState<string | null>(null);
+  /** Document Y of each section top (same order as PROGRESS_IDS) — avoids layout reads every wheel tick. */
+  const topsRef = useRef<number[] | null>(null);
 
   useEffect(() => {
-    const getCurrentSection = () => {
-      if (window.scrollY < 120) return null;
-      const scanLineY = window.scrollY + window.innerHeight * 0.3;
-      let currentId: string | null = null;
+    const measureTops = () => {
+      const y = window.scrollY;
+      const next: number[] = [];
       for (const id of PROGRESS_IDS) {
         const el = document.getElementById(id);
-        if (!el) continue;
-        const top = el.getBoundingClientRect().top + window.scrollY;
-        if (top <= scanLineY) currentId = id;
+        next.push(el ? el.getBoundingClientRect().top + y : Number.POSITIVE_INFINITY);
+      }
+      topsRef.current = next;
+    };
+
+    let didRemeasurePastHero = false;
+    const getCurrentSection = () => {
+      const scrollY = window.scrollY;
+      if (scrollY < 120) return null;
+      if (!didRemeasurePastHero && scrollY > window.innerHeight * 0.85) {
+        didRemeasurePastHero = true;
+        measureTops();
+      }
+      const scanLineY = scrollY + window.innerHeight * 0.3;
+      let tops = topsRef.current;
+      if (!tops || tops.length !== PROGRESS_IDS.length) {
+        measureTops();
+        tops = topsRef.current;
+      }
+      if (!tops || tops.length !== PROGRESS_IDS.length) return null;
+      let currentId: string | null = null;
+      for (let i = 0; i < PROGRESS_IDS.length; i++) {
+        const top = tops[i]!;
+        if (!Number.isFinite(top)) continue;
+        if (top <= scanLineY) currentId = PROGRESS_IDS[i]!;
         else break;
       }
       return currentId;
@@ -58,13 +81,23 @@ export function ScrollProgress() {
       raf = requestAnimationFrame(tick);
     };
 
+    const onResize = () => {
+      didRemeasurePastHero = false;
+      measureTops();
+      schedule();
+    };
+
+    measureTops();
     tick();
     window.addEventListener("scroll", schedule, { passive: true });
-    window.addEventListener("resize", schedule);
+    window.addEventListener("resize", onResize, { passive: true });
+    if ("fonts" in document && document.fonts?.ready) {
+      void document.fonts.ready.then(measureTops).catch(() => {});
+    }
     return () => {
       if (raf) cancelAnimationFrame(raf);
       window.removeEventListener("scroll", schedule);
-      window.removeEventListener("resize", schedule);
+      window.removeEventListener("resize", onResize);
     };
   }, []);
 

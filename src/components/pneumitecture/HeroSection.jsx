@@ -215,7 +215,7 @@ export default function HeroSection() {
 
     if (phase !== 'video') {
       ytSuspendedRef.current = false;
-      setYtSuspended(false);
+      setYtSuspended((prev) => (prev ? false : prev));
       ytResetDrive(lastYtDriveRef);
       return;
     }
@@ -248,8 +248,8 @@ export default function HeroSection() {
     }
   }, [ytUnavailable, resetHeroToIntro]);
 
-  /** Re-sync scroll-driven hero state when phase / availability change (refs handle scroll position). */
-  useLayoutEffect(() => {
+  /** Re-sync scroll-driven hero after phase / availability change (useEffect avoids blocking wheel input on layout). */
+  useEffect(() => {
     queueMicrotask(() => applyHeroScroll());
   }, [applyHeroScroll, heroPhase, ytUnavailable]);
 
