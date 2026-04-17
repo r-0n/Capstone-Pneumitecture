@@ -64,20 +64,29 @@ The app is built for **static hosting** (no Node server). Pushes to **`main`** c
 ### One-time GitHub setup
 
 1. Push this repo to GitHub.
-2. **Settings → Pages → Build and deployment**: set **Source** to **GitHub Actions** (not “Deploy from a branch”).
-3. Push to **`main`**, open **Actions**, then use the **Pages** URL (typically `https://<user>.github.io/<repo>/`).
+2. **Settings → Pages → Build and deployment → Source:** choose **GitHub Actions** (not “Deploy from a branch”).  
+   If you ever used a branch before: switch to Actions, then **save**. The UI must **not** still show a branch + folder (e.g. `main` / `/ (root)`). While that is selected, GitHub serves your **repo files** (README, folders) — **not** the `out/` artifact from this workflow.
+3. Push to **`main`** (or run **Actions → Deploy to GitHub Pages → Run workflow**). Wait for the **build** and **deploy** jobs to finish green.
+4. Open the **site URL** shown under **Settings → Pages** (“Your site is live at …”), or the link in the workflow run **Summary** (added by the workflow).  
+   Format: `https://<github-username>.github.io/<exact-repo-name>/`  
+   **Do not** use the normal repo page `https://github.com/<user>/<repo>` — that page always includes the README below the file list.
 
-The workflow sets **`BASE_PATH`** to `/<repository-name>` so assets match a **project site** URL.
+The workflow sets **`BASE_PATH`** to `/<repository-name>` (from GitHub’s canonical repo name) so asset URLs match a **project** Pages URL.
 
-### If the live site looks like this README (or a file list)
+**First deploy:** if Actions shows **“Waiting for approval”** for the `github-pages` environment, open the run → **Review deployments** → **Approve** so the site can publish.
 
-That almost always means **GitHub Pages is not serving the Next.js build** from Actions.
+### If the live site still looks like this README (or a file list)
 
-1. **Settings → Pages → Build and deployment → Source** must be **GitHub Actions**, not **Deploy from a branch**.  
-   If Source is a branch (e.g. `main` / `/ (root)`), GitHub serves the **repository tree** (markdown, folders, etc.), not the contents of `out/` from the workflow.
-2. Open the site using the **Pages URL** from **Settings → Pages** (or the `page_url` from the latest successful **Deploy to GitHub Pages** run), e.g. `https://<username>.github.io/<RepositoryName>/` — **not** the main GitHub **Code** tab for the repo (that tab shows the README by design).
-3. Confirm the **Deploy to GitHub Pages** workflow on `main` completed with a green check; a failed build leaves the previous deployment (or nothing useful) in place.
-4. This repo ships **`public/.nojekyll`** and the workflow runs **`touch out/.nojekyll`** so **Jekyll** on Pages does not rewrite or drop static assets.
+The built app is **not** what Pages is serving. The export itself is valid (CI checks `out/index.html` contains Next assets).
+
+1. Re-check **Settings → Pages → Source = GitHub Actions** only (no branch publish).
+2. Use the **`*.github.io/<repo>/`** URL, not `github.com/.../blob/.../README.md`.
+3. Open the latest **Deploy to GitHub Pages** run: the **Summary** tab shows the exact URL to try.
+4. Hard-refresh or try a private window (old HTML cached rarely, but possible).
+
+Official reference: [Configuring a publishing source for GitHub Pages](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site).
+
+This repo includes **`public/.nojekyll`** and the workflow runs **`touch out/.nojekyll`** so **Jekyll** on Pages does not process the upload.
 
 ### Optional: feature section video on Pages
 

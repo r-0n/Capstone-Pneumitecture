@@ -53,6 +53,20 @@ jobs:
       - name: Disable Jekyll for Pages
         run: touch out/.nojekyll
 
+      - name: Verify artifact is the Next export (not repo files)
+        run: |
+          test -f out/index.html
+          grep -q "_next" out/index.html || (echo "::error::out/index.html missing Next assets — check BASE_PATH/build"; exit 1)
+          echo "OK: out/index.html is a Next.js static export"
+
+      - name: Expected live URL (project site)
+        run: |
+          echo "## After deploy, open this URL" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "**https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/**" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "If the site still looks like the GitHub README, Pages **Source** is not set to **GitHub Actions** (see repo README)." >> "$GITHUB_STEP_SUMMARY"
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
