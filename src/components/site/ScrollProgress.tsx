@@ -32,35 +32,32 @@ export function ScrollProgress() {
   const [active, setActive] = useState<string | null>(null);
 
   useEffect(() => {
-    const onScroll = () => {
-      if (window.scrollY < 140) setActive(null);
+    const getCurrentSection = () => {
+      if (window.scrollY < 120) return null;
+      const scanLineY = window.scrollY + window.innerHeight * 0.3;
+      let currentId: string | null = null;
+      for (const id of PROGRESS_IDS) {
+        const el = document.getElementById(id);
+        if (!el) continue;
+        const top = el.getBoundingClientRect().top + window.scrollY;
+        if (top <= scanLineY) currentId = id;
+        else break;
+      }
+      return currentId;
     };
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
-  useEffect(() => {
-    const els = PROGRESS_IDS.map((id) => document.getElementById(id)).filter(
-      Boolean,
-    ) as HTMLElement[];
-    if (!els.length) return;
-
-    const io = new IntersectionObserver(
-      (entries) => {
-        const hit = entries
-          .filter((e) => e.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-        if (hit?.target.id) setActive(hit.target.id);
-      },
-      { root: null, rootMargin: "-40% 0px -40% 0px", threshold: [0.12, 0.28] },
-    );
-
-    els.forEach((el) => io.observe(el));
-    return () => io.disconnect();
+    const updateActive = () => setActive(getCurrentSection());
+    updateActive();
+    window.addEventListener("scroll", updateActive, { passive: true });
+    window.addEventListener("resize", updateActive);
+    return () => {
+      window.removeEventListener("scroll", updateActive);
+      window.removeEventListener("resize", updateActive);
+    };
   }, []);
 
   const scrollTo = useCallback((id: string) => {
+    setActive(id);
     scrollToSection(id);
   }, []);
 

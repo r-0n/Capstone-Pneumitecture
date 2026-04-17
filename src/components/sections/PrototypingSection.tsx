@@ -1,6 +1,7 @@
 "use client";
 
 import SectionLabel from "@/components/pneumitecture/SectionLabel";
+import { YouTubeForceMutedPlayer } from "@/components/pneumitecture/paradigm-shift/YouTubeForceMutedPlayer";
 import { publicAssetPath } from "@/lib/publicAssetPath";
 import { motion } from "framer-motion";
 import Image from "next/image";
@@ -17,6 +18,7 @@ type PrototypeMediaItem =
       src: string;
       title: string;
       label?: string;
+      playbackRate?: number;
     }
 
 type PrototypeVersion = {
@@ -35,6 +37,26 @@ type RoadmapItem = {
   copy: string;
   media: PrototypeMediaItem;
 };
+
+function parseYouTubeVideoId(src: string): string | null {
+  try {
+    const url = new URL(src);
+    const host = url.hostname.replace(/^www\./, "");
+    if (host === "youtu.be") return url.pathname.slice(1) || null;
+    if (host === "youtube.com" || host === "m.youtube.com") {
+      if (url.pathname.startsWith("/shorts/")) {
+        return url.pathname.split("/")[2] || null;
+      }
+      if (url.pathname.startsWith("/embed/")) {
+        return url.pathname.split("/")[2] || null;
+      }
+      return url.searchParams.get("v");
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
 
 const versions: PrototypeVersion[] = [
   {
@@ -73,7 +95,7 @@ const versions: PrototypeVersion[] = [
     media: [
       {
         type: "video",
-        src: "https://drive.google.com/file/d/1S9HCrs4D9AX2rWAZKvv_8I3tH-EtQGu1/preview",
+        src: "https://youtube.com/shorts/wMBQTvkn0lQ",
         title: "V3 hexagonal breathing grid video",
         label: "Hexagonal breathing test",
       },
@@ -87,9 +109,10 @@ const versions: PrototypeVersion[] = [
     media: [
       {
         type: "video",
-        src: "https://drive.google.com/file/d/1ZnFgcApK-7O6e3EUslGnDBkalMxwu1Ht/preview",
+        src: "https://youtube.com/shorts/lR4QNp3BsmE",
         title: "V4 scaling up video",
         label: "Scaling up study",
+        playbackRate: 2,
       },
     ],
   },
@@ -97,7 +120,7 @@ const versions: PrototypeVersion[] = [
     id: "V5",
     phase: "Simulation",
     title: "Rhino+Grasshopper Physics Prototyping",
-    copy: "The war forced us to branch into digital simulation, which let us test and push the capstone idea to further limits.",
+    copy: "As regional conditions escalated in March, the development of Pneumitecture transitioned toward digital prototyping. By simulating the system computationally, we were able to investigate the behavior of the pneumatic architecture without relying solely on physical fabrication. Using Rhinoceros and Grasshopper, we implemented physics-based simulations that approximated the real-world behavior of the pneumatic cells, allowing us to study how inflation, deformation, and spatial interactions might occur in a full-scale system. This shift not only enabled us to model the system’s dynamics but also opened a broader creative space to explore its physical limits, emergent behaviors, and choreographic potential.",
     media: [
       {
         type: "video",
@@ -166,6 +189,7 @@ export function PrototypingSection() {
               const isEven = idx % 2 === 0;
               const shouldMute =
                 item.versionId === "V2" || item.versionId === "V3" || item.versionId === "V4";
+              const youtubeVideoId = item.media.type === "video" ? parseYouTubeVideoId(item.media.src) : null;
 
               return (
                 <motion.article
@@ -191,7 +215,13 @@ export function PrototypingSection() {
                       isEven ? "md:order-1" : "md:order-2"
                     } aspect-video md:aspect-[4/3]`}
                   >
-                    {item.media.type === "video" ? (
+                    {item.media.type === "video" && youtubeVideoId && shouldMute ? (
+                      <YouTubeForceMutedPlayer
+                        videoId={youtubeVideoId}
+                        title={item.media.title}
+                        playbackRate={item.media.playbackRate ?? 1}
+                      />
+                    ) : item.media.type === "video" ? (
                       <iframe
                         src={item.media.src}
                         className="h-full w-full border-0"

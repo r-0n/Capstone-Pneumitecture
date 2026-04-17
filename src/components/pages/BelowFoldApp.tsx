@@ -50,7 +50,7 @@ export default function BelowFoldApp() {
       <SectionBreak />
       <SectionTransition>
         <footer className="border-t border-[var(--hairline)] bg-[var(--canvas-deep)] py-12 text-center text-[11px] text-[var(--ink-muted)]">
-          Pneumitecture- Capstone Project 2026
+          Pneumitecture- Capstone Project 2026 @ New York University Abu Dhabi
         </footer>
       </SectionTransition>
     </>

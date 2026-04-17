@@ -5,6 +5,8 @@ import { useEffect, useId, useRef } from "react";
 type YTPlayerInstance = {
   mute: () => void;
   setVolume: (v: number) => void;
+  setPlaybackRate: (rate: number) => void;
+  setPlaybackQuality: (quality: string) => void;
   destroy: () => void;
 };
 
@@ -67,9 +69,13 @@ function runWhenYTReady(cb: () => void) {
 export function YouTubeForceMutedPlayer({
   videoId,
   title,
+  playbackRate = 1,
+  preferredQuality = "default",
 }: {
   videoId: string;
   title: string;
+  playbackRate?: number;
+  preferredQuality?: string;
 }) {
   const reactId = useId().replace(/:/g, "");
   const containerId = `yt-force-mute-${videoId}-${reactId}`;
@@ -84,6 +90,10 @@ export function YouTubeForceMutedPlayer({
       try {
         p.mute();
         p.setVolume(0);
+        p.setPlaybackRate(playbackRate);
+        if (preferredQuality !== "default") {
+          p.setPlaybackQuality(preferredQuality);
+        }
       } catch {
         /* ignore */
       }
@@ -116,6 +126,10 @@ export function YouTubeForceMutedPlayer({
             try {
               e.target.mute();
               e.target.setVolume(0);
+              e.target.setPlaybackRate(playbackRate);
+              if (preferredQuality !== "default") {
+                e.target.setPlaybackQuality(preferredQuality);
+              }
             } catch {
               /* ignore */
             }
@@ -124,6 +138,10 @@ export function YouTubeForceMutedPlayer({
             try {
               e.target.mute();
               e.target.setVolume(0);
+              e.target.setPlaybackRate(playbackRate);
+              if (preferredQuality !== "default") {
+                e.target.setPlaybackQuality(preferredQuality);
+              }
             } catch {
               /* ignore */
             }
@@ -146,7 +164,7 @@ export function YouTubeForceMutedPlayer({
       }
       playerRef.current = null;
     };
-  }, [videoId, containerId]);
+  }, [videoId, containerId, playbackRate, preferredQuality]);
 
   return (
     <div className="absolute inset-0 h-full w-full">

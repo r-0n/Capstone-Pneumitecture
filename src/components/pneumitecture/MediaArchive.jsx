@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ScrollReveal from './ScrollReveal';
 import SectionLabel from './SectionLabel';
@@ -36,10 +36,28 @@ const archiveItems = [
 export default function MediaArchive() {
   const [filter, setFilter] = useState('All');
   const [selected, setSelected] = useState(null);
+  const [showWeeklyLinks, setShowWeeklyLinks] = useState(false);
+  const weeklyLinksRef = useRef(null);
 
   const filtered = filter === 'All' 
     ? archiveItems 
     : archiveItems.filter(item => item.cat === filter);
+
+  useEffect(() => {
+    if (!showWeeklyLinks) return;
+    const onPointerDown = (e) => {
+      const target = e.target;
+      if (weeklyLinksRef.current && !weeklyLinksRef.current.contains(target)) {
+        setShowWeeklyLinks(false);
+      }
+    };
+    document.addEventListener('mousedown', onPointerDown);
+    document.addEventListener('touchstart', onPointerDown, { passive: true });
+    return () => {
+      document.removeEventListener('mousedown', onPointerDown);
+      document.removeEventListener('touchstart', onPointerDown);
+    };
+  }, [showWeeklyLinks]);
 
   return (
     <section id="archive" className="py-32 md:py-48 max-w-7xl mx-auto px-8 md:px-16">
@@ -66,6 +84,50 @@ export default function MediaArchive() {
               {cat}
             </button>
           ))}
+          <span className="mx-1 hidden h-10 w-px bg-[rgba(0,0,0,0.12)] md:block" aria-hidden />
+          <div ref={weeklyLinksRef} className="contents">
+            <button
+              type="button"
+              onClick={() => setShowWeeklyLinks((prev) => !prev)}
+              className={`tech-label px-4 py-2 border transition-all duration-300 ${
+                showWeeklyLinks
+                  ? 'bg-[#121212] text-[#FBFBF9] border-[#121212]'
+                  : 'bg-transparent text-[#707070] border-[rgba(0,0,0,0.15)] hover:border-[#121212]'
+              }`}
+            >
+              Weekly Blog Links
+            </button>
+            <AnimatePresence>
+              {showWeeklyLinks ? (
+                <>
+                  <motion.a
+                    href="https://www.notion.so/Capstone-Journey-2607962f620780ffbfabe559b247534c?source=copy_link"
+                    target="_blank"
+                    rel="noreferrer"
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }}
+                    transition={{ duration: 0.2 }}
+                    className="tech-label px-4 py-2 border border-[rgba(0,0,0,0.15)] text-[#707070] transition-all duration-300 hover:border-[#121212] hover:text-[#121212]"
+                  >
+                    r-0n
+                  </motion.a>
+                  <motion.a
+                    href="https://www.notion.so/Capstone-Progress-2626e8ec69fb80648cfde741894381bf?source=copy_link"
+                    target="_blank"
+                    rel="noreferrer"
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }}
+                    transition={{ duration: 0.2 }}
+                    className="tech-label px-4 py-2 border border-[rgba(0,0,0,0.15)] text-[#707070] transition-all duration-300 hover:border-[#121212] hover:text-[#121212]"
+                  >
+                    Mariam
+                  </motion.a>
+                </>
+              ) : null}
+            </AnimatePresence>
+          </div>
         </div>
       </ScrollReveal>
 

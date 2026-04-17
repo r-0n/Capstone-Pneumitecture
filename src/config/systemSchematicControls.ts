@@ -47,11 +47,16 @@ export const SYSTEM_SCHEMATIC_Y_GROUND = 216;
 
 /**
  * Physical placement in **world units** (same space as projection).
- * - **supply**: pump anchor; manifold = pump + manifold offsets (on `Y_GROUND`). Control Logic uses
+ * - **supply**: explicit pump/manifold XZ anchors (on `Y_GROUND`). Control Logic uses
  *   `SYSTEM_SCHEMATIC_CONTROLLER_*` below (full world X/Y/Z).
  * - **valveGrid**: lower-left of the 3×3; `spacingX` along +X, `spacingZ` along +Z.
  * - **cellWall.x**: world X of the YZ wall (cells + wall tint). Frame uses this + `SYSTEM_SCHEMATIC_FRAME_OFFSET_X`.
  */
+export const SYSTEM_SCHEMATIC_PUMP_X = 300;
+export const SYSTEM_SCHEMATIC_PUMP_Z = 180;
+export const SYSTEM_SCHEMATIC_MANIFOLD_X = 550;
+export const SYSTEM_SCHEMATIC_MANIFOLD_Z = 180;
+
 export const SYSTEM_SCHEMATIC_LAYOUT = {
   cellWall: {
     x: 1400, // Pushed wall further out to give lines room to travel
@@ -59,15 +64,14 @@ export const SYSTEM_SCHEMATIC_LAYOUT = {
   valveGrid: {
     originX: 800,
     originZ: 50,
-    spacingX: 120, // Huge spacing for a clear map-like grid
+    spacingX: 160, // Huge spacing for a clear map-like grid
     spacingZ: 120,
   },
   supply: {
-    pumpX: 300,
-    pumpZ: 250,
-    /** Manifold = pump + offsets (same **Y** as `Y_GROUND`). */
-    manifoldOffsetX: 250,
-    manifoldOffsetZ: -70,
+    pumpX: SYSTEM_SCHEMATIC_PUMP_X,
+    pumpZ: SYSTEM_SCHEMATIC_PUMP_Z,
+    manifoldX: SYSTEM_SCHEMATIC_MANIFOLD_X,
+    manifoldZ: SYSTEM_SCHEMATIC_MANIFOLD_Z,
   },
 } as const;
 
@@ -169,18 +173,10 @@ export const SYSTEM_SCHEMATIC_AXIS_EXT = { x: 260, y: 240, z: 220 } as const;
 // 8) Nodes not driven by LAYOUT alone (frame + TPU cell grid)
 // -----------------------------------------------------------------------------
 
-/**
- * **Mounting frame** world **X**: `cellWall.x + FRAME_OFFSET_X` (+X = behind the membrane
- * from the default −X camera).
- */
-export const SYSTEM_SCHEMATIC_FRAME_OFFSET_X = 180;
-
-/**
- * **Mounting frame** world **Y / Z** on the same YZ family as the wall, but **offset from the
- * 3×3 TPU grid** (grid spans roughly originY..originY+2·spacingY and originZ..originZ+2·spacingZ).
- */
-export const SYSTEM_SCHEMATIC_FRAME_Y = 720;
-export const SYSTEM_SCHEMATIC_FRAME_Z = 460;
+/** Mounting frame node world position (X/Y/Z). */
+export const SYSTEM_SCHEMATIC_FRAME_X = 1580;
+export const SYSTEM_SCHEMATIC_FRAME_Y = 620;
+export const SYSTEM_SCHEMATIC_FRAME_Z = 160;
 
 /**
  * **TPU cell** 3×3 grid: lower-left on the wall (world Y, Z), then spacing along +Y and +Z.
@@ -243,3 +239,19 @@ export const SYSTEM_SCHEMATIC_MANIFOLD_VALVE_LANE_STEP = 15;
 
 /** Base offset to center the lane highway relative to the manifold. */
 export const SYSTEM_SCHEMATIC_MANIFOLD_VALVE_LANE_BASE = -60;
+
+/**
+ * Distinct colors for manifold -> valve air lines (valve-1..valve-9).
+ * Add more entries if you ever expand beyond 9 valves.
+ */
+export const SYSTEM_SCHEMATIC_MANIFOLD_TO_VALVE_COLORS = [
+  "#22d3ee",
+  "#3b82f6",
+  "#8b5cf6",
+  "#d946ef",
+  "#f43f5e",
+  "#fb923c",
+  "#facc15",
+  "#84cc16",
+  "#14b8a6",
+] as const;

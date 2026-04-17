@@ -2,20 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import { scrollToSection } from '@/lib/scrollToSection';
-
-const sections = [
-  { label: 'Hero', id: 'hero' },
-  { label: 'Pavilion', id: 'pavilion-lead' },
-  { label: 'Paradigm', id: 'paradigm-shift' },
-  { label: 'Concept', id: 'concept' },
-  { label: 'Materials', id: 'materials' },
-  { label: 'System', id: 'system' },
-  { label: 'Prototyping', id: 'prototyping' },
-  { label: 'Interaction', id: 'interaction' },
-  { label: 'Installation', id: 'installation' },
-  { label: 'Reflection', id: 'reflection' },
-  { label: 'Archive', id: 'archive' },
-];
+import { SITE_SECTIONS } from '@/config/navigation';
 
 export default function NavOverlay() {
   const [open, setOpen] = useState(false);
@@ -54,15 +41,15 @@ export default function NavOverlay() {
               <X className="w-6 h-6 text-bone" />
             </button>
 
-            <nav className="flex flex-col items-center gap-6">
-              {sections.map((s, i) => (
+            <nav className="flex max-h-[74vh] w-full max-w-[28rem] flex-col items-center gap-3 overflow-y-auto px-4 py-2 text-center">
+              {SITE_SECTIONS.map((s, i) => (
                 <motion.button
                   key={s.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.05, duration: 0.4 }}
                   onClick={() => scrollTo(s.id)}
-                  className="text-bone font-display font-extralight text-3xl md:text-5xl tracking-tight hover:opacity-60 transition-opacity duration-300"
+                  className="max-w-full whitespace-normal text-bone font-display text-xl font-light leading-tight sm:text-2xl md:text-3xl lg:text-4xl tracking-tight hover:opacity-60 transition-opacity duration-300"
                 >
                   {s.label}
                 </motion.button>
@@ -70,7 +57,7 @@ export default function NavOverlay() {
             </nav>
 
             <div className="absolute bottom-8 left-8 tech-label text-structural">
-              Pneumitecture — 2026
+              Pneumitecture — Capstone Project 2026 @ New York University Abu Dhabi
             </div>
           </motion.div>
         )}

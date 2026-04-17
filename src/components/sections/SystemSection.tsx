@@ -6,8 +6,6 @@
  */
 import SectionLabel from "@/components/pneumitecture/SectionLabel";
 import {
-  SYSTEM_SCHEMATIC_AXIS_EXT,
-  SYSTEM_SCHEMATIC_AXIS_ORIGIN_XZ,
   SYSTEM_SCHEMATIC_CAMERA_DEFAULT,
   SYSTEM_SCHEMATIC_CELL_GRID_ORIGIN_Y,
   SYSTEM_SCHEMATIC_CELL_GRID_ORIGIN_Z,
@@ -16,7 +14,7 @@ import {
   SYSTEM_SCHEMATIC_CONTROLLER_X,
   SYSTEM_SCHEMATIC_CONTROLLER_Y,
   SYSTEM_SCHEMATIC_CONTROLLER_Z,
-  SYSTEM_SCHEMATIC_FRAME_OFFSET_X,
+  SYSTEM_SCHEMATIC_FRAME_X,
   SYSTEM_SCHEMATIC_FRAME_Y,
   SYSTEM_SCHEMATIC_FRAME_Z,
   SYSTEM_SCHEMATIC_FOCAL_LENGTH,
@@ -28,6 +26,7 @@ import {
   SYSTEM_SCHEMATIC_MANIFOLD_BOX_SIZE_Y,
   SYSTEM_SCHEMATIC_MANIFOLD_BOX_SIZE_Z,
   SYSTEM_SCHEMATIC_MANIFOLD_NODE_HIT_R,
+  SYSTEM_SCHEMATIC_MANIFOLD_TO_VALVE_COLORS,
   SYSTEM_SCHEMATIC_MANIFOLD_VALVE_LANE_BASE,
   SYSTEM_SCHEMATIC_MANIFOLD_VALVE_LANE_STEP,
   SYSTEM_SCHEMATIC_NODE_CHIP_VIEWBOX,
@@ -71,12 +70,14 @@ const Y_GROUND = SYSTEM_SCHEMATIC_Y_GROUND;
 const SCH = SYSTEM_SCHEMATIC_LAYOUT;
 const X_WALL = SCH.cellWall.x;
 const WORLD_CENTER = SYSTEM_SCHEMATIC_WORLD_CENTER;
+/* XYZ trihedral (quarter-planes + axes) — disabled; re-enable with axisRef useMemo + imports AXIS_*.
 const AXIS_ORIGIN = {
   x: SYSTEM_SCHEMATIC_AXIS_ORIGIN_XZ.x,
   y: Y_GROUND,
   z: SYSTEM_SCHEMATIC_AXIS_ORIGIN_XZ.z,
 };
 const AXIS_EXT = SYSTEM_SCHEMATIC_AXIS_EXT;
+*/
 const BASE_FOCAL_LENGTH = SYSTEM_SCHEMATIC_FOCAL_LENGTH;
 const GRID_SIZE = 3;
 
@@ -134,9 +135,9 @@ const BASE_NODES: NodeDef[] = (() => {
     },
     {
       id: "manifold",
-      x: s.pumpX + s.manifoldOffsetX,
+      x: s.manifoldX,
       y,
-      z: s.pumpZ + s.manifoldOffsetZ,
+      z: s.manifoldZ,
       label: "Manifold (9 Outputs)",
       icon: "▤",
       color: "#7dc3ff",
@@ -154,7 +155,7 @@ const BASE_NODES: NodeDef[] = (() => {
     },
     {
       id: "frame",
-      x: X_WALL + SYSTEM_SCHEMATIC_FRAME_OFFSET_X,
+      x: SYSTEM_SCHEMATIC_FRAME_X,
       y: SYSTEM_SCHEMATIC_FRAME_Y,
       z: SYSTEM_SCHEMATIC_FRAME_Z,
       label: "Mounting Frame",
@@ -334,46 +335,56 @@ function worldWaypointsToSvgPath(
 }
 
 /** SVG stroke style per logical connection. */
-function getEdgeLineStyle(edge: EdgeDef, active: boolean) {
-  const w = (n: number) => (active ? n * 1.22 : n);
+function getEdgeLineStyle(edge: EdgeDef, active: boolean, hasSelection: boolean) {
+  const w = (n: number) => (active ? n * 1.6 : n);
+  const baseOpacity = hasSelection ? 0.22 : 0.9;
   if (edge.type === "air") {
     if (edge.a === "pump" && edge.b === "manifold") {
       return {
-        stroke: active ? "#e4fdff" : "#c2f6ff",
+        stroke: active ? "#f6feff" : "#c2f6ff",
         width: w(3),
-        opacity: active ? 1 : 0.95,
+        opacity: active ? 1 : baseOpacity,
         dash: "0",
-        filter: "drop-shadow(0 0 4px rgba(0,28,48,0.55))",
+        filter: active
+          ? "drop-shadow(0 0 10px rgba(132,236,255,0.9))"
+          : "drop-shadow(0 0 2px rgba(0,28,48,0.4))",
       };
     }
     if (edge.a === "manifold" && edge.b.startsWith("valve-")) {
       const n = valveNumberFromId(edge.b);
-      const hue = 158 + (n % 9) * 11 + Math.floor((n - 1) / 9) * 3;
+      const strokeColor =
+        SYSTEM_SCHEMATIC_MANIFOLD_TO_VALVE_COLORS[(Math.max(1, n) - 1) % SYSTEM_SCHEMATIC_MANIFOLD_TO_VALVE_COLORS.length];
       return {
-        stroke: active ? "#d8fffb" : `hsl(${hue} 88% 68%)`,
+        stroke: active ? "#ffffff" : strokeColor,
         width: w(2.35),
-        opacity: active ? 1 : 0.9,
+        opacity: active ? 1 : baseOpacity,
         dash: "0",
-        filter: "drop-shadow(0 0 2px rgba(0,32,44,0.45))",
+        filter: active
+          ? `drop-shadow(0 0 14px ${strokeColor}) drop-shadow(0 0 7px rgba(255,255,255,0.75))`
+          : "drop-shadow(0 0 2px rgba(0,32,44,0.35))",
       };
     }
     if (edge.a.startsWith("valve-") && edge.b.startsWith("cell-")) {
       return {
-        stroke: active ? "#b8e8ff" : "#86d6f5",
+        stroke: active ? "#e7f8ff" : "#86d6f5",
         width: w(2.05),
-        opacity: active ? 0.98 : 0.88,
+        opacity: active ? 1 : baseOpacity,
         dash: "0",
-        filter: "drop-shadow(0 0 2px rgba(0,36,52,0.4))",
+        filter: active
+          ? "drop-shadow(0 0 10px rgba(125,218,255,0.9))"
+          : "drop-shadow(0 0 2px rgba(0,36,52,0.35))",
       };
     }
   }
   if (edge.type === "electrical") {
     return {
-      stroke: active ? "#fceaff" : "#f0c8ff",
+      stroke: active ? "#ffe6ff" : "#f0c8ff",
       width: w(1.95),
-      opacity: active ? 1 : 0.9,
+      opacity: active ? 1 : (hasSelection ? 0.2 : 0.9),
       dash: "8 7",
-      filter: "drop-shadow(0 0 2px rgba(36,0,48,0.45))",
+      filter: active
+        ? "drop-shadow(0 0 9px rgba(255,180,255,0.9))"
+        : "drop-shadow(0 0 2px rgba(36,0,48,0.35))",
     };
   }
   return {
@@ -490,7 +501,19 @@ function SystemSchematic() {
   );
   const hovered = activeId ? nodeMap[activeId] : null;
   const hoveredProjected = activeId ? projectedMap[activeId] : null;
+  const activeValveNumber = activeId ? valveNumberFromId(activeId) : 0;
+  const relatedActiveIds = useMemo(() => {
+    if (!activeId) return new Set<string>();
+    const ids = new Set<string>([activeId]);
+    const n = valveNumberFromId(activeId);
+    if (n > 0) {
+      ids.add(`valve-${n}`);
+      ids.add(`cell-${n}`);
+    }
+    return ids;
+  }, [activeId]);
 
+  /*
   const axisRef = useMemo(() => {
     const ox = AXIS_ORIGIN.x;
     const oy = AXIS_ORIGIN.y;
@@ -519,7 +542,6 @@ function SystemSchematic() {
       [ox, oy, oz + lz],
     ];
 
-    /** Quarter-planes: XY = vertical slice at fixed Z (magenta), XZ = floor (green), YZ = wall slice (cyan). */
     const faces = [
       { key: "xy" as const, corners: xy, fill: "rgba(255, 120, 160, 0.11)", stroke: "rgba(255, 150, 185, 0.55)" },
       { key: "xz" as const, corners: xz, fill: "rgba(90, 255, 170, 0.12)", stroke: "rgba(120, 255, 200, 0.5)" },
@@ -576,6 +598,7 @@ function SystemSchematic() {
       ],
     };
   }, [camera.pitch, camera.yaw, camera.zoom]);
+  */
 
   useEffect(() => {
     const handlePointerMove = (e: PointerEvent) => {
@@ -625,6 +648,17 @@ function SystemSchematic() {
       onUpdate: (v) => setCamera((c) => ({ ...c, zoom: v })),
     });
   }, []);
+  const handleCanvasWheel = useCallback(
+    (e: React.WheelEvent<HTMLDivElement>) => {
+      const el = canvasRef.current;
+      if (!el) return;
+      const target = e.target as Node | null;
+      if (target && !el.contains(target)) return;
+      e.preventDefault();
+      zoomBy(e.deltaY > 0 ? -SYSTEM_SCHEMATIC_ZOOM_STEP_WHEEL : SYSTEM_SCHEMATIC_ZOOM_STEP_WHEEL);
+    },
+    [zoomBy],
+  );
 
   useEffect(() => {
     return () => zoomAnimRef.current?.stop();
@@ -681,10 +715,7 @@ function SystemSchematic() {
         <div
           ref={canvasRef}
           onPointerDown={startOrbit}
-          onWheel={(e) => {
-            e.preventDefault();
-            zoomBy(e.deltaY > 0 ? -SYSTEM_SCHEMATIC_ZOOM_STEP_WHEEL : SYSTEM_SCHEMATIC_ZOOM_STEP_WHEEL);
-          }}
+          onWheel={handleCanvasWheel}
           className="relative min-h-[680px] cursor-grab rounded-2xl border border-white/10 bg-[#060f22]/90 lg:min-h-[720px] active:cursor-grabbing"
         >
           <div className="absolute right-3 top-3 z-20 flex items-center gap-2 rounded-full border border-white/14 bg-[#081227]/85 px-2.5 py-1.5 text-[11px] text-white/85 backdrop-blur-sm">
@@ -716,10 +747,12 @@ function SystemSchematic() {
               Reset
             </button>
           </div>
+          {/* XYZ trihedral caption (commented with axes)
           <p className="pointer-events-none absolute bottom-3 left-3 z-10 max-w-[16rem] text-[10px] leading-snug text-white/48">
             <span className="font-semibold uppercase tracking-[0.16em] text-white/60">World axes</span>
             : right-handed · +Y up · horizontal floor = XZ (constant Y)
           </p>
+          */}
           <svg
             viewBox={`0 0 ${GRAPH_W} ${GRAPH_H}`}
             className="pointer-events-none absolute inset-0 z-0 h-full w-full"
@@ -730,43 +763,19 @@ function SystemSchematic() {
                 <stop offset="0%" stopColor="#d58bff" stopOpacity="0.9" />
                 <stop offset="100%" stopColor="#d58bff" stopOpacity="0" />
               </radialGradient>
-              <marker
-                id="sys-axis-arrow-x"
-                viewBox="0 0 10 10"
-                refX="8"
-                refY="5"
-                markerWidth="5.5"
-                markerHeight="5.5"
-                orient="auto"
-                markerUnits="strokeWidth"
-              >
+              {/* Axis arrow markers — re-enable with XYZ trihedral
+              <marker id="sys-axis-arrow-x" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto" markerUnits="strokeWidth">
                 <path d="M0,0 L10,5 L0,10 z" fill="#ff9aa8" />
               </marker>
-              <marker
-                id="sys-axis-arrow-y"
-                viewBox="0 0 10 10"
-                refX="8"
-                refY="5"
-                markerWidth="5.5"
-                markerHeight="5.5"
-                orient="auto"
-                markerUnits="strokeWidth"
-              >
+              <marker id="sys-axis-arrow-y" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto" markerUnits="strokeWidth">
                 <path d="M0,0 L10,5 L0,10 z" fill="#7dffb3" />
               </marker>
-              <marker
-                id="sys-axis-arrow-z"
-                viewBox="0 0 10 10"
-                refX="8"
-                refY="5"
-                markerWidth="5.5"
-                markerHeight="5.5"
-                orient="auto"
-                markerUnits="strokeWidth"
-              >
+              <marker id="sys-axis-arrow-z" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto" markerUnits="strokeWidth">
                 <path d="M0,0 L10,5 L0,10 z" fill="#9fd4ff" />
               </marker>
+              */}
             </defs>
+            {/* XYZ quarter-planes + axis strokes + origin (see axisRef useMemo)
             <g className="pointer-events-none" aria-hidden>
               {axisRef.faces.map((f) => (
                 <polygon
@@ -817,11 +826,17 @@ function SystemSchematic() {
                 strokeWidth={1.2}
               />
             </g>
+            */}
             {[...EDGES]
               .sort((a, b) => edgePaintPriority(a) - edgePaintPriority(b))
               .map((edge) => {
-                const active = activeId === edge.a || activeId === edge.b;
-                const line = getEdgeLineStyle(edge, active);
+                const active =
+                  relatedActiveIds.has(edge.a) ||
+                  relatedActiveIds.has(edge.b) ||
+                  (activeValveNumber > 0 &&
+                    edge.a === "manifold" &&
+                    edge.b === `valve-${activeValveNumber}`);
+                const line = getEdgeLineStyle(edge, active, Boolean(activeId));
                 const waypoints = getEdgeWorldWaypoints(edge, nodeMap);
                 const d = worldWaypointsToSvgPath(waypoints, camera.yaw, camera.pitch, camera.zoom);
                 return (
@@ -839,6 +854,7 @@ function SystemSchematic() {
                   />
                 );
               })}
+            {/* +X / +Y / +Z labels (see axisRef)
             <g className="pointer-events-none" aria-hidden>
               {axisRef.labels.map((L) => (
                 <text
@@ -858,9 +874,10 @@ function SystemSchematic() {
                 </text>
               ))}
             </g>
+            */}
             {nodesSortedByDepth.map((n) => {
               const p = projectedMap[n.id]!;
-              const isActive = activeId === n.id;
+              const isActive = relatedActiveIds.has(n.id);
               if (n.id === "manifold") {
                 const faces = manifoldBoxFaceDefs(n).sort(
                   (a, b) =>
@@ -1014,40 +1031,12 @@ export function SystemSection() {
         >
           <SystemSchematic />
 
-          <div className="mt-6 grid gap-3 md:grid-cols-4">
-            {[
-              {
-                t: "Air Generation",
-                b: "Pump + regulator create stable compressed airflow.",
-              },
-              {
-                t: "Distribution & Control",
-                b: "Manifold splits to 9 lines; solenoids gate each line.",
-              },
-              {
-                t: "Computational Control",
-                b: "Microcontroller runs choreography: order, timing, duration.",
-              },
-              {
-                t: "Soft Robotic Actuation",
-                b: "9 TPU cells inflate/deflate to form spatial motion.",
-              },
-            ].map((card) => (
-              <div key={card.t} className="rounded-xl border border-[var(--hairline)] bg-white/75 px-3 py-2.5">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink)]">
-                  {card.t}
-                </p>
-                <p className="mt-1 text-[11px] leading-relaxed text-[var(--ink-muted)]">{card.b}</p>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-3 rounded-xl border border-[var(--hairline)] bg-white/75 px-3 py-3">
+          <div className="mt-20 rounded-xl border border-[var(--hairline)] bg-white/75 px-3 py-3">
             <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink)]">
               System Flow Summary
             </p>
             <p className="mt-1 text-[11px] leading-relaxed text-[var(--ink-muted)]">
-              Air Pump → Pressure Regulator → Manifold (9 outputs) → Solenoid Valves (9) →
+              Air Pump → Manifold (9 outputs) → Solenoid Valves (9) →
               Pneumatic Tubing → TPU Cells (9) → Grid Motion
             </p>
             <p className="mt-1 text-[11px] leading-relaxed text-[var(--ink-muted)]">
