@@ -1,4 +1,7 @@
+"use client";
+
 import { motion } from "framer-motion";
+import Image from "next/image";
 import ScrollReveal from "./ScrollReveal";
 import SectionLabel from "./SectionLabel";
 
@@ -23,7 +26,7 @@ export default function DesignConcept() {
           <ScrollReveal>
             <div className="flex h-full flex-col justify-center py-4">
               <p className="font-display font-extralight text-foreground/70 text-base md:text-lg leading-relaxed mb-8">
-                At its core, the project explores the dynimism of architecture based on human presence.
+                At its core, the project explores the dynamism of architecture based on human presence.
                 Traditional architecture is typically conceived as static: walls,
                 ceilings, and surfaces that remain fixed once constructed. This project challenges that
                 paradigm by imagining a spatial system composed of soft pneumatic cells capable of continuous
@@ -52,9 +55,15 @@ export default function DesignConcept() {
               <motion.div
                 whileHover={{ scale: 1.02 }}
                 transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
-                className="overflow-hidden aspect-[16/9] rounded-xl bg-[var(--paper)]/95 shadow-sm md:aspect-[14/7]"
+                className="relative aspect-[16/9] overflow-hidden rounded-xl bg-[var(--paper)]/95 shadow-sm md:aspect-[14/7]"
               >
-                <img src={SOFT_3} alt="Hand touching soft membrane" className="h-full w-full object-cover" />
+                <Image
+                  src={SOFT_3}
+                  alt="Hand touching soft membrane"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 55vw"
+                  className="object-cover"
+                />
               </motion.div>
             </ScrollReveal>
 
@@ -62,9 +71,15 @@ export default function DesignConcept() {
               <motion.div
                 whileHover={{ scale: 1.02 }}
                 transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
-                className="overflow-hidden aspect-[4/5] rounded-xl bg-[var(--paper)]/95 shadow-sm md:aspect-[1/1]"
+                className="relative aspect-[4/5] overflow-hidden rounded-xl bg-[var(--paper)]/95 shadow-sm md:aspect-[1/1]"
               >
-                <img src={SOFT_2} alt="Pneumatic pillow forms" className="h-full w-full object-cover" />
+                <Image
+                  src={SOFT_2}
+                  alt="Pneumatic pillow forms"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 40vw"
+                  className="object-cover"
+                />
               </motion.div>
             </ScrollReveal>
 
@@ -72,9 +87,15 @@ export default function DesignConcept() {
               <motion.div
                 whileHover={{ scale: 1.02 }}
                 transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
-                className="overflow-hidden aspect-[7/4] rounded-xl bg-[var(--paper)]/95 shadow-sm md:aspect-[6/4]"
+                className="relative aspect-[7/4] overflow-hidden rounded-xl bg-[var(--paper)]/95 shadow-sm md:aspect-[6/4]"
               >
-                <img src={SOFT_1} alt="Translucent membrane folds" className="h-full w-full object-cover" />
+                <Image
+                  src={SOFT_1}
+                  alt="Translucent membrane folds"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 40vw"
+                  className="object-cover"
+                />
               </motion.div>
             </ScrollReveal>
           </div>

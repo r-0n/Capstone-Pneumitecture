@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { ChevronDown, CirclePlay, Mouse, Volume2, VolumeX } from 'lucide-react';
 import { scrollToSection } from '@/lib/scrollToSection';
 import { publicAssetPath } from '@/lib/publicAssetPath';
@@ -59,6 +59,29 @@ function ytPostCommand(iframe, func, args = []) {
   }
 }
 
+/** Only postMessage when values change — avoids main-thread jank from spamming the iframe every scroll tick. */
+function ytApplyDrive(iframe, lastRef, { volume, muted, paused }) {
+  const last = lastRef.current;
+  if (volume !== undefined && volume !== last.volume) {
+    ytPostCommand(iframe, 'setVolume', [volume]);
+    last.volume = volume;
+  }
+  if (muted !== undefined && muted !== last.muted) {
+    if (muted) ytPostCommand(iframe, 'mute');
+    else ytPostCommand(iframe, 'unMute');
+    last.muted = muted;
+  }
+  if (paused !== undefined && paused !== last.paused) {
+    if (paused) ytPostCommand(iframe, 'pauseVideo');
+    else ytPostCommand(iframe, 'playVideo');
+    last.paused = paused;
+  }
+}
+
+function ytResetDrive(lastRef) {
+  lastRef.current = { volume: undefined, muted: undefined, paused: undefined };
+}
+
 const SCROLL_TOP_THRESHOLD = 24;
 const FADE_SCROLL_VH = 1.35;
 const IFRAME_STALL_MS = 14000;
@@ -79,7 +102,6 @@ export default function HeroSection() {
   const [scrollHintVisible, setScrollHintVisible] = useState(false);
   /** intro = title + Play; exit = title slides off; video = YouTube */
   const [heroPhase, setHeroPhase] = useState('intro');
-  const [scrollFade, setScrollFade] = useState(0);
   const [ytUnavailable, setYtUnavailable] = useState(false);
   const [userAudible, setUserAudible] = useState(false);
   const [ytEmbedSrc, setYtEmbedSrc] = useState('');
@@ -87,8 +109,11 @@ export default function HeroSection() {
   const ytSuspendedRef = useRef(false);
   const [introAnimKey, setIntroAnimKey] = useState(0);
   const [ytInstanceKey, setYtInstanceKey] = useState(0);
+  const lastYtDriveRef = useRef({ volume: undefined, muted: undefined, paused: undefined });
 
-  heroPhaseRef.current = heroPhase;
+  useLayoutEffect(() => {
+    heroPhaseRef.current = heroPhase;
+  }, [heroPhase]);
 
   useEffect(() => {
     userAudibleRef.current = userAudible;
@@ -103,24 +128,27 @@ export default function HeroSection() {
   }, []);
 
   useEffect(() => {
-    const origin = typeof window !== 'undefined' ? window.location.origin : '';
-    const q = new URLSearchParams({
-      autoplay: '1',
-      mute: '1',
-      playsinline: '1',
-      controls: '0',
-      modestbranding: '1',
-      rel: '0',
-      loop: '1',
-      playlist: YOUTUBE_ID,
-      enablejsapi: '1',
+    queueMicrotask(() => {
+      const origin = typeof window !== 'undefined' ? window.location.origin : '';
+      const q = new URLSearchParams({
+        autoplay: '1',
+        mute: '1',
+        playsinline: '1',
+        controls: '0',
+        modestbranding: '1',
+        rel: '0',
+        loop: '1',
+        playlist: YOUTUBE_ID,
+        enablejsapi: '1',
+      });
+      if (origin) q.set('origin', origin);
+      setYtEmbedSrc(`https://www.youtube.com/embed/${YOUTUBE_ID}?${q.toString()}`);
     });
-    if (origin) q.set('origin', origin);
-    setYtEmbedSrc(`https://www.youtube.com/embed/${YOUTUBE_ID}?${q.toString()}`);
   }, []);
 
   const resetHeroToIntro = useCallback(() => {
     const iframe = ytIframeRef.current;
+    ytResetDrive(lastYtDriveRef);
     if (iframe) {
       ytPostCommand(iframe, 'pauseVideo');
       ytPostCommand(iframe, 'mute');
@@ -129,7 +157,6 @@ export default function HeroSection() {
     setUserAudible(false);
     ytSuspendedRef.current = false;
     setYtSuspended(false);
-    setScrollFade(0);
     setIntroAnimKey((k) => k + 1);
     setYtInstanceKey((k) => k + 1);
     setHeroPhase('intro');
@@ -141,7 +168,8 @@ export default function HeroSection() {
     const y = getScrollY();
     const vh = typeof window !== 'undefined' ? window.innerHeight : 800;
 
-    setScrollHintVisible(phase === 'video' && y < SCROLL_TOP_THRESHOLD);
+    const nextHint = phase === 'video' && y < SCROLL_TOP_THRESHOLD;
+    setScrollHintVisible((prev) => (prev === nextHint ? prev : nextHint));
 
     if (y > vh * PAST_HERO_Y_RATIO) {
       wasPastHeroRef.current = true;
@@ -154,15 +182,14 @@ export default function HeroSection() {
     }
 
     if (phase !== 'video') {
-      setScrollFade(0);
       ytSuspendedRef.current = false;
       setYtSuspended(false);
+      ytResetDrive(lastYtDriveRef);
       return;
     }
 
     const fadeEnd = vh * FADE_SCROLL_VH;
     const p = fadeEnd > 0 ? Math.min(1, Math.max(0, y / fadeEnd)) : 0;
-    setScrollFade(p);
 
     let nextSus = ytSuspendedRef.current;
     if (p > 0.84) nextSus = true;
@@ -172,7 +199,7 @@ export default function HeroSection() {
       setYtSuspended(nextSus);
     }
 
-    if (!iframe || ytUnavailable || ytSuspended) return;
+    if (!iframe || ytUnavailable || ytSuspendedRef.current) return;
 
     const audible = userAudibleRef.current;
     if (audible) {
@@ -180,24 +207,36 @@ export default function HeroSection() {
         0,
         Math.min(MAX_AUDIBLE_VOLUME, Math.round((1 - p) * MAX_AUDIBLE_VOLUME)),
       );
-      ytPostCommand(iframe, 'setVolume', [vol]);
-      if (p > 0.93) ytPostCommand(iframe, 'mute');
-      else ytPostCommand(iframe, 'unMute');
-      if (p > 0.98) ytPostCommand(iframe, 'pauseVideo');
-      else ytPostCommand(iframe, 'playVideo');
+      const muted = p > 0.93;
+      const paused = p > 0.98;
+      ytApplyDrive(iframe, lastYtDriveRef, { volume: vol, muted, paused });
     } else {
-      ytPostCommand(iframe, 'mute');
-      ytPostCommand(iframe, 'setVolume', [0]);
-      if (p > 0.98) ytPostCommand(iframe, 'pauseVideo');
-      else ytPostCommand(iframe, 'playVideo');
+      const paused = p > 0.98;
+      ytApplyDrive(iframe, lastYtDriveRef, { volume: 0, muted: true, paused });
     }
-  }, [ytUnavailable, ytSuspended, resetHeroToIntro]);
+  }, [ytUnavailable, resetHeroToIntro]);
+
+  /** Re-sync scroll-driven hero state when phase / availability change (refs handle scroll position). */
+  useLayoutEffect(() => {
+    queueMicrotask(() => applyHeroScroll());
+  }, [applyHeroScroll, heroPhase, ytUnavailable]);
 
   useEffect(() => {
-    applyHeroScroll();
-    window.addEventListener('scroll', applyHeroScroll, { passive: true });
-    return () => window.removeEventListener('scroll', applyHeroScroll);
-  }, [applyHeroScroll, heroPhase, ytUnavailable, ytSuspended]);
+    let raf = 0;
+    const onScroll = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        applyHeroScroll();
+      });
+    };
+    queueMicrotask(() => applyHeroScroll());
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+      window.removeEventListener('scroll', onScroll);
+    };
+  }, [applyHeroScroll]);
 
   const titleExitMs = reduceMotion ? 500 : 1200;
 
@@ -205,6 +244,7 @@ export default function HeroSection() {
     if (heroPhase !== 'exit') return;
     const t = window.setTimeout(() => {
       wasPastHeroRef.current = false;
+      ytResetDrive(lastYtDriveRef);
       setHeroPhase('video');
     }, titleExitMs);
     return () => window.clearTimeout(t);
@@ -231,9 +271,12 @@ export default function HeroSection() {
         0,
         Math.min(MAX_AUDIBLE_VOLUME, Math.round((1 - p) * MAX_AUDIBLE_VOLUME)),
       );
-      ytPostCommand(iframe, 'unMute');
-      ytPostCommand(iframe, 'setVolume', [vol]);
-      ytPostCommand(iframe, 'playVideo');
+      ytResetDrive(lastYtDriveRef);
+      ytApplyDrive(iframe, lastYtDriveRef, {
+        volume: vol,
+        muted: false,
+        paused: p > 0.98,
+      });
     }
   }, []);
 
@@ -255,9 +298,12 @@ export default function HeroSection() {
       0,
       Math.min(MAX_AUDIBLE_VOLUME, Math.round((1 - p) * MAX_AUDIBLE_VOLUME)),
     );
-    ytPostCommand(iframe, 'unMute');
-    ytPostCommand(iframe, 'setVolume', [vol]);
-    ytPostCommand(iframe, 'playVideo');
+    ytResetDrive(lastYtDriveRef);
+    ytApplyDrive(iframe, lastYtDriveRef, {
+      volume: vol,
+      muted: false,
+      paused: p > 0.98,
+    });
   }, [ytUnavailable]);
 
   const disableSound = useCallback(() => {
@@ -265,8 +311,8 @@ export default function HeroSection() {
     userAudibleRef.current = false;
     setUserAudible(false);
     if (!iframe || ytUnavailable) return;
-    ytPostCommand(iframe, 'setVolume', [0]);
-    ytPostCommand(iframe, 'mute');
+    ytResetDrive(lastYtDriveRef);
+    ytApplyDrive(iframe, lastYtDriveRef, { volume: 0, muted: true });
   }, [ytUnavailable]);
 
   const toggleSound = useCallback(() => {

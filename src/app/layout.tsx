@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import type { CSSProperties } from "react";
 import { Instrument_Sans, Inter } from "next/font/google";
 import { AppShell } from "@/components/AppShell";
@@ -20,6 +20,12 @@ export const metadata: Metadata = {
   title: "Pneumitecture | Inflatable Systems for Adaptive Spaces",
   description:
     "Soft responsive architecture — pneumatic cellular modules, system design, and adaptive spatial design.",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 const heroBgUrl = publicAssetPath("/images/backg.PNG");

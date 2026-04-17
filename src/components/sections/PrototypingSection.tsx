@@ -163,9 +163,9 @@ export function PrototypingSection() {
   return (
     <section
       id="prototyping"
-      className="relative scroll-mt-24 border-t border-[var(--hairline)] bg-[var(--canvas)] py-24 md:py-32"
+      className="relative scroll-mt-24 border-t border-[var(--hairline)] bg-[var(--canvas)] py-16 md:py-32"
     >
-      <div className="relative z-10 mx-auto max-w-[1200px] px-5 md:px-10">
+      <div className="relative z-10 mx-auto max-w-[1200px] min-w-0 px-4 sm:px-5 md:px-10">
         <SectionLabel number="07" text="Prototyping" textFirst />
         <header className="text-center">
           <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--ink-muted)]">

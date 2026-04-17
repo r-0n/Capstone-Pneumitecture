@@ -46,13 +46,25 @@ export function ScrollProgress() {
       return currentId;
     };
 
-    const updateActive = () => setActive(getCurrentSection());
-    updateActive();
-    window.addEventListener("scroll", updateActive, { passive: true });
-    window.addEventListener("resize", updateActive);
+    let raf = 0;
+    const tick = () => {
+      raf = 0;
+      const next = getCurrentSection();
+      setActive((prev) => (prev === next ? prev : next));
+    };
+
+    const schedule = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(tick);
+    };
+
+    tick();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
     return () => {
-      window.removeEventListener("scroll", updateActive);
-      window.removeEventListener("resize", updateActive);
+      if (raf) cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
     };
   }, []);
 
@@ -63,7 +75,10 @@ export function ScrollProgress() {
 
   return (
     <aside
-      className="pointer-events-auto fixed right-4 top-1/2 z-[190] hidden -translate-y-1/2 flex-col gap-2.5 md:flex"
+      className="pointer-events-auto fixed top-1/2 z-[190] hidden -translate-y-1/2 flex-col gap-2.5 md:flex"
+      style={{
+        right: "max(1rem, env(safe-area-inset-right, 0px))",
+      }}
       aria-label="Section progress"
     >
       {PROGRESS_STEPS.map(({ id }) => {

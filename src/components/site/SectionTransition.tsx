@@ -1,6 +1,20 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
+
+function subscribeReducedMotion(onStoreChange: () => void) {
+  const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+  mq.addEventListener("change", onStoreChange);
+  return () => mq.removeEventListener("change", onStoreChange);
+}
+
+function getReducedMotionSnapshot() {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+function getReducedMotionServerSnapshot() {
+  return false;
+}
 
 type Props = {
   children: ReactNode;
@@ -11,23 +25,25 @@ type Props = {
 /** Scroll-driven block enter with subtle, seamless motion. */
 export function SectionTransition({ children, className = "", id }: Props) {
   const rootRef = useRef<HTMLDivElement>(null);
-  const [entered, setEntered] = useState(false);
+  const prefersReducedMotion = useSyncExternalStore(
+    subscribeReducedMotion,
+    getReducedMotionSnapshot,
+    getReducedMotionServerSnapshot,
+  );
+  const [ioEntered, setIoEntered] = useState(false);
+  const entered = prefersReducedMotion || ioEntered;
 
   useEffect(() => {
     const el = rootRef.current;
     if (!el) return;
-
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setEntered(true);
-      return;
-    }
+    if (prefersReducedMotion) return;
 
     const io = new IntersectionObserver(
       (entries) => {
         const hit = entries[0];
         if (!hit?.isIntersecting) return;
         if (hit.intersectionRatio >= 0.1) {
-          setEntered(true);
+          setIoEntered(true);
           io.disconnect();
         }
       },
@@ -36,7 +52,7 @@ export function SectionTransition({ children, className = "", id }: Props) {
 
     io.observe(el);
     return () => io.disconnect();
-  }, []);
+  }, [prefersReducedMotion]);
 
   return (
     <div ref={rootRef} id={id} className={`relative ${className}`}>

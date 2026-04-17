@@ -6,10 +6,6 @@ import { AirCursor } from "@/components/air/AirCursor";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   useEffect(() => {
-    void import("@/lib/gsap");
-  }, []);
-
-  useEffect(() => {
     const mqFine = window.matchMedia("(pointer: fine)");
     const mqReduce = window.matchMedia("(prefers-reduced-motion: reduce)");
 
@@ -31,7 +27,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <CursorProvider>
       <AirCursor />
-      <div className="relative flex min-h-dvh flex-col">
+      <div className="relative flex min-h-dvh min-w-0 flex-col">
         {children}
       </div>
     </CursorProvider>

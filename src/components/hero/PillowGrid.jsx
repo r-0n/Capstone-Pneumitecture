@@ -63,6 +63,7 @@ function SkyGradientBackground() {
   useLayoutEffect(() => {
     if (!texture) return;
     const prev = scene.background;
+    // eslint-disable-next-line react-hooks/immutability -- Three.js: swap scene background for canvas backdrop
     scene.background = texture;
     return () => {
       scene.background = prev;

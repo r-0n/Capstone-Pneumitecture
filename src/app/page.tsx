@@ -11,7 +11,7 @@ import { HomePage } from "@/components/pages/HomePage";
 export default function Home() {
   return (
     <div
-      className="relative min-h-screen overflow-x-hidden"
+      className="relative min-h-screen min-w-0 overflow-x-hidden"
       style={{ backgroundColor: "#FBFBF9" }}
     >
       <BubbleBackground />

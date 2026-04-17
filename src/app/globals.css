@@ -52,10 +52,13 @@
    nav / `scrollToSection` use `scrollIntoView({ behavior: "smooth" })` instead. */
 html {
   scroll-behavior: auto;
+  overflow-x: clip;
 }
 
 body {
   font-family: var(--font-sans), system-ui, sans-serif;
+  min-width: 0;
+  overflow-x: clip;
 }
 
 .font-display {
@@ -319,4 +322,28 @@ body.air-cursor-active [role="button"] {
   box-shadow:
     0 0 15px rgba(128, 161, 255, 0.72),
     inset 0 0 12px rgba(255, 255, 255, 0.34);
+}
+
+/* Nav overlay: CSS stagger so Framer Motion does not run nested opacity exits (avoids “undefined → 0” warnings). */
+@keyframes nav-overlay-item-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.nav-overlay-item {
+  animation: nav-overlay-item-in 0.45s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-overlay-item {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
 }

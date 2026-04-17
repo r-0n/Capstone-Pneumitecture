@@ -6,7 +6,7 @@ import { useReducedMotion } from "framer-motion";
 import { Suspense, useCallback, useRef } from "react";
 const SEGMENTS = 150;
 
-function createPillowOnBeforeCompile(material) {
+function createPillowOnBeforeCompile(material, pillowUniformsRef) {
   return (shader) => {
     shader.uniforms.uTime = { value: 0 };
     shader.uniforms.uPillowFreq = { value: 14.0 };
@@ -15,6 +15,7 @@ function createPillowOnBeforeCompile(material) {
     shader.uniforms.uPillowPhaseY = { value: 0.32 };
 
     material.userData.pillowUniforms = shader.uniforms;
+    if (pillowUniformsRef) pillowUniformsRef.current = shader.uniforms;
 
     shader.vertexShader = shader.vertexShader.replace(
       "#include <common>",
@@ -61,19 +62,21 @@ vec3 objectNormal = normalize(vec3(-ps * dfdx * uPillowAmp, -ps * dfdy * uPillow
 
 function PillowScene() {
   const matRef = useRef(null);
+  const pillowUniformsRef = useRef(null);
   const viewport = useThree((s) => s.viewport);
   const reduceMotion = useReducedMotion();
 
   const attachMaterial = useCallback((m) => {
     matRef.current = m;
+    pillowUniformsRef.current = null;
     if (!m) return;
-    m.onBeforeCompile = createPillowOnBeforeCompile(m);
+    m.onBeforeCompile = createPillowOnBeforeCompile(m, pillowUniformsRef);
     m.customProgramCacheKey = () => "pillow_membrane_v1";
     m.needsUpdate = true;
   }, []);
 
   useFrame((state) => {
-    const u = matRef.current?.userData?.pillowUniforms;
+    const u = pillowUniformsRef.current;
     if (!u) return;
     if (!reduceMotion) {
       u.uTime.value = state.clock.elapsedTime;

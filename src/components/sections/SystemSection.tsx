@@ -45,7 +45,7 @@ import {
   SYSTEM_SCHEMATIC_ZOOM_STEP_WHEEL,
 } from "@/config/systemSchematicControls";
 import { animate, motion } from "framer-motion";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 type NodeDef = {
   id: string;
@@ -480,7 +480,9 @@ function SystemSchematic() {
   const canvasRef = useRef<HTMLDivElement | null>(null);
   const cameraRef = useRef(camera);
   const zoomAnimRef = useRef<ReturnType<typeof animate> | null>(null);
-  cameraRef.current = camera;
+  useLayoutEffect(() => {
+    cameraRef.current = camera;
+  }, [camera]);
   const orbitRef = useRef<{
     startX: number;
     startY: number;
@@ -665,11 +667,11 @@ function SystemSchematic() {
   }, []);
 
   return (
-    <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#050a18] px-5 py-6 shadow-[0_48px_96px_rgba(2,6,18,0.62)] md:px-9 md:py-9">
+    <div className="relative min-w-0 overflow-hidden rounded-2xl border border-white/10 bg-[#050a18] px-4 py-5 shadow-[0_48px_96px_rgba(2,6,18,0.62)] sm:rounded-[1.75rem] sm:px-5 sm:py-6 md:rounded-[2rem] md:px-9 md:py-9">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_14%,rgba(84,143,255,0.18),transparent_46%),radial-gradient(circle_at_85%_15%,rgba(109,224,209,0.14),transparent_42%),radial-gradient(circle_at_75%_80%,rgba(236,116,255,0.10),transparent_42%),linear-gradient(180deg,rgba(255,255,255,0.025),rgba(255,255,255,0)_45%)]" />
       <div className="pointer-events-none absolute inset-0 opacity-45 [background-image:radial-gradient(rgba(255,255,255,0.18)_1px,transparent_1px)] [background-size:24px_24px]" />
 
-      <div className="relative grid gap-5 lg:grid-cols-[250px_1fr]">
+      <div className="relative grid min-w-0 gap-5 lg:grid-cols-[250px_1fr]">
         <aside className="text-white/90">
           <p className="font-display text-[clamp(1.45rem,2.1vw,1.85rem)] uppercase tracking-[0.18em]">
             System Design
@@ -716,7 +718,7 @@ function SystemSchematic() {
           ref={canvasRef}
           onPointerDown={startOrbit}
           onWheel={handleCanvasWheel}
-          className="relative min-h-[680px] cursor-grab rounded-2xl border border-white/10 bg-[#060f22]/90 lg:min-h-[720px] active:cursor-grabbing"
+          className="relative min-h-[min(52dvh,26rem)] cursor-grab rounded-xl border border-white/10 bg-[#060f22]/90 sm:min-h-[32rem] sm:rounded-2xl md:min-h-[600px] lg:min-h-[720px] active:cursor-grabbing"
         >
           <div className="absolute right-3 top-3 z-20 flex items-center gap-2 rounded-full border border-white/14 bg-[#081227]/85 px-2.5 py-1.5 text-[11px] text-white/85 backdrop-blur-sm">
             <button
@@ -1007,7 +1009,7 @@ export function SystemSection() {
       id="system"
       className="relative scroll-mt-24 border-t border-[var(--hairline)] bg-blueprint py-24 md:py-32"
     >
-      <div className="relative z-10 mx-auto max-w-[1240px] px-5 md:px-10">
+      <div className="relative z-10 mx-auto max-w-[1240px] min-w-0 px-4 sm:px-5 md:px-10">
         <SectionLabel number="05" text="System" textFirst />
         <header className="text-center">
           <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--ink-muted)]">

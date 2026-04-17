@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Image from 'next/image';
 import ScrollReveal from './ScrollReveal';
 import SectionLabel from './SectionLabel';
 import { publicImages2Path } from '@/lib/publicAssetPath';
@@ -52,11 +53,13 @@ function MaterialCard({ img, delay }) {
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
       >
-        <div className="relative w-full h-full overflow-hidden rounded-xl">
-          <img
+        <div className="relative h-full w-full overflow-hidden rounded-xl">
+          <Image
             src={img.src}
             alt={img.alt}
-            className="w-full h-full object-cover hover:scale-105 transition-all duration-700"
+            fill
+            sizes="(max-width: 768px) 50vw, 33vw"
+            className="object-cover transition-all duration-700 hover:scale-105"
           />
           <div
             className="absolute inset-0 flex flex-col justify-end p-3"
@@ -84,7 +87,7 @@ function MaterialCard({ img, delay }) {
 
 export default function MaterialExploration() {
   return (
-    <section id="materials" className="py-32 md:py-48 max-w-7xl mx-auto px-8 md:px-16">
+    <section id="materials" className="mx-auto max-w-7xl min-w-0 px-4 py-24 sm:px-6 md:px-12 md:py-48 lg:px-16">
       <SectionLabel number="06" text="Material Exploration" textFirst />
       <ScrollReveal>
         <p className="font-display font-extralight text-structural text-base md:text-lg tracking-wide mb-2">Before the form, the material</p>
@@ -106,10 +109,10 @@ export default function MaterialExploration() {
       <ScrollReveal>
         <div className="mt-16 md:mt-24 max-w-2xl">
           <p className="font-display font-extralight text-foreground/70 text-base leading-relaxed">
-            Material experimentation formed the backbone of the project's development. 
-            Through systematic testing of heat-sealing techniques, membrane thicknesses, 
-            and seam configurations, a vocabulary of failure and success emerged that 
-            directly informed the final system's construction methodology.
+            Material experimentation formed the backbone of the project&apos;s development.
+            Through systematic testing of heat-sealing techniques, membrane thicknesses,
+            and seam configurations, a vocabulary of failure and success emerged that
+            directly informed the final system&apos;s construction methodology.
           </p>
           <p className="tech-label text-structural mt-6">
             <span className="font-bold">Materials:</span> Lycra Fabric (Silk, Cotton) · TPU 3D Print Filament ·

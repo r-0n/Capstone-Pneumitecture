@@ -8,13 +8,13 @@ export function BehaviorSection() {
   return (
     <section
       id="behavior"
-      className="relative scroll-mt-24 border-t border-[var(--hairline)] bg-[radial-gradient(circle_at_0%_0%,rgba(255,250,242,0.72),rgba(255,250,242,0.18)_48%,transparent_74%),radial-gradient(circle_at_100%_0%,rgba(236,245,255,0.62),rgba(236,245,255,0.16)_52%,transparent_78%),linear-gradient(135deg,rgba(255,252,247,0.9),rgba(246,250,255,0.86)_58%,rgba(238,246,255,0.82))] py-20 md:py-28"
+      className="relative scroll-mt-24 border-t border-[var(--hairline)] bg-[radial-gradient(circle_at_0%_0%,rgba(255,250,242,0.72),rgba(255,250,242,0.18)_48%,transparent_74%),radial-gradient(circle_at_100%_0%,rgba(236,245,255,0.62),rgba(236,245,255,0.16)_52%,transparent_78%),linear-gradient(135deg,rgba(255,252,247,0.9),rgba(246,250,255,0.86)_58%,rgba(238,246,255,0.82))] py-16 md:py-28"
     >
-      <div className="relative z-10 w-full px-4 md:px-6">
+      <div className="relative z-10 w-full min-w-0 px-3 sm:px-4 md:px-6">
         <div className="mx-auto max-w-[1000px]">
           <SectionLabel number="08" text="Behavior" textFirst />
         </div>
-        <div className="mx-auto max-w-[1680px]">
+        <div className="mx-auto max-w-[1680px] min-w-0">
           <motion.article
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import ScrollReveal from "./ScrollReveal";
 import SectionLabel from "./SectionLabel";
-import { publicAssetPath, publicImages2Path } from "@/lib/publicAssetPath";
+import { publicAssetPath } from "@/lib/publicAssetPath";
 import { DesignProcessPhaseSlider } from "./DesignProcessPhaseSlider";
 
 /** Google Drive preview (share: anyone with link can view). */

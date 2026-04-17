@@ -10,7 +10,7 @@ export function SiteNav() {
       initial={{ y: -12, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-      className="site-nav-glass pointer-events-auto fixed inset-x-0 top-0 z-[200] border-b border-[var(--hairline)]"
+      className="site-nav-glass pointer-events-auto fixed inset-x-0 top-0 z-[200] border-b border-[var(--hairline)] pt-[env(safe-area-inset-top,0px)] pl-[env(safe-area-inset-left,0px)] pr-[env(safe-area-inset-right,0px)]"
     >
       <nav
         className="mx-auto flex max-w-[1400px] items-center justify-center gap-0 overflow-x-auto px-2 py-3 md:px-5"

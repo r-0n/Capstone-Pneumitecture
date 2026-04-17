@@ -5,7 +5,7 @@ export function SectionBreak() {
   return (
     <div
       aria-hidden
-      className="relative left-1/2 z-10 w-screen -translate-x-1/2 border-y border-slate-300/25 bg-linear-to-b from-[#eef2f8] via-[#e9eef6] to-[#eef2f8] py-5"
+      className="relative z-10 w-full max-w-[100%] border-y border-slate-300/25 bg-linear-to-b from-[#eef2f8] via-[#e9eef6] to-[#eef2f8] py-5"
     >
       <div className="mx-auto flex max-w-3xl items-center gap-3 px-6">
         <span className="h-px min-h-px flex-1 rounded-full bg-slate-400/25" />

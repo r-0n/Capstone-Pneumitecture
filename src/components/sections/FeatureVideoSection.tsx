@@ -2,7 +2,6 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import Image from "next/image";
-import { useState } from "react";
 import { publicAssetPath } from "@/lib/publicAssetPath";
 
 const FALLBACK_POSTER =
@@ -14,7 +13,7 @@ const ENV_VIDEO_SRC = rawVideoSrc ? publicAssetPath(rawVideoSrc) : null;
 
 export function FeatureVideoSection() {
   const reduceMotion = useReducedMotion();
-  const [videoSrc, setVideoSrc] = useState<string | null>(() => ENV_VIDEO_SRC);
+  const videoSrc = ENV_VIDEO_SRC;
   const showVideo = Boolean(videoSrc) && !reduceMotion;
 
   return (

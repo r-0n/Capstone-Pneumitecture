@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import ScrollReveal from './ScrollReveal';
 import SectionLabel from './SectionLabel';
@@ -60,7 +61,7 @@ export default function MediaArchive() {
   }, [showWeeklyLinks]);
 
   return (
-    <section id="archive" className="py-32 md:py-48 max-w-7xl mx-auto px-8 md:px-16">
+    <section id="archive" className="mx-auto max-w-7xl min-w-0 px-4 py-24 sm:px-6 md:px-12 md:py-48 lg:px-16">
       <SectionLabel number="10" text="Media / Archive" textFirst />
 
       <ScrollReveal>
@@ -98,62 +99,73 @@ export default function MediaArchive() {
               Weekly Blog Links
             </button>
             <AnimatePresence>
-              {showWeeklyLinks ? (
-                <>
-                  <motion.a
-                    href="https://www.notion.so/Capstone-Journey-2607962f620780ffbfabe559b247534c?source=copy_link"
-                    target="_blank"
-                    rel="noreferrer"
-                    initial={{ opacity: 0, y: 6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -6 }}
-                    transition={{ duration: 0.2 }}
-                    className="tech-label px-4 py-2 border border-[rgba(0,0,0,0.15)] text-[#707070] transition-all duration-300 hover:border-[#121212] hover:text-[#121212]"
-                  >
-                    r-0n
-                  </motion.a>
-                  <motion.a
-                    href="https://www.notion.so/Capstone-Progress-2626e8ec69fb80648cfde741894381bf?source=copy_link"
-                    target="_blank"
-                    rel="noreferrer"
-                    initial={{ opacity: 0, y: 6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -6 }}
-                    transition={{ duration: 0.2 }}
-                    className="tech-label px-4 py-2 border border-[rgba(0,0,0,0.15)] text-[#707070] transition-all duration-300 hover:border-[#121212] hover:text-[#121212]"
-                  >
-                    Mariam
-                  </motion.a>
-                </>
-              ) : null}
+              {showWeeklyLinks
+                ? [
+                    <motion.a
+                      key="weekly-notion-r0n"
+                      href="https://www.notion.so/Capstone-Journey-2607962f620780ffbfabe559b247534c?source=copy_link"
+                      target="_blank"
+                      rel="noreferrer"
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -6 }}
+                      transition={{ duration: 0.2 }}
+                      className="tech-label border border-[rgba(0,0,0,0.15)] px-4 py-2 text-[#707070] transition-all duration-300 hover:border-[#121212] hover:text-[#121212]"
+                    >
+                      r-0n
+                    </motion.a>,
+                    <motion.a
+                      key="weekly-notion-mariam"
+                      href="https://www.notion.so/Capstone-Progress-2626e8ec69fb80648cfde741894381bf?source=copy_link"
+                      target="_blank"
+                      rel="noreferrer"
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -6 }}
+                      transition={{ duration: 0.2 }}
+                      className="tech-label border border-[rgba(0,0,0,0.15)] px-4 py-2 text-[#707070] transition-all duration-300 hover:border-[#121212] hover:text-[#121212]"
+                    >
+                      Mariam
+                    </motion.a>,
+                  ]
+                : null}
             </AnimatePresence>
           </div>
         </div>
       </ScrollReveal>
 
       {/* Grid */}
-      <motion.div layout className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <AnimatePresence mode="popLayout">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+        <AnimatePresence>
           {filtered.map((item) => (
             <motion.div
               key={item.src}
-              layout
-              initial={{ opacity: 0, scale: 0.95 }}
+              initial={{ opacity: 0, scale: 0.96 }}
               animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.4 }}
-              className="overflow-hidden aspect-square bg-[#F5F5F3] group cursor-pointer relative"
+              exit={{ opacity: 0, scale: 0.96 }}
+              transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+              className="group relative aspect-square cursor-pointer overflow-hidden bg-[#F5F5F3]"
+              onClick={() => setSelected(item)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  setSelected(item);
+                }
+              }}
             >
-              <img
+              <Image
                 src={item.src}
                 alt={item.alt}
-                onClick={() => setSelected(item)}
-                className="w-full h-full object-contain"
+                fill
+                sizes="(max-width: 768px) 50vw, 25vw"
+                className="object-contain"
               />
             </motion.div>
           ))}
         </AnimatePresence>
-      </motion.div>
+      </div>
 
       <AnimatePresence>
         {selected && (
@@ -163,13 +175,23 @@ export default function MediaArchive() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setSelected(null)}
-            className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center cursor-pointer"
+            className="fixed inset-0 z-50 flex cursor-pointer items-center justify-center bg-black/80 p-4"
           >
-            <img
-              src={selected.src}
-              alt={selected.alt}
-              className="max-w-[90vw] max-h-[90vh] object-contain"
-            />
+            <div
+              className="pointer-events-auto max-h-[90vh] max-w-[90vw]"
+              onClick={(e) => e.stopPropagation()}
+              onKeyDown={(e) => e.stopPropagation()}
+              role="presentation"
+            >
+              <Image
+                src={selected.src}
+                alt={selected.alt}
+                width={2000}
+                height={1500}
+                sizes="90vw"
+                className="h-auto max-h-[90vh] w-auto max-w-[min(90vw,1200px)] object-contain"
+              />
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

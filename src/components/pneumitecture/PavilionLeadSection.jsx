@@ -4,7 +4,7 @@ export default function PavilionLeadSection() {
       id="pavilion-lead"
       className="relative scroll-mt-24 border-b border-neutral-200 bg-white text-[#0a0a0a]"
     >
-      <div className="mx-auto max-w-[1400px] px-6 py-14 md:px-10 md:py-16 lg:px-14 lg:py-20">
+      <div className="mx-auto max-w-[1400px] min-w-0 px-4 py-12 sm:px-6 sm:py-14 md:px-10 md:py-16 lg:px-14 lg:py-20">
         <header className="flex flex-col justify-between gap-8 border-b border-neutral-200 pb-10 md:flex-row md:items-start md:gap-12">
           <div className="max-w-3xl">
             <h1 className="font-sans text-[clamp(1rem,2.4vw,1.35rem)] font-semibold uppercase leading-[1.15] tracking-[0.02em] text-black">

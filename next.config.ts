@@ -43,6 +43,11 @@ const nextConfig: NextConfig = {
         hostname: "videos.pexels.com",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "media.base44.com",
+        pathname: "/**",
+      },
     ],
   },
 };
