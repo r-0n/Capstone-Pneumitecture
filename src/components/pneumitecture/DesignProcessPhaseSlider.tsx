@@ -3,12 +3,33 @@
 import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
+import { DesignProcessYoutubeSlide } from "./DesignProcessYoutubeSlide";
 
 export type DesignProcessSlide =
   | { type: "image"; src: string; caption: string; alt: string }
   | { type: "video"; src: string; caption: string; alt: string; poster?: string }
   /** Google Drive preview, YouTube embed, etc. `src` is the iframe `src` URL. */
-  | { type: "iframe"; src: string; caption: string; alt: string; poster?: string };
+  | {
+      type: "iframe";
+      src: string;
+      caption: string;
+      alt: string;
+      poster?: string;
+      /** When set for a YouTube `src`, uses IFrame API: stays muted and applies `playbackRate`. */
+      youtube?: { playbackRate?: number };
+    };
+
+function parseYoutubeEmbedVideoId(src: string): string | null {
+  try {
+    const u = new URL(src);
+    const host = u.hostname.replace(/^www\./, "");
+    if (host !== "youtube.com" && host !== "youtube-nocookie.com") return null;
+    const m = u.pathname.match(/\/embed\/([^/?]+)/);
+    return m?.[1] ?? null;
+  } catch {
+    return null;
+  }
+}
 
 type DesignProcessPhaseSliderProps = {
   slides: readonly DesignProcessSlide[];
@@ -98,15 +119,31 @@ export function DesignProcessPhaseSlider({ slides, priority = false }: DesignPro
                 />
               ) : slide.type === "iframe" ? (
                 i === index ? (
-                  <iframe
-                    key={slide.src}
-                    src={slide.src}
-                    title={slide.alt}
-                    className="absolute inset-0 h-full w-full rounded-sm border-0 bg-bone p-0.5"
-                    allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
-                    allowFullScreen
-                    referrerPolicy="strict-origin-when-cross-origin"
-                  />
+                  (() => {
+                    if (slide.type !== "iframe") return null;
+                    const ytId = slide.youtube ? parseYoutubeEmbedVideoId(slide.src) : null;
+                    if (ytId && slide.youtube) {
+                      return (
+                        <DesignProcessYoutubeSlide
+                          key={slide.src}
+                          videoId={ytId}
+                          title={slide.alt}
+                          playbackRate={slide.youtube.playbackRate ?? 1.5}
+                        />
+                      );
+                    }
+                    return (
+                      <iframe
+                        key={slide.src}
+                        src={slide.src}
+                        title={slide.alt}
+                        className="absolute inset-0 h-full w-full rounded-sm border-0 bg-bone p-0.5"
+                        allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+                        allowFullScreen
+                        referrerPolicy="strict-origin-when-cross-origin"
+                      />
+                    );
+                  })()
                 ) : slide.poster ? (
                   <Image src={slide.poster} alt={slide.alt} fill className="object-contain p-1 opacity-80" sizes="(max-width:768px) 92vw, 33vw" />
                 ) : (

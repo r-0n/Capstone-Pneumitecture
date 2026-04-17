@@ -17,17 +17,19 @@ const mountingImg = (n) =>
   publicAssetPath(`/images/design-process/mounting-rods/${String(n).padStart(2, "0")}.png`);
 
 const MOUNTING_TEST_VIDEO_IFRAME_A =
-  "https://drive.google.com/file/d/1ikSUiOJzLn-oxtvjNdaSKWz1vevogtTZ/preview";
-const MOUNTING_TEST_VIDEO_IFRAME_B =
-  "https://drive.google.com/file/d/1UNXmqvHuG1tgUvb4lcKx-CTSmjbxRWj5/preview";
+  "https://www.youtube.com/embed/9Bi_o7kGaBA?rel=0&modestbranding=1";
+const MOUNTING_TEST_VIDEO_UNIT_CELL =
+  "https://www.youtube.com/embed/oivFJ6d2UN4?rel=0&modestbranding=1";
+const ARDUINO_TEST_VIDEO_IFRAME_BEFORE_A =
+  "https://www.youtube.com/embed/wMBQTvkn0lQ?rel=0&modestbranding=1";
 const ARDUINO_TEST_VIDEO_IFRAME_A =
-  "https://drive.google.com/file/d/1TT4enFtedAvIoGcyQMHh5onOeebDkuSz/preview";
-const ARDUINO_TEST_VIDEO_IFRAME_B =
-  "https://drive.google.com/file/d/1ZnFgcApK-7O6e3EUslGnDBkalMxwu1Ht/preview";
+  "https://www.youtube.com/embed/kY4dTFvlMXI?rel=0&modestbranding=1";
+const ARDUINO_TEST_VIDEO_IFRAME_C =
+  "https://www.youtube.com/embed/lR4QNp3BsmE?rel=0&modestbranding=1";
 const RHINO_GH_VIDEO_IFRAME_A =
-  "https://drive.google.com/file/d/1yEIp8EeoqVb-49s7lg82Hja2zv9A0w9R/preview";
+  "https://www.youtube.com/embed/icCzrSQQW_o?rel=0&modestbranding=1";
 const RHINO_GH_VIDEO_IFRAME_B =
-  "https://drive.google.com/file/d/15LPcn--R-cZZXUlfOctfqLajAIJmroL5/preview";
+  "https://www.youtube.com/embed/A9ya9y9IIzo?rel=0&modestbranding=1";
 const RHINO_GH_VIDEO_IFRAME_C =
   "https://drive.google.com/file/d/1WeAxBJEg7rBfVf8Zh_8egIQhuaDbYUiG/preview";
 
@@ -191,17 +193,19 @@ const MOUNTING_PHASE_SLIDES = [
   },
   {
     type: "iframe",
+    src: MOUNTING_TEST_VIDEO_UNIT_CELL,
+    poster: mountingImg(3),
+    alt: "Unit cell inflation — scaling test video",
+    caption: "Test video: Unit Cell Inflation",
+    youtube: { playbackRate: 2 },
+  },
+  {
+    type: "iframe",
     src: MOUNTING_TEST_VIDEO_IFRAME_A,
     poster: mountingImg(1),
     alt: "Mounting onto aluminium rods test video A",
     caption: "Test video A — mounting sequence and initial behavior.",
-  },
-  {
-    type: "iframe",
-    src: MOUNTING_TEST_VIDEO_IFRAME_B,
-    poster: mountingImg(3),
-    alt: "Mounting onto aluminium rods test video B",
-    caption: "Test video B — rod-mounted response during handling.",
+    youtube: { playbackRate: 2 },
   },
 ];
 
@@ -214,7 +218,7 @@ const phases = [
   },
   {
     num: 2,
-    title: "Material Exploration",
+    title: "Material Exploration & Unit Design  ",
     sub: "",
     slides: [
       ...HEAT_SEALING_SLIDES,
@@ -229,7 +233,7 @@ const phases = [
   },
   {
     num: 3,
-    title: "Cell Population",
+    title: "Moving from Single Cell to Cell Population",
     sub: "",
     body:
       "The shift from singular experimentation to collective behavior. As cells were combined, new spatial conditions began to emerge — driven by interaction, pressure, and constraint. What was once a unit became a system, defining the project’s architectural direction.",
@@ -237,7 +241,7 @@ const phases = [
   },
   {
     num: 4,
-    title: "Frame Fabrication",
+    title: "Structural Design &Frame Fabrication",
     sub: "",
     slides: [
       {
@@ -303,17 +307,27 @@ const phases = [
       },
       {
         type: "iframe",
+        src: ARDUINO_TEST_VIDEO_IFRAME_BEFORE_A,
+        poster: arduinoImg(2),
+        alt: "Pneumatic inflation sequence before test A",
+        caption: "Miniature TPU Grid: Solenoid Valve Control",
+        youtube: { playbackRate: 2 },
+      },
+      {
+        type: "iframe",
         src: ARDUINO_TEST_VIDEO_IFRAME_A,
         poster: arduinoImg(1),
         alt: "Arduino and solenoid inflation test video A",
         caption: "Test video A — solenoid-actuated inflation sequence.",
+        youtube: { playbackRate: 2 },
       },
       {
         type: "iframe",
-        src: ARDUINO_TEST_VIDEO_IFRAME_B,
-        poster: arduinoImg(4),
-        alt: "Arduino and solenoid inflation test video B",
-        caption: "Test video B — timing and control response check.",
+        src: ARDUINO_TEST_VIDEO_IFRAME_C,
+        poster: arduinoImg(3),
+        alt: "Arduino and solenoid inflation test video C",
+        caption: "Test video C — follow-up inflation sequence.",
+        youtube: { playbackRate: 2 },
       },
     ],
   },
@@ -327,7 +341,7 @@ const phases = [
     num: 7,
     title: "Project Digital Simulation",
     sub: "",
-    body: "Ron Placeholder",
+    body: "To achieve this responsive inflation, the system relies on a synchronized network of native Grasshopper logic and Kangaroo 2 physics components. The initial spatial trigger is established using Distance and Smaller Than components, which act as a proximity sensor between the moving agent (as a point attractor) and the geometric centroids of the surface. This boolean output is translated into fluid data using a Grasshopper Graph Mapper component set to a Bezier curve, which is then fed into a Multiplication component to dynamically scale the simulation's intensity. The physical deformation itself is executed by the core Kangaroo Solver component. Within this solver, the outward force generated by the Kangaroo Pressure goal is continuously balanced against the mesh's structural resistance-defined by EdgeLengths (tension) and constrained by rigid Anchor points along the diamond cutouts-ultimately producing the organic, pillow-like inflation.",
     slides: [
       ...RHINO_GH_SLIDES,
       {
@@ -335,14 +349,17 @@ const phases = [
         src: RHINO_GH_VIDEO_IFRAME_A,
         poster: rhinoImg(14),
         alt: "Rhinoceros+Grasshopper simulation video A",
-        caption: "Simulation video A — parametric behavior playback.",
+        caption:
+          "Simulation Video- 3 Combination Cell Simulation: Without Inflation Physics",
+        youtube: { playbackRate: 2 },
       },
       {
         type: "iframe",
         src: RHINO_GH_VIDEO_IFRAME_B,
         poster: rhinoImg(13),
         alt: "Rhinoceros+Grasshopper simulation video B",
-        caption: "Simulation video B — inflation sequence and logic check.",
+        caption: "Simulation B: Cell Grid with Inflation Physics.",
+        youtube: { playbackRate: 2 },
       },
       {
         type: "iframe",
@@ -414,8 +431,14 @@ function FeaturedPhaseCard({ phase }) {
         </div>
         <div className="hairline flex-1" />
       </div>
-      <div className="grid grid-cols-1 items-center gap-8 md:grid-cols-[minmax(0,1.05fr)_minmax(0,1.2fr)] md:gap-12 md:items-center md:justify-items-center">
-        <div className="w-full max-w-xl">
+      <div
+        className={`grid grid-cols-1 items-center gap-8 md:items-center md:justify-items-stretch ${
+          phase.num === 7
+            ? "md:grid-cols-[minmax(0,1.65fr)_minmax(0,1fr)] md:gap-10 lg:gap-14"
+            : "md:grid-cols-[minmax(0,1.05fr)_minmax(0,1.2fr)] md:gap-12 md:justify-items-center"
+        }`}
+      >
+        <div className={`w-full min-w-0 ${phase.num === 7 ? "max-w-none" : "max-w-xl"}`}>
           {phase.sub ? (
             <p className="tech-label mb-3 text-structural/50">{phase.sub}</p>
           ) : null}
@@ -423,12 +446,24 @@ function FeaturedPhaseCard({ phase }) {
             {phase.title}
           </h3>
           {phase.body ? (
-            <p className="font-display font-extralight text-foreground/70 text-base md:text-lg leading-relaxed">
+            <p
+              className={`font-display font-extralight text-foreground/70 text-base md:text-lg leading-relaxed ${
+                phase.num === 7
+                  ? "md:columns-2 md:gap-x-12 lg:gap-x-16 md:[column-fill:_balance] [text-wrap:pretty]"
+                  : ""
+              }`}
+            >
               {phase.body}
             </p>
           ) : null}
         </div>
-        <div className="w-full max-w-[32rem] md:justify-self-center md:mx-auto lg:max-w-[36rem]">
+        <div
+          className={`w-full min-w-0 ${
+            phase.num === 7
+              ? "max-w-none"
+              : "max-w-[32rem] md:justify-self-center md:mx-auto lg:max-w-[36rem]"
+          }`}
+        >
           <div className="h-full w-full" style={{ aspectRatio: "16/10" }}>
             <DesignProcessPhaseSlider slides={phase.slides} tall />
           </div>
@@ -453,9 +488,6 @@ export default function DesignProcess() {
         <SectionLabel number="04" text="Design Process" textFirst />
 
         <ScrollReveal>
-          <p className="font-display font-extralight text-structural text-base md:text-lg tracking-wide mb-2">
-            The central thesis
-          </p>
           <h2 className="font-display font-extralight text-3xl md:text-5xl tracking-tight mb-16 max-w-3xl">
             From geometry to form
           </h2>

@@ -1,8 +1,44 @@
 "use client";
 
+/**
+ * System schematic (Section 05). **Tunables** (layout, camera, zoom, etc.):
+ * `src/config/systemSchematicControls.ts`
+ */
 import SectionLabel from "@/components/pneumitecture/SectionLabel";
-import { motion } from "framer-motion";
-import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  SYSTEM_SCHEMATIC_AXIS_EXT,
+  SYSTEM_SCHEMATIC_AXIS_ORIGIN_XZ,
+  SYSTEM_SCHEMATIC_CAMERA_DEFAULT,
+  SYSTEM_SCHEMATIC_CELL_GRID_ORIGIN_Y,
+  SYSTEM_SCHEMATIC_CELL_GRID_ORIGIN_Z,
+  SYSTEM_SCHEMATIC_CELL_GRID_SPACING_Y,
+  SYSTEM_SCHEMATIC_CELL_GRID_SPACING_Z,
+  SYSTEM_SCHEMATIC_FRAME_OFFSET_X,
+  SYSTEM_SCHEMATIC_FRAME_Y,
+  SYSTEM_SCHEMATIC_FRAME_Z,
+  SYSTEM_SCHEMATIC_FOCAL_LENGTH,
+  SYSTEM_SCHEMATIC_GRAPH_H,
+  SYSTEM_SCHEMATIC_GRAPH_W,
+  SYSTEM_SCHEMATIC_LAYOUT,
+  SYSTEM_SCHEMATIC_MANIFOLD_VALVE_LANE_BASE,
+  SYSTEM_SCHEMATIC_MANIFOLD_VALVE_LANE_STEP,
+  SYSTEM_SCHEMATIC_NODE_CHIP_VIEWBOX,
+  SYSTEM_SCHEMATIC_ORBIT_PITCH_MAX,
+  SYSTEM_SCHEMATIC_ORBIT_PITCH_MIN,
+  SYSTEM_SCHEMATIC_ORBIT_PITCH_SENS,
+  SYSTEM_SCHEMATIC_ORBIT_YAW_SENS,
+  SYSTEM_SCHEMATIC_PERSPECTIVE_NEAR_CLAMP,
+  SYSTEM_SCHEMATIC_WORLD_CENTER,
+  SYSTEM_SCHEMATIC_Y_GROUND,
+  SYSTEM_SCHEMATIC_ZOOM_ANIM_DURATION,
+  SYSTEM_SCHEMATIC_ZOOM_ANIM_EASE,
+  SYSTEM_SCHEMATIC_ZOOM_MAX,
+  SYSTEM_SCHEMATIC_ZOOM_MIN,
+  SYSTEM_SCHEMATIC_ZOOM_STEP_BUTTON,
+  SYSTEM_SCHEMATIC_ZOOM_STEP_WHEEL,
+} from "@/config/systemSchematicControls";
+import { animate, motion } from "framer-motion";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 type NodeDef = {
   id: string;
@@ -18,86 +54,113 @@ type NodeDef = {
 type EdgeDef = {
   a: string;
   b: string;
-  type: "air" | "electrical" | "mount" | "mesh";
+  type: "air" | "electrical";
 };
 
-const GRAPH_W = 1100;
-const GRAPH_H = 620;
-const WORLD_CENTER = { x: 760, y: 330, z: 210 };
-const DEFAULT_CAMERA = { yaw: -0.34, pitch: 0.18, zoom: 1 };
-const BASE_FOCAL_LENGTH = 520;
+const GRAPH_W = SYSTEM_SCHEMATIC_GRAPH_W;
+const GRAPH_H = SYSTEM_SCHEMATIC_GRAPH_H;
+const Y_GROUND = SYSTEM_SCHEMATIC_Y_GROUND;
+const SCH = SYSTEM_SCHEMATIC_LAYOUT;
+const X_WALL = SCH.cellWall.x;
+const WORLD_CENTER = SYSTEM_SCHEMATIC_WORLD_CENTER;
+const AXIS_ORIGIN = {
+  x: SYSTEM_SCHEMATIC_AXIS_ORIGIN_XZ.x,
+  y: Y_GROUND,
+  z: SYSTEM_SCHEMATIC_AXIS_ORIGIN_XZ.z,
+};
+const AXIS_EXT = SYSTEM_SCHEMATIC_AXIS_EXT;
+const BASE_FOCAL_LENGTH = SYSTEM_SCHEMATIC_FOCAL_LENGTH;
 const GRID_SIZE = 3;
 
-function buildGrid3x3(
+/** 3×3 in the XZ plane (“ground”): fixed Y, columns along +X, rows along +Z. */
+function buildGrid3x3XZ(
   origin: { x: number; y: number; z: number },
-  spacing: { x: number; y: number; z: number },
+  spacing: { x: number; z: number },
 ) {
   const out: Array<[number, number, number]> = [];
   for (let row = 0; row < GRID_SIZE; row += 1) {
     for (let col = 0; col < GRID_SIZE; col += 1) {
-      out.push([
-        origin.x + col * spacing.x,
-        origin.y + row * spacing.y,
-        origin.z + row * spacing.z,
-      ]);
+      out.push([origin.x + col * spacing.x, origin.y, origin.z + row * spacing.z]);
     }
   }
   return out;
 }
 
-const BASE_NODES: NodeDef[] = [
-  {
-    id: "pump",
-    x: 120,
-    y: 470,
-    z: 40,
-    label: "Air Pump (Main Source)",
-    icon: "◉",
-    color: "#9eff7a",
-    description: "Primary air source. Feeds compressed air into the manifold.",
-  },
-  {
-    id: "manifold",
-    x: 330,
-    y: 455,
-    z: 55,
-    label: "Manifold (9 Outputs)",
-    icon: "▤",
-    color: "#7dc3ff",
-    description: "Distribution hub. Splits one inlet into 9 output channels.",
-  },
-  {
-    id: "controller",
-    x: 470,
-    y: 540,
-    z: 30,
-    label: "Control Logic",
-    icon: "</>",
-    color: "#d983ff",
-    description: "Software timing logic for valve order, duration, and grouping.",
-  },
-  {
-    id: "frame",
-    x: 960,
-    y: 300,
-    z: 420,
-    label: "Mounting Frame",
-    icon: "▥",
-    color: "#f2dc65",
-    description: "Physical support for the 3×3 TPU cell array.",
-  },
-];
+/** 3×3 in the YZ plane (“wall”): fixed X, columns along +Y, rows along +Z. */
+function buildGrid3x3YZ(
+  origin: { x: number; y: number; z: number },
+  spacing: { y: number; z: number },
+) {
+  const out: Array<[number, number, number]> = [];
+  for (let row = 0; row < GRID_SIZE; row += 1) {
+    for (let col = 0; col < GRID_SIZE; col += 1) {
+      out.push([origin.x, origin.y + col * spacing.y, origin.z + row * spacing.z]);
+    }
+  }
+  return out;
+}
 
-// Valves are flat on the same surface plane (same y), equally spaced in 3x3.
-const VALVE_POSITIONS = buildGrid3x3(
-  { x: 540, y: 442, z: 100 },
-  { x: 108, y: 0, z: 116 },
+// TPU cells: grid in YZ, single X (vertical wall parallel to world YZ).
+const CELL_POSITIONS = buildGrid3x3YZ(
+  {
+    x: X_WALL,
+    y: SYSTEM_SCHEMATIC_CELL_GRID_ORIGIN_Y,
+    z: SYSTEM_SCHEMATIC_CELL_GRID_ORIGIN_Z,
+  },
+  { y: SYSTEM_SCHEMATIC_CELL_GRID_SPACING_Y, z: SYSTEM_SCHEMATIC_CELL_GRID_SPACING_Z },
 ) as ReadonlyArray<[number, number, number]>;
 
-// TPU cells stand vertical (vary x+y, fixed z), equally spaced in 3x3.
-const CELL_POSITIONS = buildGrid3x3(
-  { x: 900, y: 170, z: 362 },
-  { x: 92, y: 108, z: 0 },
+const BASE_NODES: NodeDef[] = (() => {
+  const y = Y_GROUND;
+  const s = SCH.supply;
+  return [
+    {
+      id: "pump",
+      x: s.pumpX,
+      y,
+      z: s.pumpZ,
+      label: "Air Pump (Main Source)",
+      icon: "◉",
+      color: "#9eff7a",
+      description: "Primary air source. Feeds compressed air into the manifold.",
+    },
+    {
+      id: "manifold",
+      x: s.pumpX + s.manifoldOffsetX,
+      y,
+      z: s.pumpZ + s.manifoldOffsetZ,
+      label: "Manifold (9 Outputs)",
+      icon: "▤",
+      color: "#7dc3ff",
+      description: "Distribution hub. Splits one inlet into 9 output channels.",
+    },
+    {
+      id: "controller",
+      x: s.pumpX + s.controllerOffsetX,
+      y,
+      z: s.pumpZ + s.controllerOffsetZ,
+      label: "Control Logic",
+      icon: "</>",
+      color: "#d983ff",
+      description: "Software timing logic for valve order, duration, and grouping.",
+    },
+    {
+      id: "frame",
+      x: X_WALL + SYSTEM_SCHEMATIC_FRAME_OFFSET_X,
+      y: SYSTEM_SCHEMATIC_FRAME_Y,
+      z: SYSTEM_SCHEMATIC_FRAME_Z,
+      label: "Mounting Frame",
+      icon: "▥",
+      color: "#f2dc65",
+      description: "Physical support for the 3×3 TPU cell array.",
+    },
+  ];
+})();
+
+// Solenoid valves: 3×3 on the XZ floor at Y_GROUND.
+const VALVE_POSITIONS = buildGrid3x3XZ(
+  { x: SCH.valveGrid.originX, y: Y_GROUND, z: SCH.valveGrid.originZ },
+  { x: SCH.valveGrid.spacingX, z: SCH.valveGrid.spacingZ },
 ) as ReadonlyArray<[number, number, number]>;
 
 const VALVE_NODES: NodeDef[] = VALVE_POSITIONS.map(([x, y, z], i) => ({
@@ -122,49 +185,22 @@ const CELL_NODES: NodeDef[] = CELL_POSITIONS.map(([x, y, z], i) => ({
   description: `TPU Cell ${i + 1}/9. Inflates on command, then deflates when flow is cut.`,
 }));
 
-const INITIAL_NODES: NodeDef[] = [...BASE_NODES, ...VALVE_NODES, ...CELL_NODES];
+const SCHEMATIC_NODES: NodeDef[] = [...BASE_NODES, ...VALVE_NODES, ...CELL_NODES];
 
 const EDGES: EdgeDef[] = [
   { a: "pump", b: "manifold", type: "air" },
   { a: "controller", b: "manifold", type: "electrical" },
-  { a: "frame", b: "manifold", type: "mount" },
   ...VALVE_NODES.flatMap((v, i) => [
     { a: "manifold", b: v.id, type: "air" as const },
     { a: "controller", b: v.id, type: "electrical" as const },
     { a: v.id, b: `cell-${i + 1}`, type: "air" as const },
-    { a: "frame", b: `cell-${i + 1}`, type: "mount" as const },
   ]),
-  // Delaunay-style mesh links to reinforce network readability.
-  ...VALVE_NODES.filter((_, i) => i % 3 !== 2).map((v, i) => ({
-    a: v.id,
-    b: VALVE_NODES[i + 1].id,
-    type: "mesh" as const,
-  })),
-  ...VALVE_NODES.filter((_, i) => i < 6).map((v, i) => ({
-    a: v.id,
-    b: VALVE_NODES[i + 3].id,
-    type: "mesh" as const,
-  })),
-  ...CELL_NODES.filter((_, i) => i % 3 !== 2).map((c, i) => ({
-    a: c.id,
-    b: CELL_NODES[i + 1].id,
-    type: "mesh" as const,
-  })),
-  ...CELL_NODES.filter((_, i) => i < 6).map((c, i) => ({
-    a: c.id,
-    b: CELL_NODES[i + 3].id,
-    type: "mesh" as const,
-  })),
 ];
 
-function projectNode(node: NodeDef) {
-  return { x: node.x, y: node.y };
-}
-
-function projectWithCamera(node: NodeDef, yaw: number, pitch: number, zoom: number) {
-  const cx = node.x - WORLD_CENTER.x;
-  const cy = node.y - WORLD_CENTER.y;
-  const cz = node.z - WORLD_CENTER.z;
+function coreProjection(x: number, y: number, z: number, yaw: number, pitch: number) {
+  const cx = x - WORLD_CENTER.x;
+  const cy = y - WORLD_CENTER.y;
+  const cz = z - WORLD_CENTER.z;
 
   const cosy = Math.cos(yaw);
   const siny = Math.sin(yaw);
@@ -176,50 +212,222 @@ function projectWithCamera(node: NodeDef, yaw: number, pitch: number, zoom: numb
   const yzY = cy * cosx - xzZ * sinx;
   const yzZ = cy * sinx + xzZ * cosx;
 
-  const focal = BASE_FOCAL_LENGTH * zoom;
-  const persp = focal / Math.max(180, focal + yzZ);
-  const px = GRAPH_W / 2 + xzX * persp;
-  const py = GRAPH_H / 2 + yzY * persp;
+  const focal = BASE_FOCAL_LENGTH;
+  const persp = focal / Math.max(SYSTEM_SCHEMATIC_PERSPECTIVE_NEAR_CLAMP, focal + yzZ);
+  return { xzX, yzY, yzZ, persp };
+}
 
+function projectCoords(x: number, y: number, z: number, yaw: number, pitch: number, zoom: number) {
+  const { xzX, yzY, yzZ, persp } = coreProjection(x, y, z, yaw, pitch);
+  const px = GRAPH_W / 2 + xzX * persp * zoom;
+  const py = GRAPH_H / 2 - yzY * persp * zoom;
   return { x: px, y: py, depth: yzZ };
 }
 
-function buildWavyPath(a: { x: number; y: number }, b: { x: number; y: number }, amplitude: number) {
-  const dx = b.x - a.x;
-  const dy = b.y - a.y;
-  const len = Math.max(1, Math.hypot(dx, dy));
-  const nx = -dy / len;
-  const ny = dx / len;
+function isXZFloorSchematicNode(n: NodeDef) {
+  return (
+    Math.abs(n.y - Y_GROUND) < 0.5 &&
+    (n.id.startsWith("valve-") || n.id === "pump" || n.id === "manifold" || n.id === "controller")
+  );
+}
 
-  const c1x = a.x + dx * 0.33 + nx * amplitude;
-  const c1y = a.y + dy * 0.33 + ny * amplitude;
-  const c2x = a.x + dx * 0.66 - nx * amplitude;
-  const c2y = a.y + dy * 0.66 - ny * amplitude;
+function projectWithCamera(node: NodeDef, yaw: number, pitch: number, zoom: number) {
+  return projectCoords(node.x, node.y, node.z, yaw, pitch, zoom);
+}
 
-  return `M ${a.x} ${a.y} C ${c1x} ${c1y}, ${c2x} ${c2y}, ${b.x} ${b.y}`;
+function valveNumberFromId(id: string): number {
+  const m = /^(?:valve|cell)-(\d+)$/.exec(id);
+  return m ? parseInt(m[1], 10) : 0;
+}
+
+/**
+ * Axis-aligned L / U routes in world space (orthogonal “duct” runs), then projected to SVG.
+ *
+ * Story: **pump → manifold** is a **straight** run in the XZ floor plane; **manifold → valves** use offset bus lanes;
+ * **valve → cell** (riser to wall then up YZ). Electrical uses a **high-Z** trunk so it does not sit on the air header.
+ */
+function getEdgeWorldWaypoints(edge: EdgeDef, m: Record<string, NodeDef>): Array<[number, number, number]> {
+  const a = m[edge.a];
+  const b = m[edge.b];
+  if (!a || !b) return [[0, 0, 0], [0, 0, 0]];
+
+  const ax = a.x;
+  const ay = a.y;
+  const az = a.z;
+  const bx = b.x;
+  const by = b.y;
+  const bz = b.z;
+
+  const idA = edge.a;
+  const idB = edge.b;
+
+  /** Pump → manifold: straight along world +X (same Y and Z on the floor). */
+  if (idA === "pump" && idB === "manifold") {
+    return [
+      [ax, ay, az],
+      [bx, by, bz],
+    ];
+  }
+
+  /** Electrical back to manifold: stay at controller Z (above valve rows), run in X, then drop in Z. */
+  if (idA === "controller" && idB === "manifold") {
+    return [
+      [ax, ay, az],
+      [bx, ay, az],
+      [bx, ay, bz],
+    ];
+  }
+
+  /**
+   * Manifold → valve (air): short Z “bus lane” per port so nine runs do not share one pixel stack,
+   * then +X along that lane, then Z into the valve (still axis-aligned).
+   */
+  if (idA === "manifold" && idB.startsWith("valve-")) {
+    const n = valveNumberFromId(idB);
+    const lane = (Math.max(1, n) - 1) * SYSTEM_SCHEMATIC_MANIFOLD_VALVE_LANE_STEP + SYSTEM_SCHEMATIC_MANIFOLD_VALVE_LANE_BASE;
+    return [
+      [ax, ay, az],
+      [ax, ay, az + lane],
+      [bx, ay, az + lane],
+      [bx, ay, bz],
+    ];
+  }
+
+  /** Controller → valve (electrical): run in X at controller Z (high trunk), then drop in Z to the valve. */
+  if (idA === "controller" && idB.startsWith("valve-")) {
+    return [
+      [ax, ay, az],
+      [bx, ay, az],
+      [bx, ay, bz],
+    ];
+  }
+
+  /** Valve → cell (air): along +X at valve Z to the wall, along the wall base in Z, then up in Y into the cell. */
+  if (idA.startsWith("valve-") && idB.startsWith("cell-")) {
+    return [
+      [ax, ay, az],
+      [bx, ay, az],
+      [bx, ay, bz],
+      [bx, by, bz],
+    ];
+  }
+
+  return [[ax, ay, az], [bx, by, bz]];
+}
+
+function worldWaypointsToSvgPath(
+  pts: Array<[number, number, number]>,
+  yaw: number,
+  pitch: number,
+  zoom: number,
+) {
+  if (pts.length === 0) return "";
+  const proj = pts.map(([x, y, z]) => projectCoords(x, y, z, yaw, pitch, zoom));
+  const [p0, ...rest] = proj;
+  return `M ${p0.x} ${p0.y}` + rest.map((p) => ` L ${p.x} ${p.y}`).join("");
+}
+
+/** SVG stroke style per logical connection. */
+function getEdgeLineStyle(edge: EdgeDef, active: boolean) {
+  const w = (n: number) => (active ? n * 1.22 : n);
+  if (edge.type === "air") {
+    if (edge.a === "pump" && edge.b === "manifold") {
+      return {
+        stroke: active ? "#e4fdff" : "#c2f6ff",
+        width: w(3),
+        opacity: active ? 1 : 0.95,
+        dash: "0",
+        filter: "drop-shadow(0 0 4px rgba(0,28,48,0.55))",
+      };
+    }
+    if (edge.a === "manifold" && edge.b.startsWith("valve-")) {
+      const n = valveNumberFromId(edge.b);
+      const hue = 158 + (n % 9) * 11 + Math.floor((n - 1) / 9) * 3;
+      return {
+        stroke: active ? "#d8fffb" : `hsl(${hue} 88% 68%)`,
+        width: w(2.35),
+        opacity: active ? 1 : 0.9,
+        dash: "0",
+        filter: "drop-shadow(0 0 2px rgba(0,32,44,0.45))",
+      };
+    }
+    if (edge.a.startsWith("valve-") && edge.b.startsWith("cell-")) {
+      return {
+        stroke: active ? "#b8e8ff" : "#86d6f5",
+        width: w(2.05),
+        opacity: active ? 0.98 : 0.88,
+        dash: "0",
+        filter: "drop-shadow(0 0 2px rgba(0,36,52,0.4))",
+      };
+    }
+  }
+  if (edge.type === "electrical") {
+    const toManifold = edge.a === "controller" && edge.b === "manifold";
+    return {
+      stroke: active ? "#fceaff" : toManifold ? "#e6b4ff" : "#f0c8ff",
+      width: w(toManifold ? 2.1 : 1.95),
+      opacity: active ? 1 : 0.9,
+      dash: "8 7",
+      filter: "drop-shadow(0 0 2px rgba(36,0,48,0.45))",
+    };
+  }
+  return {
+    stroke: active ? "#d0d8e8" : "#a8b0c4",
+    width: w(1.2),
+    opacity: 0.45,
+    dash: "4 4",
+    filter: "none",
+  };
+}
+
+/** Lower numbers paint first (underneath). */
+function edgePaintPriority(edge: EdgeDef): number {
+  if (edge.type === "electrical") return 20;
+  if (edge.type === "air") {
+    if (edge.a.startsWith("valve-") && edge.b.startsWith("cell-")) return 40;
+    if (edge.a === "manifold") return 60;
+    if (edge.a === "pump") return 80;
+  }
+  return 30;
+}
+
+function avgFaceDepth(
+  corners: ReadonlyArray<[number, number, number]>,
+  yaw: number,
+  pitch: number,
+  zoom: number,
+) {
+  let s = 0;
+  for (const [x, y, z] of corners) s += projectCoords(x, y, z, yaw, pitch, zoom).depth;
+  return s / corners.length;
+}
+
+function worldQuadToSvgPoints(
+  corners: ReadonlyArray<[number, number, number]>,
+  yaw: number,
+  pitch: number,
+  zoom: number,
+) {
+  return corners
+    .map(([x, y, z]) => projectCoords(x, y, z, yaw, pitch, zoom))
+    .map((p) => `${p.x},${p.y}`)
+    .join(" ");
 }
 
 function SystemSchematic() {
-  const [activeId, setActiveId] = useState<string | null>("pump");
-  const [lockedId, setLockedId] = useState<string | null>(null);
-  const [camera, setCamera] = useState(DEFAULT_CAMERA);
-  const [nodes, setNodes] = useState<NodeDef[]>(INITIAL_NODES);
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const [camera, setCamera] = useState(() => ({ ...SYSTEM_SCHEMATIC_CAMERA_DEFAULT }));
+  const nodes = SCHEMATIC_NODES;
   const canvasRef = useRef<HTMLDivElement | null>(null);
+  const cameraRef = useRef(camera);
+  const zoomAnimRef = useRef<ReturnType<typeof animate> | null>(null);
+  cameraRef.current = camera;
   const orbitRef = useRef<{
     startX: number;
     startY: number;
     startYaw: number;
     startPitch: number;
   } | null>(null);
-  const dragRef = useRef<{
-    id: string;
-    startX: number;
-    startY: number;
-    originX: number;
-    originY: number;
-    originZ: number;
-  } | null>(null);
-
   const nodeMap = useMemo(() => Object.fromEntries(nodes.map((n) => [n.id, n])), [nodes]);
   const projectedMap = useMemo(
     () =>
@@ -228,45 +436,116 @@ function SystemSchematic() {
       ) as Record<string, { x: number; y: number; depth: number }>,
     [camera.pitch, camera.yaw, camera.zoom, nodes],
   );
-  const selectedId = activeId ?? lockedId;
-  const selected = selectedId ? nodeMap[selectedId] : null;
-  const selectedProjected = selectedId ? projectedMap[selectedId] : null;
+  const nodesSortedByDepth = useMemo(
+    () => [...nodes].sort((a, b) => projectedMap[a.id]!.depth - projectedMap[b.id]!.depth),
+    [nodes, projectedMap],
+  );
+  const hovered = activeId ? nodeMap[activeId] : null;
+  const hoveredProjected = activeId ? projectedMap[activeId] : null;
+
+  const axisRef = useMemo(() => {
+    const ox = AXIS_ORIGIN.x;
+    const oy = AXIS_ORIGIN.y;
+    const oz = AXIS_ORIGIN.z;
+    const lx = AXIS_EXT.x;
+    const ly = AXIS_EXT.y;
+    const lz = AXIS_EXT.z;
+    const { yaw, pitch, zoom } = camera;
+
+    const xy: [number, number, number][] = [
+      [ox, oy, oz],
+      [ox + lx, oy, oz],
+      [ox + lx, oy + ly, oz],
+      [ox, oy + ly, oz],
+    ];
+    const xz: [number, number, number][] = [
+      [ox, oy, oz],
+      [ox + lx, oy, oz],
+      [ox + lx, oy, oz + lz],
+      [ox, oy, oz + lz],
+    ];
+    const yz: [number, number, number][] = [
+      [ox, oy, oz],
+      [ox, oy + ly, oz],
+      [ox, oy + ly, oz + lz],
+      [ox, oy, oz + lz],
+    ];
+
+    /** Quarter-planes: XY = vertical slice at fixed Z (magenta), XZ = floor (green), YZ = wall slice (cyan). */
+    const faces = [
+      { key: "xy" as const, corners: xy, fill: "rgba(255, 120, 160, 0.11)", stroke: "rgba(255, 150, 185, 0.55)" },
+      { key: "xz" as const, corners: xz, fill: "rgba(90, 255, 170, 0.12)", stroke: "rgba(120, 255, 200, 0.5)" },
+      { key: "yz" as const, corners: yz, fill: "rgba(110, 200, 255, 0.11)", stroke: "rgba(140, 215, 255, 0.52)" },
+    ].sort(
+      (a, b) => avgFaceDepth(a.corners, yaw, pitch, zoom) - avgFaceDepth(b.corners, yaw, pitch, zoom),
+    );
+
+    const xTip = projectCoords(ox + lx, oy, oz, yaw, pitch, zoom);
+    const yTip = projectCoords(ox, oy + ly, oz, yaw, pitch, zoom);
+    const zTip = projectCoords(ox, oy, oz + lz, yaw, pitch, zoom);
+    const o = projectCoords(ox, oy, oz, yaw, pitch, zoom);
+    const nudge = (from: { x: number; y: number }, to: { x: number; y: number }, d: number) => {
+      const dx = to.x - from.x;
+      const dy = to.y - from.y;
+      const len = Math.hypot(dx, dy) || 1;
+      return { x: to.x + (dx / len) * d, y: to.y + (dy / len) * d };
+    };
+
+    return {
+      faces,
+      origin: o,
+      xAxis: worldWaypointsToSvgPath(
+        [
+          [ox, oy, oz],
+          [ox + lx, oy, oz],
+        ],
+        yaw,
+        pitch,
+        zoom,
+      ),
+      yAxis: worldWaypointsToSvgPath(
+        [
+          [ox, oy, oz],
+          [ox, oy + ly, oz],
+        ],
+        yaw,
+        pitch,
+        zoom,
+      ),
+      zAxis: worldWaypointsToSvgPath(
+        [
+          [ox, oy, oz],
+          [ox, oy, oz + lz],
+        ],
+        yaw,
+        pitch,
+        zoom,
+      ),
+      labels: [
+        { text: "+X", ...nudge(o, xTip, 18), fill: "#ff9aa8" },
+        { text: "+Y", ...nudge(o, yTip, 18), fill: "#7dffb3" },
+        { text: "+Z", ...nudge(o, zTip, 18), fill: "#9fd4ff" },
+      ],
+    };
+  }, [camera.pitch, camera.yaw, camera.zoom]);
 
   useEffect(() => {
     const handlePointerMove = (e: PointerEvent) => {
-      const drag = dragRef.current;
-      if (drag) {
-        const worldFactor = 1.25 / camera.zoom;
-        const nextX = drag.originX + (e.clientX - drag.startX) * worldFactor;
-        const nextY = drag.originY + (e.clientY - drag.startY) * worldFactor;
-        setNodes((curr) =>
-          curr.map((n) =>
-            n.id === drag.id
-              ? {
-                  ...n,
-                  x: Math.max(840, Math.min(1080, nextX)),
-                  y: Math.max(130, Math.min(430, nextY)),
-                  z: drag.originZ,
-                }
-              : n,
-          ),
-        );
-        return;
-      }
-
       const orbit = orbitRef.current;
       if (!orbit) return;
 
       const dx = e.clientX - orbit.startX;
       const dy = e.clientY - orbit.startY;
-      const nextYaw = orbit.startYaw + dx * 0.0055;
-      const nextPitch = Math.min(0.68, Math.max(-0.62, orbit.startPitch + dy * 0.0042));
+      const nextYaw = orbit.startYaw + dx * SYSTEM_SCHEMATIC_ORBIT_YAW_SENS;
+      const nextPitch = Math.min(
+        SYSTEM_SCHEMATIC_ORBIT_PITCH_MAX,
+        Math.max(SYSTEM_SCHEMATIC_ORBIT_PITCH_MIN, orbit.startPitch - dy * SYSTEM_SCHEMATIC_ORBIT_PITCH_SENS),
+      );
       setCamera((curr) => ({ ...curr, yaw: nextYaw, pitch: nextPitch }));
     };
 
     const handlePointerUp = () => {
       orbitRef.current = null;
-      dragRef.current = null;
     };
 
     window.addEventListener("pointermove", handlePointerMove);
@@ -275,7 +554,7 @@ function SystemSchematic() {
       window.removeEventListener("pointermove", handlePointerMove);
       window.removeEventListener("pointerup", handlePointerUp);
     };
-  }, [camera.zoom]);
+  }, []);
 
   const startOrbit = (e: React.PointerEvent<HTMLDivElement>) => {
     const target = e.target as HTMLElement;
@@ -288,15 +567,23 @@ function SystemSchematic() {
     };
   };
 
-  const zoomBy = (delta: number) => {
-    setCamera((curr) => ({
-      ...curr,
-      zoom: Math.min(2.2, Math.max(0.55, curr.zoom + delta)),
-    }));
-  };
+  const zoomBy = useCallback((delta: number) => {
+    zoomAnimRef.current?.stop();
+    const from = cameraRef.current.zoom;
+    const to = Math.min(SYSTEM_SCHEMATIC_ZOOM_MAX, Math.max(SYSTEM_SCHEMATIC_ZOOM_MIN, from + delta));
+    zoomAnimRef.current = animate(from, to, {
+      duration: SYSTEM_SCHEMATIC_ZOOM_ANIM_DURATION,
+      ease: SYSTEM_SCHEMATIC_ZOOM_ANIM_EASE,
+      onUpdate: (v) => setCamera((c) => ({ ...c, zoom: v })),
+    });
+  }, []);
+
+  useEffect(() => {
+    return () => zoomAnimRef.current?.stop();
+  }, []);
 
   return (
-    <div className="relative overflow-hidden rounded-[1.8rem] border border-white/10 bg-[#070e1f] px-4 py-5 shadow-[0_40px_80px_rgba(2,6,18,0.55)] md:px-7 md:py-7">
+    <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#050a18] px-5 py-6 shadow-[0_48px_96px_rgba(2,6,18,0.62)] md:px-9 md:py-9">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_14%,rgba(84,143,255,0.18),transparent_46%),radial-gradient(circle_at_85%_15%,rgba(109,224,209,0.14),transparent_42%),radial-gradient(circle_at_75%_80%,rgba(236,116,255,0.10),transparent_42%),linear-gradient(180deg,rgba(255,255,255,0.025),rgba(255,255,255,0)_45%)]" />
       <div className="pointer-events-none absolute inset-0 opacity-45 [background-image:radial-gradient(rgba(255,255,255,0.18)_1px,transparent_1px)] [background-size:24px_24px]" />
 
@@ -310,10 +597,10 @@ function SystemSchematic() {
           </p>
           <p className="mt-6 text-sm leading-relaxed text-white/64">
             A compact pneumatic pipeline: air source, distribution, control, and soft actuation.
-            Hover or click any node to inspect its role in the system.
+            Hover a node to highlight its connections and read its role.
           </p>
           <p className="mt-4 text-[11px] uppercase tracking-[0.2em] text-white/45">
-            Hover/click nodes · drag TPU cells · zoom with +/−
+            Hover nodes · drag the canvas to orbit · zoom +/− or scroll wheel
           </p>
 
           <div className="mt-7 rounded-2xl border border-white/10 bg-black/25 p-4">
@@ -339,10 +626,6 @@ function SystemSchematic() {
                 <span className="h-px w-7 border-t border-dashed border-fuchsia-300/65" />
                 Electrical Signal
               </li>
-              <li className="flex items-center gap-2">
-                <span className="h-px w-7 border-t border-dashed border-amber-300/65" />
-                Frame Mount Link
-              </li>
             </ul>
           </div>
         </aside>
@@ -350,12 +633,16 @@ function SystemSchematic() {
         <div
           ref={canvasRef}
           onPointerDown={startOrbit}
-          className="relative min-h-[560px] cursor-grab rounded-2xl border border-white/8 bg-black/20 active:cursor-grabbing"
+          onWheel={(e) => {
+            e.preventDefault();
+            zoomBy(e.deltaY > 0 ? -SYSTEM_SCHEMATIC_ZOOM_STEP_WHEEL : SYSTEM_SCHEMATIC_ZOOM_STEP_WHEEL);
+          }}
+          className="relative min-h-[680px] cursor-grab rounded-2xl border border-white/10 bg-[#060f22]/90 lg:min-h-[720px] active:cursor-grabbing"
         >
           <div className="absolute right-3 top-3 z-20 flex items-center gap-2 rounded-full border border-white/14 bg-[#081227]/85 px-2.5 py-1.5 text-[11px] text-white/85 backdrop-blur-sm">
             <button
               type="button"
-              onClick={() => zoomBy(-0.1)}
+              onClick={() => zoomBy(-SYSTEM_SCHEMATIC_ZOOM_STEP_BUTTON)}
               className="grid h-6 w-6 place-items-center rounded-full border border-white/20 bg-white/5 transition hover:bg-white/12"
               aria-label="Zoom out"
             >
@@ -364,7 +651,7 @@ function SystemSchematic() {
             <span className="min-w-[44px] text-center tabular-nums">{Math.round(camera.zoom * 100)}%</span>
             <button
               type="button"
-              onClick={() => zoomBy(0.1)}
+              onClick={() => zoomBy(SYSTEM_SCHEMATIC_ZOOM_STEP_BUTTON)}
               className="grid h-6 w-6 place-items-center rounded-full border border-white/20 bg-white/5 transition hover:bg-white/12"
               aria-label="Zoom in"
             >
@@ -372,15 +659,22 @@ function SystemSchematic() {
             </button>
             <button
               type="button"
-              onClick={() => setCamera(DEFAULT_CAMERA)}
+              onClick={() => {
+                zoomAnimRef.current?.stop();
+                setCamera({ ...SYSTEM_SCHEMATIC_CAMERA_DEFAULT });
+              }}
               className="rounded-full border border-white/20 bg-white/5 px-2 py-1 text-[10px] uppercase tracking-[0.12em] transition hover:bg-white/12"
             >
               Reset
             </button>
           </div>
+          <p className="pointer-events-none absolute bottom-3 left-3 z-10 max-w-[16rem] text-[10px] leading-snug text-white/48">
+            <span className="font-semibold uppercase tracking-[0.16em] text-white/60">World axes</span>
+            : right-handed · +Y up · horizontal floor = XZ (constant Y)
+          </p>
           <svg
             viewBox={`0 0 ${GRAPH_W} ${GRAPH_H}`}
-            className="absolute inset-0 h-full w-full"
+            className="pointer-events-none absolute inset-0 z-0 h-full w-full"
             aria-hidden
           >
             <defs>
@@ -388,149 +682,205 @@ function SystemSchematic() {
                 <stop offset="0%" stopColor="#d58bff" stopOpacity="0.9" />
                 <stop offset="100%" stopColor="#d58bff" stopOpacity="0" />
               </radialGradient>
+              <marker
+                id="sys-axis-arrow-x"
+                viewBox="0 0 10 10"
+                refX="8"
+                refY="5"
+                markerWidth="5.5"
+                markerHeight="5.5"
+                orient="auto"
+                markerUnits="strokeWidth"
+              >
+                <path d="M0,0 L10,5 L0,10 z" fill="#ff9aa8" />
+              </marker>
+              <marker
+                id="sys-axis-arrow-y"
+                viewBox="0 0 10 10"
+                refX="8"
+                refY="5"
+                markerWidth="5.5"
+                markerHeight="5.5"
+                orient="auto"
+                markerUnits="strokeWidth"
+              >
+                <path d="M0,0 L10,5 L0,10 z" fill="#7dffb3" />
+              </marker>
+              <marker
+                id="sys-axis-arrow-z"
+                viewBox="0 0 10 10"
+                refX="8"
+                refY="5"
+                markerWidth="5.5"
+                markerHeight="5.5"
+                orient="auto"
+                markerUnits="strokeWidth"
+              >
+                <path d="M0,0 L10,5 L0,10 z" fill="#9fd4ff" />
+              </marker>
             </defs>
-            <polygon
-              points="430,455 860,455 1018,338 580,338"
-              fill="rgba(126, 193, 255, 0.08)"
-              stroke="rgba(126, 193, 255, 0.22)"
-              strokeDasharray="5 8"
-            />
-            <polygon
-              points="850,145 1095,145 1095,455 850,455"
-              fill="rgba(255, 183, 112, 0.06)"
-              stroke="rgba(255, 183, 112, 0.22)"
-              strokeDasharray="5 8"
-            />
-            {EDGES.map((edge) => {
-              const na = projectedMap[edge.a];
-              const nb = projectedMap[edge.b];
-              if (!na || !nb) return null;
-              const active = selectedId === edge.a || selectedId === edge.b;
-              const styleByType = {
-                air: {
-                  stroke: active ? "#9fe7ff" : "#89b7d4",
-                  opacity: active ? 0.82 : 0.35,
-                  width: active ? 1.85 : 1.25,
-                  dash: "0",
-                  amp: active ? 13 : 9,
-                },
-                electrical: {
-                  stroke: active ? "#f1a0ff" : "#ce9be6",
-                  opacity: active ? 0.84 : 0.42,
-                  width: active ? 1.6 : 1.1,
-                  dash: "4 5",
-                  amp: active ? 12 : 8,
-                },
-                mount: {
-                  stroke: active ? "#ffd98e" : "#e0c48a",
-                  opacity: active ? 0.66 : 0.26,
-                  width: active ? 1.45 : 1.0,
-                  dash: "2 6",
-                  amp: active ? 10 : 7,
-                },
-                mesh: {
-                  stroke: active ? "#b9ecff" : "#9cb7d5",
-                  opacity: active ? 0.62 : 0.16,
-                  width: active ? 1.15 : 0.9,
-                  dash: "2 8",
-                  amp: active ? 7 : 5,
-                },
-              } as const;
-              const s = styleByType[edge.type];
-              const d = buildWavyPath(na, nb, s.amp);
-              return (
-                <path
-                  key={`${edge.a}-${edge.b}`}
-                  d={d}
-                  stroke={s.stroke}
-                  strokeOpacity={s.opacity}
-                  strokeWidth={s.width}
-                  strokeDasharray={s.dash}
-                  strokeLinecap="round"
-                  fill="none"
+            <g className="pointer-events-none" aria-hidden>
+              {axisRef.faces.map((f) => (
+                <polygon
+                  key={f.key}
+                  points={worldQuadToSvgPoints(f.corners, camera.yaw, camera.pitch, camera.zoom)}
+                  fill={f.fill}
+                  stroke={f.stroke}
+                  strokeWidth={1.15}
+                  strokeLinejoin="round"
                 />
+              ))}
+            </g>
+            <g className="pointer-events-none" aria-hidden role="img" aria-label="World axes: plus Y up, plus X and plus Z span the floor plane">
+              <path
+                d={axisRef.xAxis}
+                stroke="#ff9aa8"
+                strokeWidth={2.35}
+                strokeLinecap="round"
+                fill="none"
+                opacity={0.92}
+                markerEnd="url(#sys-axis-arrow-x)"
+              />
+              <path
+                d={axisRef.yAxis}
+                stroke="#7dffb3"
+                strokeWidth={2.35}
+                strokeLinecap="round"
+                fill="none"
+                opacity={0.92}
+                markerEnd="url(#sys-axis-arrow-y)"
+              />
+              <path
+                d={axisRef.zAxis}
+                stroke="#9fd4ff"
+                strokeWidth={2.35}
+                strokeLinecap="round"
+                fill="none"
+                opacity={0.92}
+                markerEnd="url(#sys-axis-arrow-z)"
+              />
+              <circle
+                cx={axisRef.origin.x}
+                cy={axisRef.origin.y}
+                r={4.2}
+                fill="#f4f9ff"
+                fillOpacity={0.95}
+                stroke="rgba(6,14,32,0.55)"
+                strokeWidth={1.2}
+              />
+            </g>
+            {[...EDGES]
+              .sort((a, b) => edgePaintPriority(a) - edgePaintPriority(b))
+              .map((edge) => {
+                const active = activeId === edge.a || activeId === edge.b;
+                const line = getEdgeLineStyle(edge, active);
+                const waypoints = getEdgeWorldWaypoints(edge, nodeMap);
+                const d = worldWaypointsToSvgPath(waypoints, camera.yaw, camera.pitch, camera.zoom);
+                return (
+                  <path
+                    key={`${edge.a}-${edge.b}`}
+                    d={d}
+                    stroke={line.stroke}
+                    strokeOpacity={line.opacity}
+                    strokeWidth={line.width}
+                    strokeDasharray={line.dash}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    fill="none"
+                    style={{ filter: line.filter }}
+                  />
+                );
+              })}
+            <g className="pointer-events-none" aria-hidden>
+              {axisRef.labels.map((L) => (
+                <text
+                  key={L.text}
+                  x={L.x}
+                  y={L.y}
+                  fill={L.fill}
+                  fontSize={14}
+                  fontWeight={700}
+                  fontFamily="ui-sans-serif, system-ui, sans-serif"
+                  letterSpacing="0.04em"
+                  stroke="rgba(6,15,34,0.78)"
+                  strokeWidth={3}
+                  paintOrder="stroke"
+                >
+                  {L.text}
+                </text>
+              ))}
+            </g>
+            {nodesSortedByDepth.map((n) => {
+              const p = projectedMap[n.id]!;
+              const floor = isXZFloorSchematicNode(n);
+              const chip = SYSTEM_SCHEMATIC_NODE_CHIP_VIEWBOX;
+              const baseR = (chip / 2) * (floor ? 1.06 : 0.9);
+              const isActive = activeId === n.id;
+              return (
+                <g
+                  key={n.id}
+                  data-node-btn="true"
+                  transform={`translate(${p.x},${p.y})`}
+                  className="pointer-events-auto outline-none"
+                  onMouseEnter={() => setActiveId(n.id)}
+                  onMouseLeave={() => setActiveId(null)}
+                  style={{ cursor: "pointer" }}
+                  aria-label={n.label}
+                >
+                  <motion.circle
+                    cx={0}
+                    cy={0}
+                    r={baseR * 1.65}
+                    fill="url(#pulseGlow)"
+                    pointerEvents="none"
+                    animate={{ opacity: isActive ? 0.62 : 0 }}
+                    transition={{ duration: 0.24 }}
+                  />
+                  <circle
+                    cx={0}
+                    cy={0}
+                    r={baseR}
+                    fill="rgba(10,16,30,0.94)"
+                    stroke={n.color}
+                    strokeOpacity={isActive ? 1 : 0.72}
+                    strokeWidth={isActive ? 2.45 : 1.35}
+                    filter={isActive ? `drop-shadow(0 0 8px ${n.color}77)` : undefined}
+                  />
+                  <text
+                    x={0}
+                    y={0}
+                    textAnchor="middle"
+                    dominantBaseline="central"
+                    fill={n.color}
+                    fillOpacity={isActive ? 1 : 0.9}
+                    fontSize={baseR * 1.02}
+                    fontFamily="ui-sans-serif,system-ui,sans-serif"
+                    pointerEvents="none"
+                  >
+                    {n.icon}
+                  </text>
+                </g>
               );
             })}
-            {nodes.map((n) => (
-              <circle
-                key={`point-${n.id}`}
-                cx={projectedMap[n.id].x}
-                cy={projectedMap[n.id].y}
-                r="2.4"
-                fill="#e7f1ff"
-                fillOpacity="0.85"
-              />
-            ))}
           </svg>
 
-          {nodes.map((n) => {
-            const isActive = selectedId === n.id;
-            const isCell = n.id.startsWith("cell-");
-            return (
-              <button
-                key={n.id}
-                type="button"
-                data-node-btn="true"
-                onMouseEnter={() => setActiveId(n.id)}
-                onMouseLeave={() => setActiveId(null)}
-                onClick={() => setLockedId((curr) => (curr === n.id ? null : n.id))}
-                onPointerDown={(e) => {
-                  if (!isCell) return;
-                  e.stopPropagation();
-                  dragRef.current = {
-                    id: n.id,
-                    startX: e.clientX,
-                    startY: e.clientY,
-                    originX: n.x,
-                    originY: n.y,
-                    originZ: n.z,
-                  };
-                }}
-                className="absolute -translate-x-1/2 -translate-y-1/2 text-left"
-                style={{
-                  left: `${(projectedMap[n.id].x / GRAPH_W) * 100}%`,
-                  top: `${(projectedMap[n.id].y / GRAPH_H) * 100}%`,
-                  cursor: isCell ? "grab" : "pointer",
-                }}
-                aria-label={n.label}
-              >
-                <motion.span
-                  className="absolute left-1/2 top-1/2 h-14 w-14 -translate-x-1/2 -translate-y-1/2 rounded-full"
-                  style={{ background: "radial-gradient(circle, rgba(184,132,255,0.22), transparent 64%)" }}
-                  animate={{ opacity: isActive ? 1 : 0 }}
-                />
-                <span
-                  className="relative grid h-9 w-9 place-items-center rounded-full border text-[13px] transition-all duration-300"
-                  style={{
-                    borderColor: isActive ? n.color : "rgba(255,255,255,0.22)",
-                    color: isActive ? n.color : "rgba(238,244,255,0.92)",
-                    background: isActive ? "rgba(255,255,255,0.09)" : "rgba(255,255,255,0.03)",
-                    boxShadow: isActive ? `0 0 16px ${n.color}55` : "none",
-                  }}
-                >
-                  {n.icon}
-                </span>
-              </button>
-            );
-          })}
-
-          {selected && selectedProjected ? (
+          {hovered && hoveredProjected ? (
             <motion.div
-              key={selected.id}
+              key={hovered.id}
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.22 }}
-              className="pointer-events-none absolute max-w-[230px] rounded-xl border border-white/15 bg-[#0a1429]/90 px-3 py-2.5 text-white/90 shadow-[0_14px_40px_rgba(0,0,0,0.45)] backdrop-blur-md"
+              className="pointer-events-none absolute z-[4] max-w-[230px] rounded-xl border border-white/15 bg-[#0a1429]/90 px-3 py-2.5 text-white/90 shadow-[0_14px_40px_rgba(0,0,0,0.45)] backdrop-blur-md"
               style={{
-                left: `${Math.min(82, Math.max(18, (selectedProjected.x / GRAPH_W) * 100))}%`,
-                top: `${Math.max(14, (selectedProjected.y / GRAPH_H) * 100 - 10)}%`,
+                left: `${Math.min(82, Math.max(18, (hoveredProjected.x / GRAPH_W) * 100))}%`,
+                top: `${Math.max(14, (hoveredProjected.y / GRAPH_H) * 100 - 10)}%`,
                 transform: "translate(-50%, -100%)",
               }}
             >
-              <p className="text-[10px] font-semibold uppercase tracking-[0.18em]" style={{ color: selected.color }}>
-                {selected.label}
+              <p className="text-[10px] font-semibold uppercase tracking-[0.18em]" style={{ color: hovered.color }}>
+                {hovered.label}
               </p>
-              <p className="mt-1.5 text-xs leading-relaxed text-white/76">{selected.description}</p>
+              <p className="mt-1.5 text-xs leading-relaxed text-white/76">{hovered.description}</p>
             </motion.div>
           ) : null}
         </div>
@@ -545,7 +895,7 @@ export function SystemSection() {
       id="system"
       className="relative scroll-mt-24 border-t border-[var(--hairline)] bg-blueprint py-24 md:py-32"
     >
-      <div className="relative z-10 mx-auto max-w-[1100px] px-5 md:px-10">
+      <div className="relative z-10 mx-auto max-w-[1240px] px-5 md:px-10">
         <SectionLabel number="05" text="System" textFirst />
         <header className="text-center">
           <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--ink-muted)]">
@@ -611,7 +961,7 @@ export function SystemSection() {
           </div>
 
           <p className="mt-3 text-center text-xs text-[var(--ink-muted)]">
-            Click to pin node details. Airflow, control, and structure are visualized as one network.
+            Hover a node for details. Airflow, control, and structure are visualized as one network.
           </p>
         </motion.div>
 
