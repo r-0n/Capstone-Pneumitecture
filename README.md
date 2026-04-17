@@ -1,6 +1,15 @@
 # Pneumitecture
 
-Next.js capstone site — soft pneumatic installation, design process, and media.
+**Capstone project 2026 · New York University Abu Dhabi**
+
+A long-scroll Next.js site for a responsive pneumatic installation: hero media, design process, interactive system schematic, prototyping timeline, behavior videos, pavilion vision, and a media archive.
+
+## Stack
+
+- **Next.js** 16 (App Router) with **static export** (`output: "export"`)
+- **React** 19, **TypeScript**
+- **Tailwind CSS** v4, **Framer Motion**
+- Optional **Three.js** / R3F where 3D is used
 
 ## Develop
 
@@ -11,26 +20,63 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
+## Scripts
+
+| Command               | Purpose                                      |
+| --------------------- | -------------------------------------------- |
+| `npm run dev`         | Local development server                     |
+| `npm run build`       | Production build → static output in `out/`   |
+| `npm run export:serve`| Serve `out/` after a build (smoke test)      |
+| `npm run lint`        | ESLint                                       |
+
+If `next build` fails with a stale type error after large refactors, delete `.next` and run `npm run build` again.
+
+## Site structure & navigation
+
+Section order and labels are centralized in:
+
+- [`src/config/navigation.ts`](src/config/navigation.ts) — `SITE_SECTIONS` (ids, labels, mobile `shortLabel`s). Used by the top nav, fullscreen menu overlay, and related UI.
+
+Smooth in-page jumps use:
+
+- [`src/lib/scrollToSection.ts`](src/lib/scrollToSection.ts) — `scrollIntoView` with `behavior: "smooth"` (respects reduced motion).
+
+The right-rail section dots are in:
+
+- [`src/components/site/ScrollProgress.tsx`](src/components/site/ScrollProgress.tsx)
+
+## Notable features (where to edit)
+
+| Area | Main files |
+| ---- | ---------- |
+| **System schematic** (nodes, camera, zoom, layout) | [`src/config/systemSchematicControls.ts`](src/config/systemSchematicControls.ts), [`src/components/sections/SystemSection.tsx`](src/components/sections/SystemSection.tsx) |
+| **Behavior** (dual videos, footer-style block) | [`src/components/sections/BehaviorSection.tsx`](src/components/sections/BehaviorSection.tsx) |
+| **Media / archive** (filters, weekly blog links toggle) | [`src/components/pneumitecture/MediaArchive.jsx`](src/components/pneumitecture/MediaArchive.jsx) |
+| **Fullscreen menu** | [`src/components/pneumitecture/NavOverlay.jsx`](src/components/pneumitecture/NavOverlay.jsx) |
+| **Global styles** | [`src/app/globals.css`](src/app/globals.css) |
+
+Long-scroll composition notes live in [`src/config/siteLayout.ts`](src/config/siteLayout.ts).
+
 ## GitHub Pages (static export)
 
-This app is configured for **`output: 'export'`** so it can be hosted on **GitHub Pages** (no Node server). Every push to **`main`** runs [`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml) and redeploys the `out/` folder.
+The app is built for **static hosting** (no Node server). Pushes to **`main`** can deploy via [`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml) to publish the `out/` folder.
 
 ### One-time GitHub setup
 
 1. Push this repo to GitHub.
 2. **Settings → Pages → Build and deployment**: set **Source** to **GitHub Actions** (not “Deploy from a branch”).
-3. Merge or push to **`main`** and open the **Actions** tab; when the workflow finishes, follow the **Pages** URL (typically `https://<user>.github.io/<repo>/`).
+3. Push to **`main`**, open **Actions**, then use the **Pages** URL (typically `https://<user>.github.io/<repo>/`).
 
-The workflow sets **`BASE_PATH`** to `/<repository-name>` automatically so assets and routing match a **project site** URL.
+The workflow sets **`BASE_PATH`** to `/<repository-name>` so assets match a **project site** URL.
 
 ### Optional: feature section video on Pages
 
-Static hosting has **no** `/api` routes. To show the looping video (not only the poster image), add a repository **Actions secret**:
+Static hosting has no `/api` routes. For a looping feature video, add an Actions secret:
 
-- Name: `NEXT_PUBLIC_FEATURE_VIDEO_SRC`
-- Value: a **direct MP4 URL** (for example from [Pexels](https://www.pexels.com/) download / file link, or a file you commit under `public/` and reference as `/your-repo/videos/clip.mp4` with the same path rules as `basePath`).
+- **Name:** `NEXT_PUBLIC_FEATURE_VIDEO_SRC`
+- **Value:** a direct MP4 URL, or a path under `public/` that includes the repo prefix on Pages (see existing docs in [`.env.example`](.env.example) if present).
 
-Locally, you can set the same variable in `.env.local` (see [`.env.example`](.env.example)).
+Locally, mirror this in `.env.local`.
 
 ### Preview the static build locally
 
@@ -38,27 +84,13 @@ Locally, you can set the same variable in `.env.local` (see [`.env.example`](.en
 $env:BASE_PATH="/Capstone-Pneumitecture"; npm run build; npm run export:serve
 ```
 
-Use your real repo name in `BASE_PATH` (must match the segment in `https://user.github.io/repo/`). Then open the URL `serve` prints (usually `http://localhost:3000`).
+Use your real repo name in `BASE_PATH`. Open the URL `serve` prints (often `http://localhost:3000`).
 
 ### Custom domain at the site root
 
-If the site is served at `https://example.com/` with **no** `/repo` prefix, you must build with **no** `basePath` and point Pages at your domain. Adjust the workflow’s **Set BASE_PATH** step (or set `BASE_PATH` empty in the build step) and follow GitHub’s custom domain DNS instructions under **Settings → Pages**.
+If the site is at `https://example.com/` with **no** `/repo` prefix, build with **no** `basePath`, then configure DNS and GitHub Pages custom domain per GitHub’s docs.
 
-## Scripts
-
-| Command            | Purpose                                      |
-| ------------------ | -------------------------------------------- |
-| `npm run dev`      | Local development                            |
-| `npm run build`    | Production static export → `out/`            |
-| `npm run export:serve` | Serve `out/` after a build (smoke test) |
-
-If `next build` fails with a stale type error after removing routes or changing `next.config`, delete the `.next` folder and run `npm run build` again.
-
-## Continuous updates
-
-Pushing to **`main`** triggers the Pages workflow (with **concurrency** so overlapping runs cancel instead of fighting). Iteration flow: edit locally → `npm run dev` → commit → push to `main` → wait for Actions → refresh the live site.
-
-## Learn More
+## Learn more
 
 - [Next.js static export](https://nextjs.org/docs/app/building-your-application/deploying/static-exports)
 - [GitHub Pages](https://docs.github.com/pages)
