@@ -49,6 +49,10 @@ jobs:
           NEXT_PUBLIC_FEATURE_VIDEO_SRC: ${{ secrets.NEXT_PUBLIC_FEATURE_VIDEO_SRC }}
         run: npm run build
 
+      # GitHub Pages runs Jekyll on uploads unless this file exists (can break assets / routing).
+      - name: Disable Jekyll for Pages
+        run: touch out/.nojekyll
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:

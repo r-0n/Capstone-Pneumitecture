@@ -69,6 +69,16 @@ The app is built for **static hosting** (no Node server). Pushes to **`main`** c
 
 The workflow sets **`BASE_PATH`** to `/<repository-name>` so assets match a **project site** URL.
 
+### If the live site looks like this README (or a file list)
+
+That almost always means **GitHub Pages is not serving the Next.js build** from Actions.
+
+1. **Settings → Pages → Build and deployment → Source** must be **GitHub Actions**, not **Deploy from a branch**.  
+   If Source is a branch (e.g. `main` / `/ (root)`), GitHub serves the **repository tree** (markdown, folders, etc.), not the contents of `out/` from the workflow.
+2. Open the site using the **Pages URL** from **Settings → Pages** (or the `page_url` from the latest successful **Deploy to GitHub Pages** run), e.g. `https://<username>.github.io/<RepositoryName>/` — **not** the main GitHub **Code** tab for the repo (that tab shows the README by design).
+3. Confirm the **Deploy to GitHub Pages** workflow on `main` completed with a green check; a failed build leaves the previous deployment (or nothing useful) in place.
+4. This repo ships **`public/.nojekyll`** and the workflow runs **`touch out/.nojekyll`** so **Jekyll** on Pages does not rewrite or drop static assets.
+
 ### Optional: feature section video on Pages
 
 Static hosting has no `/api` routes. For a looping feature video, add an Actions secret:
