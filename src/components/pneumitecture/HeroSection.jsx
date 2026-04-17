@@ -37,6 +37,24 @@ function resolveYoutubeId() {
 const YOUTUBE_ID = resolveYoutubeId();
 const YOUTUBE_WATCH_URL = `https://www.youtube.com/watch?v=${YOUTUBE_ID}`;
 
+/** Build embed URL when the iframe actually mounts (video phase) — avoids stall timer firing while intro has no iframe. */
+function buildHeroEmbedSrc() {
+  const origin = typeof window !== 'undefined' ? window.location.origin : '';
+  const q = new URLSearchParams({
+    autoplay: '1',
+    mute: '1',
+    playsinline: '1',
+    controls: '0',
+    modestbranding: '1',
+    rel: '0',
+    loop: '1',
+    playlist: YOUTUBE_ID,
+    enablejsapi: '1',
+  });
+  if (origin) q.set('origin', origin);
+  return `https://www.youtube.com/embed/${YOUTUBE_ID}?${q.toString()}`;
+}
+
 function getScrollY() {
   if (typeof window === 'undefined') return 0;
   return (
@@ -84,7 +102,9 @@ function ytResetDrive(lastRef) {
 
 const SCROLL_TOP_THRESHOLD = 24;
 const FADE_SCROLL_VH = 1.35;
-const IFRAME_STALL_MS = 14000;
+/** Only starts after iframe exists (video phase). Touch / slow networks get longer. */
+const IFRAME_STALL_MS_DESKTOP = 28000;
+const IFRAME_STALL_MS_TOUCH = 60000;
 /** Past ~one viewport = user left hero for the next section */
 const PAST_HERO_Y_RATIO = 0.92;
 /** Back at top of document — show intro again */
@@ -127,24 +147,11 @@ export default function HeroSection() {
     return () => mq.removeEventListener('change', apply);
   }, []);
 
+  /** Load embed only in video phase (after Play tap) so `onLoad` can fire and mobile autoplay policies see a recent gesture. */
   useEffect(() => {
-    queueMicrotask(() => {
-      const origin = typeof window !== 'undefined' ? window.location.origin : '';
-      const q = new URLSearchParams({
-        autoplay: '1',
-        mute: '1',
-        playsinline: '1',
-        controls: '0',
-        modestbranding: '1',
-        rel: '0',
-        loop: '1',
-        playlist: YOUTUBE_ID,
-        enablejsapi: '1',
-      });
-      if (origin) q.set('origin', origin);
-      setYtEmbedSrc(`https://www.youtube.com/embed/${YOUTUBE_ID}?${q.toString()}`);
-    });
-  }, []);
+    if (heroPhase !== 'video') return;
+    queueMicrotask(() => setYtEmbedSrc(buildHeroEmbedSrc()));
+  }, [heroPhase]);
 
   const resetHeroToIntro = useCallback(() => {
     const iframe = ytIframeRef.current;
@@ -157,6 +164,9 @@ export default function HeroSection() {
     setUserAudible(false);
     ytSuspendedRef.current = false;
     setYtSuspended(false);
+    ytShellOkRef.current = false;
+    setYtUnavailable(false);
+    setYtEmbedSrc('');
     setIntroAnimKey((k) => k + 1);
     setYtInstanceKey((k) => k + 1);
     setHeroPhase('intro');
@@ -251,20 +261,50 @@ export default function HeroSection() {
   }, [heroPhase, titleExitMs]);
 
   useEffect(() => {
-    if (!ytEmbedSrc) return;
+    if (heroPhase !== 'video' || !ytEmbedSrc) return;
     ytShellOkRef.current = false;
+    const coarse =
+      typeof window !== 'undefined' && window.matchMedia?.('(pointer: coarse)').matches;
+    const stallMs = coarse ? IFRAME_STALL_MS_TOUCH : IFRAME_STALL_MS_DESKTOP;
     const timer = window.setTimeout(() => {
       if (!ytShellOkRef.current) setYtUnavailable(true);
-    }, IFRAME_STALL_MS);
+    }, stallMs);
     return () => window.clearTimeout(timer);
-  }, [ytEmbedSrc]);
+  }, [heroPhase, ytEmbedSrc]);
+
+  /** iOS / WebKit sometimes skip iframe `onLoad`; YouTube posts JSON `event` strings when the player is alive. */
+  useEffect(() => {
+    if (heroPhase !== 'video') return;
+    const onMsg = (e) => {
+      if (e.origin !== YT_ORIGIN) return;
+      if (typeof e.data !== 'string' || !e.data.includes('"event"')) return;
+      try {
+        const data = JSON.parse(e.data);
+        if (data && typeof data.event === 'string') {
+          ytShellOkRef.current = true;
+          setYtUnavailable(false);
+        }
+      } catch {
+        /* ignore */
+      }
+    };
+    window.addEventListener('message', onMsg);
+    return () => window.removeEventListener('message', onMsg);
+  }, [heroPhase]);
 
   const onYtIframeLoad = useCallback(() => {
     ytShellOkRef.current = true;
     setYtUnavailable(false);
+    const iframe = ytIframeRef.current;
+    if (!iframe) return;
+    const kickPlayback = () => {
+      ytPostCommand(iframe, 'mute');
+      ytPostCommand(iframe, 'playVideo');
+    };
+    kickPlayback();
+    window.setTimeout(kickPlayback, 350);
+    window.setTimeout(kickPlayback, 1100);
     if (userAudibleRef.current) {
-      const iframe = ytIframeRef.current;
-      if (!iframe) return;
       const fadeEnd = window.innerHeight * FADE_SCROLL_VH;
       const p = fadeEnd > 0 ? Math.min(1, Math.max(0, getScrollY() / fadeEnd)) : 0;
       const vol = Math.max(
@@ -365,7 +405,7 @@ export default function HeroSection() {
               className="pointer-events-none absolute left-1/2 top-1/2 block h-[56.25vw] min-h-full w-[177.78vh] min-w-full -translate-x-1/2 -translate-y-1/2 border-0"
               src={ytEmbedSrc}
               onLoad={onYtIframeLoad}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
               allowFullScreen
               referrerPolicy="strict-origin-when-cross-origin"
             />
@@ -400,22 +440,7 @@ export default function HeroSection() {
                   ytShellOkRef.current = false;
                   setYtEmbedSrc('');
                   window.requestAnimationFrame(() => {
-                    const origin = window.location.origin;
-                    const q = new URLSearchParams({
-                      autoplay: '1',
-                      mute: '1',
-                      playsinline: '1',
-                      controls: '0',
-                      modestbranding: '1',
-                      rel: '0',
-                      loop: '1',
-                      playlist: YOUTUBE_ID,
-                      enablejsapi: '1',
-                      origin,
-                    });
-                    setYtEmbedSrc(
-                      `https://www.youtube.com/embed/${YOUTUBE_ID}?${q.toString()}`,
-                    );
+                    setYtEmbedSrc(buildHeroEmbedSrc());
                   });
                 }}
                 className="rounded-full border border-white/30 bg-black/40 px-5 py-2.5 text-xs font-medium uppercase tracking-[0.12em] text-bone transition hover:bg-black/60"

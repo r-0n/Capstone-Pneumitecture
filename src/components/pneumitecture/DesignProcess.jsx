@@ -17,19 +17,19 @@ const mountingImg = (n) =>
   publicAssetPath(`/images/design-process/mounting-rods/${String(n).padStart(2, "0")}.png`);
 
 const MOUNTING_TEST_VIDEO_IFRAME_A =
-  "https://www.youtube.com/embed/9Bi_o7kGaBA?rel=0&modestbranding=1";
+  "https://www.youtube.com/embed/9Bi_o7kGaBA?rel=0&modestbranding=1&playsinline=1&mute=1";
 const MOUNTING_TEST_VIDEO_UNIT_CELL =
-  "https://www.youtube.com/embed/oivFJ6d2UN4?rel=0&modestbranding=1";
+  "https://www.youtube.com/embed/oivFJ6d2UN4?rel=0&modestbranding=1&playsinline=1&mute=1";
 const ARDUINO_TEST_VIDEO_IFRAME_BEFORE_A =
-  "https://www.youtube.com/embed/wMBQTvkn0lQ?rel=0&modestbranding=1";
+  "https://www.youtube.com/embed/wMBQTvkn0lQ?rel=0&modestbranding=1&playsinline=1&mute=1";
 const ARDUINO_TEST_VIDEO_IFRAME_A =
-  "https://www.youtube.com/embed/kY4dTFvlMXI?rel=0&modestbranding=1";
+  "https://www.youtube.com/embed/kY4dTFvlMXI?rel=0&modestbranding=1&playsinline=1&mute=1";
 const ARDUINO_TEST_VIDEO_IFRAME_C =
-  "https://www.youtube.com/embed/lR4QNp3BsmE?rel=0&modestbranding=1";
+  "https://www.youtube.com/embed/lR4QNp3BsmE?rel=0&modestbranding=1&playsinline=1&mute=1";
 const RHINO_GH_VIDEO_IFRAME_A =
-  "https://www.youtube.com/embed/icCzrSQQW_o?rel=0&modestbranding=1";
+  "https://www.youtube.com/embed/icCzrSQQW_o?rel=0&modestbranding=1&playsinline=1&mute=1";
 const RHINO_GH_VIDEO_IFRAME_B =
-  "https://www.youtube.com/embed/A9ya9y9IIzo?rel=0&modestbranding=1";
+  "https://www.youtube.com/embed/A9ya9y9IIzo?rel=0&modestbranding=1&playsinline=1&mute=1";
 const RHINO_GH_VIDEO_IFRAME_C =
   "https://drive.google.com/file/d/1WeAxBJEg7rBfVf8Zh_8egIQhuaDbYUiG/preview";
 
