@@ -630,6 +630,8 @@ function SystemSchematic() {
   }, []);
 
   const startOrbit = (e: React.PointerEvent<HTMLDivElement>) => {
+    /** Touch drags here were stealing vertical scroll; orbit stays mouse/pen-only. */
+    if (e.pointerType === "touch") return;
     const target = e.target as HTMLElement;
     if (target.closest("[data-node-btn='true']")) return;
     orbitRef.current = {
@@ -718,7 +720,7 @@ function SystemSchematic() {
           ref={canvasRef}
           onPointerDown={startOrbit}
           onWheel={handleCanvasWheel}
-          className="relative min-h-[min(52dvh,26rem)] cursor-grab rounded-xl border border-white/10 bg-[#060f22]/90 sm:min-h-[32rem] sm:rounded-2xl md:min-h-[600px] lg:min-h-[720px] active:cursor-grabbing"
+          className="relative min-h-[min(52dvh,26rem)] touch-pan-y cursor-grab rounded-xl border border-white/10 bg-[#060f22]/90 sm:min-h-[32rem] sm:rounded-2xl md:min-h-[600px] lg:min-h-[720px] active:cursor-grabbing"
         >
           <div className="absolute right-3 top-3 z-20 flex items-center gap-2 rounded-full border border-white/14 bg-[#081227]/85 px-2.5 py-1.5 text-[11px] text-white/85 backdrop-blur-sm">
             <button

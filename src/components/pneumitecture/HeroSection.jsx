@@ -37,12 +37,15 @@ function resolveYoutubeId() {
 const YOUTUBE_ID = resolveYoutubeId();
 const YOUTUBE_WATCH_URL = `https://www.youtube.com/watch?v=${YOUTUBE_ID}`;
 
-/** Build embed URL when the iframe actually mounts (video phase) — avoids stall timer firing while intro has no iframe. */
-function buildHeroEmbedSrc() {
+/**
+ * Build embed URL when the iframe mounts (video phase).
+ * @param {boolean} startWithSound — from Play tap: `mute=0` so audio can start with the user gesture chain; otherwise `mute=1` for autoplay-only embeds.
+ */
+function buildHeroEmbedSrc(startWithSound = false) {
   const origin = typeof window !== 'undefined' ? window.location.origin : '';
   const q = new URLSearchParams({
     autoplay: '1',
-    mute: '1',
+    mute: startWithSound ? '0' : '1',
     playsinline: '1',
     controls: '0',
     modestbranding: '1',
@@ -147,10 +150,10 @@ export default function HeroSection() {
     return () => mq.removeEventListener('change', apply);
   }, []);
 
-  /** Load embed only in video phase (after Play tap) so `onLoad` can fire and mobile autoplay policies see a recent gesture. */
+  /** Load embed in video phase; `userAudibleRef` is set synchronously on Play before this runs. */
   useEffect(() => {
     if (heroPhase !== 'video') return;
-    queueMicrotask(() => setYtEmbedSrc(buildHeroEmbedSrc()));
+    queueMicrotask(() => setYtEmbedSrc(buildHeroEmbedSrc(userAudibleRef.current)));
   }, [heroPhase]);
 
   const resetHeroToIntro = useCallback(() => {
@@ -248,7 +251,12 @@ export default function HeroSection() {
     };
   }, [applyHeroScroll]);
 
-  const titleExitMs = reduceMotion ? 500 : 1200;
+  /** Touch: shorter title exit so the iframe mounts closer to the Play tap (helps unmute policies). */
+  const titleExitMs = reduceMotion
+    ? 500
+    : typeof window !== 'undefined' && window.matchMedia?.('(pointer: coarse)').matches
+      ? 420
+      : 1200;
 
   useEffect(() => {
     if (heroPhase !== 'exit') return;
@@ -297,14 +305,10 @@ export default function HeroSection() {
     setYtUnavailable(false);
     const iframe = ytIframeRef.current;
     if (!iframe) return;
-    const kickPlayback = () => {
-      ytPostCommand(iframe, 'mute');
-      ytPostCommand(iframe, 'playVideo');
-    };
-    kickPlayback();
-    window.setTimeout(kickPlayback, 350);
-    window.setTimeout(kickPlayback, 1100);
-    if (userAudibleRef.current) {
+
+    /** Must not re-`mute` when the user chose Play with sound — old `kickPlayback` timers did that. */
+    const syncPlayback = () => {
+      const audible = userAudibleRef.current;
       const fadeEnd = window.innerHeight * FADE_SCROLL_VH;
       const p = fadeEnd > 0 ? Math.min(1, Math.max(0, getScrollY() / fadeEnd)) : 0;
       const vol = Math.max(
@@ -312,12 +316,29 @@ export default function HeroSection() {
         Math.min(MAX_AUDIBLE_VOLUME, Math.round((1 - p) * MAX_AUDIBLE_VOLUME)),
       );
       ytResetDrive(lastYtDriveRef);
-      ytApplyDrive(iframe, lastYtDriveRef, {
-        volume: vol,
-        muted: false,
-        paused: p > 0.98,
-      });
-    }
+      if (audible) {
+        /** Start playback before unmute — some WebKit builds ignore unmute until `playVideo` has run. */
+        ytPostCommand(iframe, 'playVideo');
+        ytPostCommand(iframe, 'unMute');
+        ytPostCommand(iframe, 'setVolume', [vol]);
+        if (p > 0.98) ytPostCommand(iframe, 'pauseVideo');
+        lastYtDriveRef.current = {
+          volume: vol,
+          muted: false,
+          paused: p > 0.98,
+        };
+      } else {
+        ytApplyDrive(iframe, lastYtDriveRef, {
+          volume: 0,
+          muted: true,
+          paused: p > 0.98,
+        });
+      }
+    };
+
+    syncPlayback();
+    window.setTimeout(syncPlayback, 350);
+    window.setTimeout(syncPlayback, 1100);
   }, []);
 
   const startPlaySequence = useCallback(() => {
@@ -375,7 +396,7 @@ export default function HeroSection() {
       <div className="absolute inset-0 z-0 min-h-dvh">
         <div
           aria-hidden
-          className="absolute inset-0 min-h-dvh bg-cover bg-center transition-[opacity,filter] duration-300 ease-out"
+          className="pointer-events-none absolute inset-0 min-h-dvh bg-cover bg-center transition-[opacity,filter] duration-300 ease-out"
           style={{
             backgroundImage: `url(${HERO_POSTER})`,
             opacity:
@@ -392,7 +413,7 @@ export default function HeroSection() {
 
         {heroPhase === 'video' && ytEmbedSrc && !ytUnavailable && !ytSuspended && (
           <div
-            className="absolute inset-0 min-h-dvh overflow-hidden transition-[opacity,filter] duration-300 ease-out"
+            className="pointer-events-none absolute inset-0 min-h-dvh overflow-hidden transition-[opacity,filter] duration-300 ease-out"
             style={{
               opacity: mediaOpacity,
               filter: `brightness(${mediaDim})`,
@@ -419,34 +440,36 @@ export default function HeroSection() {
         )}
 
         {heroPhase === 'video' && ytUnavailable && (
-          <div className="absolute inset-0 z-[18] flex min-h-dvh flex-col items-center justify-center gap-5 bg-black/60 px-6 text-center backdrop-blur-[2px]">
-            <p className="max-w-md font-sans text-sm leading-relaxed text-bone/95">
-              The YouTube player did not load in time (network, embed restrictions, or ad blockers).
-              Open the video on YouTube, or try again.
-            </p>
-            <div className="flex flex-wrap items-center justify-center gap-3">
-              <a
-                href={YOUTUBE_WATCH_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded-full border border-white/35 bg-white/12 px-5 py-2.5 text-xs font-medium uppercase tracking-[0.12em] text-bone transition hover:bg-white/22"
-              >
-                Watch on YouTube
-              </a>
-              <button
-                type="button"
-                onClick={() => {
-                  setYtUnavailable(false);
-                  ytShellOkRef.current = false;
-                  setYtEmbedSrc('');
-                  window.requestAnimationFrame(() => {
-                    setYtEmbedSrc(buildHeroEmbedSrc());
-                  });
-                }}
-                className="rounded-full border border-white/30 bg-black/40 px-5 py-2.5 text-xs font-medium uppercase tracking-[0.12em] text-bone transition hover:bg-black/60"
-              >
-                Try again
-              </button>
+          <div className="pointer-events-none absolute inset-0 z-[18] flex min-h-dvh flex-col items-center justify-center gap-5 bg-black/60 px-6 text-center backdrop-blur-[2px]">
+            <div className="pointer-events-auto flex max-w-md flex-col items-center gap-5 text-center">
+              <p className="font-sans text-sm leading-relaxed text-bone/95">
+                The YouTube player did not load in time (network, embed restrictions, or ad blockers).
+                Open the video on YouTube, or try again.
+              </p>
+              <div className="flex flex-wrap items-center justify-center gap-3">
+                <a
+                  href={YOUTUBE_WATCH_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rounded-full border border-white/35 bg-white/12 px-5 py-2.5 text-xs font-medium uppercase tracking-[0.12em] text-bone transition hover:bg-white/22"
+                >
+                  Watch on YouTube
+                </a>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setYtUnavailable(false);
+                    ytShellOkRef.current = false;
+                    setYtEmbedSrc('');
+                    window.requestAnimationFrame(() => {
+                      setYtEmbedSrc(buildHeroEmbedSrc(userAudibleRef.current));
+                    });
+                  }}
+                  className="rounded-full border border-white/30 bg-black/40 px-5 py-2.5 text-xs font-medium uppercase tracking-[0.12em] text-bone transition hover:bg-black/60"
+                >
+                  Try again
+                </button>
+              </div>
             </div>
           </div>
         )}
