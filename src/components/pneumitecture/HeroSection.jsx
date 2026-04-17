@@ -38,14 +38,33 @@ const YOUTUBE_ID = resolveYoutubeId();
 const YOUTUBE_WATCH_URL = `https://www.youtube.com/watch?v=${YOUTUBE_ID}`;
 
 /**
+ * Touch / iOS WebKit only reliably allows **muted** inline autoplay; `mute=0` often yields a paused player.
+ */
+function heroAutoplayNeedsMutedEmbed() {
+  if (typeof window === 'undefined') return false;
+  try {
+    if (window.matchMedia?.('(pointer: coarse)').matches) return true;
+  } catch {
+    /* ignore */
+  }
+  const ua = typeof navigator !== 'undefined' ? navigator.userAgent || '' : '';
+  if (/iP(ad|hone|od)/i.test(ua)) return true;
+  if (typeof navigator !== 'undefined' && navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) {
+    return true;
+  }
+  return false;
+}
+
+/**
  * Build embed URL when the iframe mounts (video phase).
- * @param {boolean} startWithSound — from Play tap: `mute=0` so audio can start with the user gesture chain; otherwise `mute=1` for autoplay-only embeds.
+ * @param {boolean} startWithSound — desktop: `mute=0` when from Play; touch/iOS always `mute=1` for autoplay.
  */
 function buildHeroEmbedSrc(startWithSound = false) {
   const origin = typeof window !== 'undefined' ? window.location.origin : '';
+  const forceMute = heroAutoplayNeedsMutedEmbed();
   const q = new URLSearchParams({
     autoplay: '1',
-    mute: startWithSound ? '0' : '1',
+    mute: (forceMute || !startWithSound) ? '1' : '0',
     playsinline: '1',
     controls: '0',
     modestbranding: '1',
@@ -306,7 +325,14 @@ export default function HeroSection() {
     const iframe = ytIframeRef.current;
     if (!iframe) return;
 
-    /** Must not re-`mute` when the user chose Play with sound — old `kickPlayback` timers did that. */
+    const touchLike = heroAutoplayNeedsMutedEmbed();
+
+    /** Establish muted inline playback (required for iOS autoplay). */
+    const kickMutedPlay = () => {
+      ytPostCommand(iframe, 'mute');
+      ytPostCommand(iframe, 'playVideo');
+    };
+
     const syncPlayback = () => {
       const audible = userAudibleRef.current;
       const fadeEnd = window.innerHeight * FADE_SCROLL_VH;
@@ -316,29 +342,77 @@ export default function HeroSection() {
         Math.min(MAX_AUDIBLE_VOLUME, Math.round((1 - p) * MAX_AUDIBLE_VOLUME)),
       );
       ytResetDrive(lastYtDriveRef);
-      if (audible) {
-        /** Start playback before unmute — some WebKit builds ignore unmute until `playVideo` has run. */
-        ytPostCommand(iframe, 'playVideo');
-        ytPostCommand(iframe, 'unMute');
+      if (!audible) {
+        ytApplyDrive(iframe, lastYtDriveRef, {
+          volume: 0,
+          muted: true,
+          paused: p > 0.98,
+        });
+        return;
+      }
+      if (touchLike) {
+        kickMutedPlay();
         ytPostCommand(iframe, 'setVolume', [vol]);
+        ytPostCommand(iframe, 'unMute');
         if (p > 0.98) ytPostCommand(iframe, 'pauseVideo');
         lastYtDriveRef.current = {
           volume: vol,
           muted: false,
           paused: p > 0.98,
         };
-      } else {
-        ytApplyDrive(iframe, lastYtDriveRef, {
-          volume: 0,
-          muted: true,
-          paused: p > 0.98,
-        });
+        return;
       }
+      ytPostCommand(iframe, 'playVideo');
+      ytPostCommand(iframe, 'unMute');
+      ytPostCommand(iframe, 'setVolume', [vol]);
+      if (p > 0.98) ytPostCommand(iframe, 'pauseVideo');
+      lastYtDriveRef.current = {
+        volume: vol,
+        muted: false,
+        paused: p > 0.98,
+      };
+    };
+
+    /** After Play, try unmute + volume without calling `mute` again (avoids undoing a user unmute). */
+    const tryAudibleOnly = () => {
+      if (!userAudibleRef.current || ytIframeRef.current !== iframe) return;
+      const fadeEnd = window.innerHeight * FADE_SCROLL_VH;
+      const p = fadeEnd > 0 ? Math.min(1, Math.max(0, getScrollY() / fadeEnd)) : 0;
+      const vol = Math.max(
+        0,
+        Math.min(MAX_AUDIBLE_VOLUME, Math.round((1 - p) * MAX_AUDIBLE_VOLUME)),
+      );
+      ytPostCommand(iframe, 'playVideo');
+      ytPostCommand(iframe, 'unMute');
+      ytPostCommand(iframe, 'setVolume', [vol]);
+      if (p > 0.98) ytPostCommand(iframe, 'pauseVideo');
+      lastYtDriveRef.current = {
+        volume: vol,
+        muted: false,
+        paused: p > 0.98,
+      };
     };
 
     syncPlayback();
-    window.setTimeout(syncPlayback, 350);
-    window.setTimeout(syncPlayback, 1100);
+    if (touchLike) {
+      [120, 400, 900, 2000, 3600].forEach((ms) => {
+        window.setTimeout(() => {
+          if (ytIframeRef.current !== iframe) return;
+          ytPostCommand(iframe, 'playVideo');
+        }, ms);
+      });
+      window.setTimeout(() => {
+        if (ytIframeRef.current !== iframe) return;
+        tryAudibleOnly();
+      }, 650);
+      window.setTimeout(() => {
+        if (ytIframeRef.current !== iframe) return;
+        tryAudibleOnly();
+      }, 1600);
+    } else {
+      window.setTimeout(syncPlayback, 350);
+      window.setTimeout(syncPlayback, 1100);
+    }
   }, []);
 
   const startPlaySequence = useCallback(() => {
