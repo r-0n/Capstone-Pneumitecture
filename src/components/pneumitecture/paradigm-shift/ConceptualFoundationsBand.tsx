@@ -44,9 +44,6 @@ export function ConceptualFoundationsBand() {
         aria-hidden
       />
       <div className="relative mx-auto max-w-[1580px] px-5 py-14 sm:px-8 md:px-12 md:py-16 lg:px-14 lg:py-20">
-        <p className="mb-2 font-sans text-[9px] font-semibold uppercase tracking-[0.32em] text-structural">
-          Conceptual foundations
-        </p>
         <h2 className="mb-10 max-w-2xl font-display text-2xl font-extralight tracking-tight text-foreground md:text-3xl">
           Three registers that ground the thesis
         </h2>

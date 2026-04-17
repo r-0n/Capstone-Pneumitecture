@@ -35,13 +35,24 @@ function MetaphorVideoSurface({
   clip,
   isFocused,
   onFocusRequest,
+  tone,
 }: {
   clip: MetaphorClip;
   isFocused: boolean;
   onFocusRequest: () => void;
+  tone: "light" | "dark";
 }) {
+  const frame =
+    tone === "light"
+      ? "bg-neutral-100 shadow-[0_20px_48px_-12px_rgba(15,23,42,0.12)] ring-1 ring-neutral-300/80"
+      : "bg-black shadow-[0_28px_60px_-14px_rgba(0,0,0,0.85)] ring-1 ring-white/12";
+  const focusRingOffset =
+    tone === "light"
+      ? "focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+      : "focus-visible:ring-offset-2 focus-visible:ring-offset-black/40";
+
   return (
-    <div className="relative aspect-4/3 w-full overflow-hidden rounded-xl bg-black shadow-[0_28px_60px_-14px_rgba(0,0,0,0.85)] ring-1 ring-white/12">
+    <div className={`relative aspect-4/3 w-full overflow-hidden rounded-xl ${frame}`}>
       {clip.kind === "drive" ? (
         <iframe
           title={clip.title}
@@ -60,7 +71,7 @@ function MetaphorVideoSurface({
         className={
           isFocused
             ? "pointer-events-none absolute inset-0 z-2 rounded-xl"
-            : "absolute inset-0 z-2 cursor-pointer rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-black/40"
+            : `absolute inset-0 z-2 cursor-pointer rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/60 ${focusRingOffset}`
         }
         onClick={(e) => {
           e.stopPropagation();
@@ -94,9 +105,11 @@ function card1LayoutClass(focus: FocusIndex) {
 type MetaphorCardsProps = {
   /** When true, scales min-heights to fit the Paradigm bento cell. */
   fillContainer?: boolean;
+  /** Light: for cream / canvas lower band. Dark: obsidian-style band. */
+  tone?: "light" | "dark";
 };
 
-export function MetaphorCards({ fillContainer = false }: MetaphorCardsProps) {
+export function MetaphorCards({ fillContainer = false, tone = "dark" }: MetaphorCardsProps) {
   const reduceMotion = useReducedMotion();
   const [focus, setFocus] = useState<FocusIndex>(null);
   const stackRef = useRef<HTMLDivElement>(null);
@@ -152,6 +165,12 @@ export function MetaphorCards({ fillContainer = false }: MetaphorCardsProps) {
     setFocus(idx);
   };
 
+  const isLight = tone === "light";
+  const headingClass = isLight
+    ? "text-structural"
+    : "text-white/55";
+  const bodyClass = isLight ? "text-[var(--ink-muted)]" : "text-white/70";
+
   const stackClass =
     fillContainer && focus !== null
       ? "relative mx-auto min-h-[22rem] w-full px-1 py-4 sm:min-h-[26rem] sm:px-3 md:min-h-[30rem] md:py-8"
@@ -167,7 +186,9 @@ export function MetaphorCards({ fillContainer = false }: MetaphorCardsProps) {
         fillContainer ? "flex h-full min-h-0 w-full min-w-0 flex-1 flex-col" : "w-full min-w-0"
       }
     >
-      <p className="mb-4 shrink-0 font-sans text-[11px] font-semibold uppercase tracking-[0.26em] text-white/55 md:text-[12px]">
+      <p
+        className={`mb-4 shrink-0 font-sans text-[11px] font-semibold uppercase tracking-[0.26em] md:text-[12px] ${headingClass}`}
+      >
         3. The metaphor
       </p>
 
@@ -204,6 +225,7 @@ export function MetaphorCards({ fillContainer = false }: MetaphorCardsProps) {
                 clip={METAPHOR_VIDEOS[0]}
                 isFocused={focus === 0}
                 onFocusRequest={() => handleCardFocus(0)}
+                tone={tone}
               />
             </motion.div>
           </motion.div>
@@ -233,6 +255,7 @@ export function MetaphorCards({ fillContainer = false }: MetaphorCardsProps) {
                 clip={METAPHOR_VIDEOS[1]}
                 isFocused={focus === 1}
                 onFocusRequest={() => handleCardFocus(1)}
+                tone={tone}
               />
             </motion.div>
           </motion.div>
@@ -246,7 +269,7 @@ export function MetaphorCards({ fillContainer = false }: MetaphorCardsProps) {
       </div>
 
       <p
-        className={`mx-auto max-w-xl text-center font-sans text-sm font-light leading-relaxed text-white/70 md:text-[15px] ${
+        className={`mx-auto max-w-xl text-center font-sans text-sm font-light leading-relaxed md:text-[15px] ${bodyClass} ${
           fillContainer ? "mt-auto shrink-0 pt-3" : "mt-5"
         }`}
       >

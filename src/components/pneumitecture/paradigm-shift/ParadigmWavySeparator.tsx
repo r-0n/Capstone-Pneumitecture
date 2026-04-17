@@ -67,26 +67,55 @@ type WaveLineProps = {
   className?: string;
 };
 
+/** Organic seam between top (bone) and lower band — tune shape from the section via `waveShape`. */
+export const PARADIGM_WAVE_BACKDROP_SHAPES = {
+  default: {
+    top: "M0,0 L1440,0 L1440,432 C1240,448 1040,522 780,492 C520,462 280,548 0,518 L0,0 Z",
+    bottom: "M0,518 C280,548 520,462 780,492 C1040,522 1240,448 1440,432 L1440,1000 L0,1000 Z",
+    /** Lower-band fill: user-space TL → BR (viewBox 0 0 1440 1000). */
+    lowerGrad: { x1: 0, y1: 518, x2: 1440, y2: 1000 },
+  },
+  subtle: {
+    top: "M0,0 L1440,0 L1440,490 C1260,494 1020,510 780,501 C540,492 260,522 0,506 L0,0 Z",
+    bottom: "M0,506 C260,522 540,492 780,501 C1020,510 1260,494 1440,490 L1440,1000 L0,1000 Z",
+    lowerGrad: { x1: 0, y1: 506, x2: 1440, y2: 1000 },
+  },
+  bold: {
+    top: "M0,0 L1440,0 L1440,418 C1230,428 1040,525 780,485 C520,445 300,575 0,532 L0,0 Z",
+    bottom: "M0,532 C300,575 520,445 780,485 C1040,525 1230,428 1440,418 L1440,1000 L0,1000 Z",
+    lowerGrad: { x1: 0, y1: 532, x2: 1440, y2: 1000 },
+  },
+} as const;
+
+export type ParadigmWaveBackdropShape = keyof typeof PARADIGM_WAVE_BACKDROP_SHAPES;
+
 type WaveBackdropProps = {
   boneFill: string;
-  obsidianFill: string;
+  /** Lower band: first stop (e.g. cream / bone at top-left of lower region). */
+  lowerBandFrom: string;
+  /** Lower band: second stop (e.g. light blue toward bottom-right). */
+  lowerBandTo: string;
+  /** Which seam curve to use — change in ParadigmShiftSection. */
+  waveShape?: ParadigmWaveBackdropShape;
   className?: string;
 };
 
 /**
- * Full-section background: bone above an organic wave, obsidian below.
- * Stretches with the section (preserveAspectRatio none).
+ * Full-section background: bone above an organic wave, lower band with its own fill gradient.
+ * Lower fill runs user-space top-left → bottom-right with eased color stops.
  */
-export function ParadigmWaveBackdrop({ boneFill, obsidianFill, className = "" }: WaveBackdropProps) {
+export function ParadigmWaveBackdrop({
+  boneFill,
+  lowerBandFrom,
+  lowerBandTo,
+  waveShape = "default",
+  className = "",
+}: WaveBackdropProps) {
   const uid = useId().replace(/:/g, "");
-  const strokeGrad = `paradigm-wbd-stroke-${uid}`;
-  // Boundary: dips near the left column, rises toward the right.
-  const boundary =
-    "M0,518 C280,548 520,462 780,492 C1040,522 1240,448 1440,432";
-  const top =
-    "M0,0 L1440,0 L1440,432 C1240,448 1040,522 780,492 C520,462 280,548 0,518 L0,0 Z";
-  const bottom =
-    "M0,518 C280,548 520,462 780,492 C1040,522 1240,448 1440,432 L1440,1000 L0,1000 Z";
+  const bottomGrad = `paradigm-wbd-bottom-${uid}`;
+  const geom = PARADIGM_WAVE_BACKDROP_SHAPES[waveShape] ?? PARADIGM_WAVE_BACKDROP_SHAPES.default;
+  const { top, bottom, lowerGrad } = geom;
+
   return (
     <svg
       className={`pointer-events-none absolute inset-0 h-full w-full min-h-[36rem] ${className}`}
@@ -95,22 +124,22 @@ export function ParadigmWaveBackdrop({ boneFill, obsidianFill, className = "" }:
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden
     >
-      <path fill={boneFill} d={top} />
-      <path fill={obsidianFill} d={bottom} />
-      <path
-        d={boundary}
-        fill="none"
-        stroke={`url(#${strokeGrad})`}
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
       <defs>
-        <linearGradient id={strokeGrad} x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="var(--accent-soft)" stopOpacity="0.35" />
-          <stop offset="50%" stopColor="var(--accent-cyan)" stopOpacity="0.45" />
-          <stop offset="100%" stopColor="var(--accent-soft)" stopOpacity="0.3" />
+        <linearGradient
+          id={bottomGrad}
+          gradientUnits="userSpaceOnUse"
+          x1={lowerGrad.x1}
+          y1={lowerGrad.y1}
+          x2={lowerGrad.x2}
+          y2={lowerGrad.y2}
+        >
+          <stop offset="0%" stopColor={lowerBandFrom} />
+          <stop offset="40%" stopColor={lowerBandFrom} />
+          <stop offset="100%" stopColor={lowerBandTo} />
         </linearGradient>
       </defs>
+      <path fill={boneFill} d={top} />
+      <path fill={`url(#${bottomGrad})`} d={bottom} />
     </svg>
   );
 }

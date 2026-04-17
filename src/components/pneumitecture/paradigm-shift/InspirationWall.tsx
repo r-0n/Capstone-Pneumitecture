@@ -120,16 +120,38 @@ export function InspirationWall({ fillContainer = false, tone = "dark" }: Inspir
           2. The inspiration
         </p>
         <p className={`max-w-[10rem] text-right font-sans text-[9px] font-light leading-snug ${hintClass}`}>
-          Click a card or dot to bring it forward · pauses on hover
+          Click the stack or a thumbnail to focus · pauses on hover
         </p>
       </div>
 
-      <div className="relative mt-2 flex min-h-0 flex-1 flex-col gap-4">
+      <div className="relative mt-2 flex min-h-0 flex-1 flex-col gap-3">
+        {/* Thumbnails above the stack so they never crowd the in-image caption */}
+        <div className="flex shrink-0 flex-wrap items-center justify-center gap-2 px-1" role="tablist" aria-label="Inspiration slides">
+          {SLIDES.map((s) => {
+            const active = s.id === frontId;
+            return (
+              <button
+                key={s.id}
+                type="button"
+                role="tab"
+                aria-selected={active}
+                onClick={() => bringToFront(s.id)}
+                title={s.caption}
+                className={`relative h-11 w-11 shrink-0 overflow-hidden rounded-md border transition ${
+                  active ? thumbActive : thumbIdle
+                }`}
+              >
+                <Image src={s.src} alt="" fill className="object-cover" sizes="44px" />
+              </button>
+            );
+          })}
+        </div>
+
         <div
           className={
             fillContainer
-              ? "relative mx-auto aspect-[16/11] w-full min-h-[200px] max-h-[min(48vh,380px)] max-w-xl flex-1 lg:mx-0"
-              : "relative mx-auto aspect-[16/11] w-full max-w-xl flex-1 lg:mx-0"
+              ? "relative mx-auto aspect-[16/11] w-full min-h-[200px] max-h-[min(48vh,380px)] max-w-xl min-w-0 flex-1 lg:mx-0"
+              : "relative mx-auto aspect-[16/11] w-full max-w-xl min-w-0 flex-1 lg:mx-0"
           }
           style={{ perspective: 1600 }}
         >
@@ -143,7 +165,7 @@ export function InspirationWall({ fillContainer = false, tone = "dark" }: Inspir
                 type="button"
                 layout
                 aria-pressed={isFront}
-                aria-label={`Show ${slide.caption}`}
+                aria-label={slide.alt}
                 className={`absolute inset-x-[4%] top-[6%] aspect-[16/11] overflow-hidden rounded-xl border text-left outline-none transition-shadow focus-visible:ring-2 focus-visible:ring-cyan-400/60 ${
                   isFront ? cardBorderFront : cardBorderBack
                 }`}
@@ -162,7 +184,7 @@ export function InspirationWall({ fillContainer = false, tone = "dark" }: Inspir
               >
                 <Image
                   src={slide.src}
-                  alt={slide.alt}
+                  alt=""
                   fill
                   className="object-cover"
                   sizes="(max-width:1024px) 92vw, 420px"
@@ -170,41 +192,25 @@ export function InspirationWall({ fillContainer = false, tone = "dark" }: Inspir
                 />
                 <div
                   className={`pointer-events-none absolute inset-0 bg-gradient-to-t via-transparent to-transparent ${
-                    isLight ? "from-black/25" : "from-black/55"
-                  } ${isFront ? "opacity-90" : "opacity-100"}`}
+                    isLight ? "from-black/30" : "from-black/55"
+                  } ${isFront ? "opacity-80" : "opacity-100"}`}
                 />
                 {isFront && (
                   <motion.p
                     layout
-                    className={`absolute inset-x-0 bottom-0 px-3 py-2 text-center font-sans text-[9px] font-medium uppercase tracking-[0.2em] ${isLight ? "text-neutral-800" : "text-white/90"}`}
-                    initial={{ opacity: 0, y: 6 }}
+                    className="absolute inset-x-0 bottom-0 z-10 max-h-[42%] overflow-y-auto px-3 py-2.5 text-left font-sans text-[11px] font-light leading-snug text-white md:text-[12px] md:leading-snug"
+                    style={{
+                      textShadow:
+                        "0 0 1px rgba(0,0,0,0.9), 0 1px 3px rgba(0,0,0,0.95), 0 0 14px rgba(0,0,0,0.65)",
+                    }}
+                    initial={{ opacity: 0, y: 4 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.25 }}
+                    transition={{ duration: 0.22 }}
                   >
-                    {slide.caption}
+                    {slide.alt}
                   </motion.p>
                 )}
               </motion.button>
-            );
-          })}
-        </div>
-
-        <div className="flex flex-wrap items-center justify-center gap-2 px-1" role="tablist" aria-label="Inspiration slides">
-          {SLIDES.map((s) => {
-            const active = s.id === frontId;
-            return (
-              <button
-                key={s.id}
-                type="button"
-                role="tab"
-                aria-selected={active}
-                onClick={() => bringToFront(s.id)}
-                  className={`relative h-11 w-11 shrink-0 overflow-hidden rounded-md border transition ${
-                  active ? thumbActive : thumbIdle
-                }`}
-              >
-                <Image src={s.src} alt="" fill className="object-cover" sizes="44px" />
-              </button>
             );
           })}
         </div>

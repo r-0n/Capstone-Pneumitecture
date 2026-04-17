@@ -8,19 +8,42 @@ import { InspirationWall } from "@/components/pneumitecture/paradigm-shift/Inspi
 import { MetaphorCards } from "@/components/pneumitecture/paradigm-shift/MetaphorCards";
 import { ArtifactsPeelStack } from "@/components/pneumitecture/paradigm-shift/ArtifactsPeelStack";
 import { ConceptualFoundationsBand } from "@/components/pneumitecture/paradigm-shift/ConceptualFoundationsBand";
-import { ParadigmWaveBackdrop, ParadigmWaveFill } from "@/components/pneumitecture/paradigm-shift/ParadigmWavySeparator";
+import {
+  ParadigmWaveBackdrop,
+  ParadigmWaveFill,
+  type ParadigmWaveBackdropShape,
+} from "@/components/pneumitecture/paradigm-shift/ParadigmWavySeparator";
 import DesignConcept from "@/components/pneumitecture/DesignConcept";
 
 const BREATHING_DOME_SKETCH = publicAssetPath("/images/breathing-dome-sketch.png");
 
 const BONE = "#fbfbf9";
-const OBSIDIAN = "#121212";
+/** Lower wave band gradient stops (swap order to put more blue at the seam). */
+const LOWER_WAVE_CREAM = BONE;
+const LOWER_WAVE_SKY = "#d8e8f4";
+
+/**
+ * Seam curve between row 1 and row 2 (`default` | `subtle` | `bold`).
+ * See `PARADIGM_WAVE_BACKDROP_SHAPES` in ParadigmWavySeparator.tsx for geometry.
+ */
+const PARADIGM_LOWER_WAVE_SHAPE: ParadigmWaveBackdropShape = "default";
+
+/**
+ * Mobile ribbon between inspiration and row 2 — FILL_PATHS variant `1`…`4` (taller / different bump).
+ */
+const PARADIGM_MOBILE_LOWER_WAVE_VARIANT = 2 as 1 | 2 | 3 | 4;
 
 const introPad = "mx-auto max-w-[min(100%,1200px)] px-5 sm:px-8 md:px-12 lg:px-14";
 const cellPad = "h-full px-5 py-14 sm:px-8 sm:py-16 md:px-10 md:py-20 lg:px-10 lg:py-20 xl:px-12";
 
 const topCellBorder = "border-b border-[var(--hairline)] lg:border-r lg:border-b-0";
-const darkCellBorder = "border-b border-white/[0.08] lg:border-r lg:border-b-0";
+const lowerRowBorder = "border-b border-[var(--hairline)] lg:border-r lg:border-b-0";
+
+/**
+ * Pulls the second Concept grid row (Metaphor + Artifacts) upward.
+ * Tune this string only: more negative = higher (e.g. "-0.5rem", "-1.25rem", "-2.5rem", "-4rem").
+ */
+const PARADIGM_SECOND_ROW_LIFT = "-4.25rem";
 
 export default function ParadigmShiftSection() {
   return (
@@ -28,34 +51,27 @@ export default function ParadigmShiftSection() {
       id="paradigm-shift"
       className="relative isolate scroll-mt-24 overflow-x-hidden bg-bone text-foreground"
     >
-      {/* Wave + watermark only cover intro + 2×2 so DesignConcept stays on bone */}
+      {/* Wave only covers intro + 2×2 so DesignConcept stays on bone */}
       <div className="relative isolate overflow-x-hidden">
-        <ParadigmWaveBackdrop boneFill={BONE} obsidianFill={OBSIDIAN} className="z-0" />
-
-        <div
-          className="pointer-events-none absolute inset-x-0 top-0 z-[1] flex justify-center overflow-hidden px-4 pt-6 sm:pt-10 md:pt-14"
-          aria-hidden
-        >
-          <p className="max-w-[100%] text-center font-display text-[clamp(1.85rem,11vw,7rem)] font-extralight uppercase leading-none tracking-[0.08em] text-[var(--ink)] opacity-[0.07] select-none">
-            The paradigm shift
-          </p>
-        </div>
+        <ParadigmWaveBackdrop
+          boneFill={BONE}
+          lowerBandFrom={LOWER_WAVE_CREAM}
+          lowerBandTo={LOWER_WAVE_SKY}
+          waveShape={PARADIGM_LOWER_WAVE_SHAPE}
+          className="z-0"
+        />
 
         <div className="relative z-[2]">
           <div className={`${introPad} border-b border-[var(--hairline)] pb-8 pt-12 sm:pb-10 sm:pt-14 md:pt-16`}>
-          <SectionLabel number="02" text="Concept" textFirst />
-          <ScrollReveal>
-            <h2 className="relative mt-3 max-w-[min(100%,40rem)] font-display text-[clamp(1.65rem,3.6vw,2.75rem)] font-light leading-[1.1] tracking-tight text-[var(--ink)]">
-              A Shift in Paradigm
-            </h2>
-            <p className="relative mt-4 max-w-[min(100%,34rem)] font-sans text-[15px] font-light leading-relaxed text-[var(--ink-muted)] md:text-[16px] md:leading-[1.65]">
-              Philosophy, reference, motion, and artifact—each register opens a different conversation before
-              the work moves into process and system.
-            </p>
-          </ScrollReveal>
+            <SectionLabel number="02" text="Concept" textFirst />
+            <ScrollReveal>
+              <h2 className="relative mt-3 max-w-[min(100%,40rem)] font-display text-[clamp(1.35rem,2.75vw,2.1rem)] font-light leading-[1.12] tracking-tight text-[var(--ink)]">
+                A Shift in Paradigm
+              </h2>
+            </ScrollReveal>
           </div>
 
-          {/* 2×2 · top row: light · bottom row: dark (matches reference) */}
+          {/* 2×2 · top row: light · bottom row: cream→sky (backdrop) */}
           <div className="relative mx-auto grid max-w-[1800px] grid-cols-1 lg:grid-cols-2 lg:items-stretch">
           {/* 1 · Philosophy */}
           <div className={`relative min-h-0 ${topCellBorder}`}>
@@ -101,34 +117,44 @@ export default function ParadigmShiftSection() {
 
           {/* Mobile-only seam where the static backdrop doesn’t match the stack order */}
           <div className="col-span-full lg:hidden">
-            <ParadigmWaveFill topFill={BONE} bottomFill={OBSIDIAN} variant={2} className="h-12 sm:h-16" />
+            <ParadigmWaveFill
+              topFill={BONE}
+              bottomFill={LOWER_WAVE_SKY}
+              variant={PARADIGM_MOBILE_LOWER_WAVE_VARIANT}
+              className="h-12 sm:h-16"
+            />
           </div>
 
-          {/* 3 · Metaphor */}
-          <div className={`relative min-h-0 text-bone ${darkCellBorder}`}>
-            <div
-              className="pointer-events-none absolute inset-0 opacity-40"
-              style={{
-                background: "radial-gradient(ellipse 75% 50% at 85% 25%, rgba(107, 140, 255, 0.1), transparent 52%)",
-              }}
-              aria-hidden
-            />
-            <div className={`relative z-[1] min-h-0 ${cellPad}`}>
-              <MetaphorCards />
+          <div
+            className="relative z-[3] col-span-full grid min-h-0 grid-cols-1 lg:col-span-2 lg:grid-cols-2 lg:items-stretch"
+            style={{ marginTop: PARADIGM_SECOND_ROW_LIFT }}
+          >
+            {/* 3 · Metaphor */}
+            <div className={`relative min-h-0 text-foreground ${lowerRowBorder}`}>
+              <div
+                className="pointer-events-none absolute inset-0 opacity-25"
+                style={{
+                  background: "radial-gradient(ellipse 75% 50% at 85% 25%, rgba(107, 140, 255, 0.12), transparent 52%)",
+                }}
+                aria-hidden
+              />
+              <div className={`relative z-[1] min-h-0 ${cellPad}`}>
+                <MetaphorCards tone="light" />
+              </div>
             </div>
-          </div>
 
-          {/* 4 · Artifacts */}
-          <div className="relative min-h-0 text-bone">
-            <div
-              className="pointer-events-none absolute inset-0 opacity-35"
-              style={{
-                background: "radial-gradient(ellipse 80% 55% at 20% 20%, rgba(94, 184, 212, 0.08), transparent 55%)",
-              }}
-              aria-hidden
-            />
-            <div className={`relative z-[1] min-h-0 ${cellPad}`}>
-              <ArtifactsPeelStack tone="dark" />
+            {/* 4 · Artifacts */}
+            <div className="relative min-h-0 text-foreground">
+              <div
+                className="pointer-events-none absolute inset-0 opacity-20"
+                style={{
+                  background: "radial-gradient(ellipse 80% 55% at 20% 20%, rgba(94, 184, 212, 0.1), transparent 55%)",
+                }}
+                aria-hidden
+              />
+              <div className={`relative z-[1] min-h-0 ${cellPad}`}>
+                <ArtifactsPeelStack tone="light" />
+              </div>
             </div>
           </div>
           </div>
