@@ -35,7 +35,10 @@
 // 1) FLOOR HEIGHT (world Y — all “ground” equipment uses this exact Y)
 // -----------------------------------------------------------------------------
 
-/** Every floor node (pump, manifold, controller, 9 valves) uses this Y. */
+/**
+ * World **Y** of the **XZ floor plane** for pump, manifold, valves, and manifold box base.
+ * Control Logic may use its own **Y** via `SYSTEM_SCHEMATIC_CONTROLLER_Y`.
+ */
 export const SYSTEM_SCHEMATIC_Y_GROUND = 216;
 
 // -----------------------------------------------------------------------------
@@ -44,7 +47,8 @@ export const SYSTEM_SCHEMATIC_Y_GROUND = 216;
 
 /**
  * Physical placement in **world units** (same space as projection).
- * - **supply**: pump anchor; manifold/controller = pump + offsets (same Y as ground).
+ * - **supply**: pump anchor; manifold = pump + manifold offsets (on `Y_GROUND`). Control Logic uses
+ *   `SYSTEM_SCHEMATIC_CONTROLLER_*` below (full world X/Y/Z).
  * - **valveGrid**: lower-left of the 3×3; `spacingX` along +X, `spacingZ` along +Z.
  * - **cellWall.x**: world X of the YZ wall (cells + wall tint). Frame uses this + `SYSTEM_SCHEMATIC_FRAME_OFFSET_X`.
  */
@@ -61,13 +65,19 @@ export const SYSTEM_SCHEMATIC_LAYOUT = {
   supply: {
     pumpX: 300,
     pumpZ: 250,
-    /** Manifold = pump + offsets. Z offset 0 → straight +X air run to manifold in world space. */
+    /** Manifold = pump + offsets (same **Y** as `Y_GROUND`). */
     manifoldOffsetX: 250,
-    manifoldOffsetZ: 0, 
-    controllerOffsetX: 250,
-    controllerOffsetZ: -120, // Moved controller well out of the air-path
+    manifoldOffsetZ: -70,
   },
 } as const;
+
+/**
+ * **Control Logic** — explicit **world X / Y / Z** (same space as projection). Independent of
+ * `supply.pumpX` / `pumpZ`. With **+Y = up**, **decrease Y** to move the node “down”.
+ */
+export const SYSTEM_SCHEMATIC_CONTROLLER_X = 550;
+export const SYSTEM_SCHEMATIC_CONTROLLER_Y = -8;
+export const SYSTEM_SCHEMATIC_CONTROLLER_Z = 130;
 
 // -----------------------------------------------------------------------------
 // 3) SVG “graph” canvas (viewBox pixel size — projection maps into this box)
@@ -186,6 +196,20 @@ export const SYSTEM_SCHEMATIC_CELL_GRID_SPACING_Z = 120;
  * Keeps chips scaling with the diagram like edges and the XYZ trihedral (unlike fixed CSS px).
  */
 export const SYSTEM_SCHEMATIC_NODE_CHIP_VIEWBOX = 48;
+
+/**
+ * **Manifold** is drawn as a **3D box** in world space (bottom face on the floor plane at the
+ * manifold node’s **Y**, centered on its **X / Z**). Sizes are **full spans** along each axis.
+ */
+export const SYSTEM_SCHEMATIC_MANIFOLD_BOX_SIZE_X = 72;
+export const SYSTEM_SCHEMATIC_MANIFOLD_BOX_SIZE_Z = 250;
+export const SYSTEM_SCHEMATIC_MANIFOLD_BOX_SIZE_Y = 48;
+
+/** Face fill alpha (0–1); sides use multiples of this for a simple light/dark read. */
+export const SYSTEM_SCHEMATIC_MANIFOLD_BOX_FACE_ALPHA = 0.26;
+
+/** Invisible hover target in **SVG viewBox units** (circle under pointer capture). */
+export const SYSTEM_SCHEMATIC_MANIFOLD_NODE_HIT_R = 44;
 
 // -----------------------------------------------------------------------------
 // 9) Dragging nodes (world units clamped while pointer moves)

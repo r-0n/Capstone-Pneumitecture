@@ -20,8 +20,6 @@ export const SYSTEM_SCHEMATIC_LAYOUT = {
     pumpZ: 290,
     manifoldOffsetX: 170,
     manifoldOffsetZ: 0,
-    controllerOffsetX: 412,
-    controllerOffsetZ: 32,
   },
 } as const;
 

@@ -13,6 +13,9 @@ import {
   SYSTEM_SCHEMATIC_CELL_GRID_ORIGIN_Z,
   SYSTEM_SCHEMATIC_CELL_GRID_SPACING_Y,
   SYSTEM_SCHEMATIC_CELL_GRID_SPACING_Z,
+  SYSTEM_SCHEMATIC_CONTROLLER_X,
+  SYSTEM_SCHEMATIC_CONTROLLER_Y,
+  SYSTEM_SCHEMATIC_CONTROLLER_Z,
   SYSTEM_SCHEMATIC_FRAME_OFFSET_X,
   SYSTEM_SCHEMATIC_FRAME_Y,
   SYSTEM_SCHEMATIC_FRAME_Z,
@@ -20,6 +23,11 @@ import {
   SYSTEM_SCHEMATIC_GRAPH_H,
   SYSTEM_SCHEMATIC_GRAPH_W,
   SYSTEM_SCHEMATIC_LAYOUT,
+  SYSTEM_SCHEMATIC_MANIFOLD_BOX_FACE_ALPHA,
+  SYSTEM_SCHEMATIC_MANIFOLD_BOX_SIZE_X,
+  SYSTEM_SCHEMATIC_MANIFOLD_BOX_SIZE_Y,
+  SYSTEM_SCHEMATIC_MANIFOLD_BOX_SIZE_Z,
+  SYSTEM_SCHEMATIC_MANIFOLD_NODE_HIT_R,
   SYSTEM_SCHEMATIC_MANIFOLD_VALVE_LANE_BASE,
   SYSTEM_SCHEMATIC_MANIFOLD_VALVE_LANE_STEP,
   SYSTEM_SCHEMATIC_NODE_CHIP_VIEWBOX,
@@ -136,9 +144,9 @@ const BASE_NODES: NodeDef[] = (() => {
     },
     {
       id: "controller",
-      x: s.pumpX + s.controllerOffsetX,
-      y,
-      z: s.pumpZ + s.controllerOffsetZ,
+      x: SYSTEM_SCHEMATIC_CONTROLLER_X,
+      y: SYSTEM_SCHEMATIC_CONTROLLER_Y,
+      z: SYSTEM_SCHEMATIC_CONTROLLER_Z,
       label: "Control Logic",
       icon: "</>",
       color: "#d983ff",
@@ -189,7 +197,6 @@ const SCHEMATIC_NODES: NodeDef[] = [...BASE_NODES, ...VALVE_NODES, ...CELL_NODES
 
 const EDGES: EdgeDef[] = [
   { a: "pump", b: "manifold", type: "air" },
-  { a: "controller", b: "manifold", type: "electrical" },
   ...VALVE_NODES.flatMap((v, i) => [
     { a: "manifold", b: v.id, type: "air" as const },
     { a: "controller", b: v.id, type: "electrical" as const },
@@ -224,10 +231,13 @@ function projectCoords(x: number, y: number, z: number, yaw: number, pitch: numb
   return { x: px, y: py, depth: yzZ };
 }
 
-function isXZFloorSchematicNode(n: NodeDef) {
+/** Pump / manifold / controller / valves share the “floor equipment” chip sizing (controller Y may differ from `Y_GROUND`). */
+function isFloorStyleSchematicChip(n: NodeDef) {
   return (
-    Math.abs(n.y - Y_GROUND) < 0.5 &&
-    (n.id.startsWith("valve-") || n.id === "pump" || n.id === "manifold" || n.id === "controller")
+    n.id === "pump" ||
+    n.id === "manifold" ||
+    n.id === "controller" ||
+    n.id.startsWith("valve-")
   );
 }
 
@@ -244,7 +254,8 @@ function valveNumberFromId(id: string): number {
  * Axis-aligned L / U routes in world space (orthogonal “duct” runs), then projected to SVG.
  *
  * Story: **pump → manifold** is a **straight** run in the XZ floor plane; **manifold → valves** use offset bus lanes;
- * **valve → cell** (riser to wall then up YZ). Electrical uses a **high-Z** trunk so it does not sit on the air header.
+ * **valve → cell** (riser to wall then up YZ). **Controller → valve** (electrical): +X at controller **Y**, then along **Z**
+ * to the valve column, then **+Y** to the valve on the floor plane.
  */
 function getEdgeWorldWaypoints(edge: EdgeDef, m: Record<string, NodeDef>): Array<[number, number, number]> {
   const a = m[edge.a];
@@ -269,15 +280,6 @@ function getEdgeWorldWaypoints(edge: EdgeDef, m: Record<string, NodeDef>): Array
     ];
   }
 
-  /** Electrical back to manifold: stay at controller Z (above valve rows), run in X, then drop in Z. */
-  if (idA === "controller" && idB === "manifold") {
-    return [
-      [ax, ay, az],
-      [bx, ay, az],
-      [bx, ay, bz],
-    ];
-  }
-
   /**
    * Manifold → valve (air): short Z “bus lane” per port so nine runs do not share one pixel stack,
    * then +X along that lane, then Z into the valve (still axis-aligned).
@@ -293,12 +295,16 @@ function getEdgeWorldWaypoints(edge: EdgeDef, m: Record<string, NodeDef>): Array
     ];
   }
 
-  /** Controller → valve (electrical): run in X at controller Z (high trunk), then drop in Z to the valve. */
+  /**
+   * Controller → valve (electrical): +X at controller **Y** and Z, then **Z** to the valve’s Z (same as manifold→valve
+   * turn style), then **+Y** from that point up to the solenoid (floor plane).
+   */
   if (idA === "controller" && idB.startsWith("valve-")) {
     return [
       [ax, ay, az],
       [bx, ay, az],
       [bx, ay, bz],
+      [bx, by, bz],
     ];
   }
 
@@ -362,10 +368,9 @@ function getEdgeLineStyle(edge: EdgeDef, active: boolean) {
     }
   }
   if (edge.type === "electrical") {
-    const toManifold = edge.a === "controller" && edge.b === "manifold";
     return {
-      stroke: active ? "#fceaff" : toManifold ? "#e6b4ff" : "#f0c8ff",
-      width: w(toManifold ? 2.1 : 1.95),
+      stroke: active ? "#fceaff" : "#f0c8ff",
+      width: w(1.95),
       opacity: active ? 1 : 0.9,
       dash: "8 7",
       filter: "drop-shadow(0 0 2px rgba(36,0,48,0.45))",
@@ -412,6 +417,49 @@ function worldQuadToSvgPoints(
     .map(([x, y, z]) => projectCoords(x, y, z, yaw, pitch, zoom))
     .map((p) => `${p.x},${p.y}`)
     .join(" ");
+}
+
+function hexToRgba(hex: string, alpha: number) {
+  const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
+  if (!m) return `rgba(125,195,255,${alpha})`;
+  const v = parseInt(m[1], 16);
+  const r = (v >> 16) & 255;
+  const g = (v >> 8) & 255;
+  const b = v & 255;
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+type ManifoldFaceDef = {
+  key: string;
+  corners: ReadonlyArray<[number, number, number]>;
+  fillAlpha: number;
+};
+
+/** Six faces of the manifold prism (world coords); caller sorts by projected depth. */
+function manifoldBoxFaceDefs(n: NodeDef): ManifoldFaceDef[] {
+  const mx = n.x;
+  const my = n.y;
+  const mz = n.z;
+  const hx = SYSTEM_SCHEMATIC_MANIFOLD_BOX_SIZE_X / 2;
+  const hz = SYSTEM_SCHEMATIC_MANIFOLD_BOX_SIZE_Z / 2;
+  const h = SYSTEM_SCHEMATIC_MANIFOLD_BOX_SIZE_Y;
+  const b0: [number, number, number] = [mx - hx, my, mz - hz];
+  const b1: [number, number, number] = [mx + hx, my, mz - hz];
+  const b2: [number, number, number] = [mx + hx, my, mz + hz];
+  const b3: [number, number, number] = [mx - hx, my, mz + hz];
+  const t0: [number, number, number] = [b0[0], my + h, b0[2]];
+  const t1: [number, number, number] = [b1[0], my + h, b1[2]];
+  const t2: [number, number, number] = [b2[0], my + h, b2[2]];
+  const t3: [number, number, number] = [b3[0], my + h, b3[2]];
+  const a = SYSTEM_SCHEMATIC_MANIFOLD_BOX_FACE_ALPHA;
+  return [
+    { key: "bottom", corners: [b0, b1, b2, b3], fillAlpha: a * 0.35 },
+    { key: "top", corners: [t3, t2, t1, t0], fillAlpha: a * 1.15 },
+    { key: "x-", corners: [b0, b3, t3, t0], fillAlpha: a * 0.78 },
+    { key: "x+", corners: [b1, b2, t2, t1], fillAlpha: a * 0.92 },
+    { key: "z-", corners: [b0, b1, t1, t0], fillAlpha: a * 0.68 },
+    { key: "z+", corners: [b3, b2, t2, t3], fillAlpha: a * 1.0 },
+  ];
 }
 
 function SystemSchematic() {
@@ -812,10 +860,57 @@ function SystemSchematic() {
             </g>
             {nodesSortedByDepth.map((n) => {
               const p = projectedMap[n.id]!;
-              const floor = isXZFloorSchematicNode(n);
-              const chip = SYSTEM_SCHEMATIC_NODE_CHIP_VIEWBOX;
-              const baseR = (chip / 2) * (floor ? 1.06 : 0.9);
               const isActive = activeId === n.id;
+              if (n.id === "manifold") {
+                const faces = manifoldBoxFaceDefs(n).sort(
+                  (a, b) =>
+                    avgFaceDepth(a.corners, camera.yaw, camera.pitch, camera.zoom) -
+                    avgFaceDepth(b.corners, camera.yaw, camera.pitch, camera.zoom),
+                );
+                return (
+                  <g
+                    key={n.id}
+                    data-node-btn="true"
+                    className="pointer-events-auto outline-none"
+                    onMouseEnter={() => setActiveId(n.id)}
+                    onMouseLeave={() => setActiveId(null)}
+                    style={{ cursor: "pointer" }}
+                    aria-label={n.label}
+                  >
+                    <motion.circle
+                      cx={p.x}
+                      cy={p.y}
+                      r={SYSTEM_SCHEMATIC_MANIFOLD_NODE_HIT_R * 1.35}
+                      fill="url(#pulseGlow)"
+                      pointerEvents="none"
+                      animate={{ opacity: isActive ? 0.45 : 0 }}
+                      transition={{ duration: 0.24 }}
+                    />
+                    {faces.map((f) => (
+                      <polygon
+                        key={f.key}
+                        points={worldQuadToSvgPoints(f.corners, camera.yaw, camera.pitch, camera.zoom)}
+                        fill={hexToRgba(n.color, Math.min(1, f.fillAlpha))}
+                        stroke={n.color}
+                        strokeOpacity={isActive ? 0.95 : 0.55}
+                        strokeWidth={isActive ? 2.1 : 1.15}
+                        strokeLinejoin="round"
+                        pointerEvents="none"
+                      />
+                    ))}
+                    <circle
+                      cx={p.x}
+                      cy={p.y}
+                      r={SYSTEM_SCHEMATIC_MANIFOLD_NODE_HIT_R}
+                      fill="transparent"
+                      pointerEvents="all"
+                    />
+                  </g>
+                );
+              }
+              const floorChip = isFloorStyleSchematicChip(n);
+              const chip = SYSTEM_SCHEMATIC_NODE_CHIP_VIEWBOX;
+              const baseR = (chip / 2) * (floorChip ? 1.06 : 0.9);
               return (
                 <g
                   key={n.id}
